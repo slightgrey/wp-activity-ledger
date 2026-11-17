@@ -1,0 +1,24 @@
+# Normalise line endings in the repo.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.zip binary
+
+# Dev-only files left out of `git archive` exports.
+/.gitattributes      export-ignore
+/.gitignore          export-ignore
+/admin-app           export-ignore
+/tests               export-ignore
+/scripts             export-ignore
+/screenshots         export-ignore
+/node_modules        export-ignore
+/phpcs.xml.dist      export-ignore
+/phpstan.neon.dist   export-ignore
+/phpunit.xml.dist    export-ignore
+/phpunit-integration.xml.dist export-ignore
+/package.json        export-ignore
+/package-lock.json   export-ignore
+/vite.config.js      export-ignore
+/tailwind.config.js  export-ignore
+/postcss.config.js   export-ignore
+/eslint.config.js    export-ignore

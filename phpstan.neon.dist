@@ -1,0 +1,11 @@
+includes:
+	- vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+	level: 6
+	phpVersion: 80100
+	paths:
+		- wp-activity-ledger.php
+		- src
+	bootstrapFiles:
+		- tests/phpstan-bootstrap.php
