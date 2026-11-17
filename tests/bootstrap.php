@@ -258,7 +258,7 @@ if ( ! function_exists( 'is_serialized' ) ) {
 
 		$data = trim( $data );
 
-		if ( 'N;' === $data ) {
+		if ( 'N;' === $data || 'b:0;' === $data ) {
 			return true;
 		}
 
