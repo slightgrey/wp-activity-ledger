@@ -50,7 +50,7 @@ final class PluginSensor implements SensorInterface {
 	}
 
 	/**
-	 * Records an activation.
+	 * Records an activation (except this plugin's own; the Activator logs system.activated).
 	 *
 	 * @param string $plugin       Plugin file, e.g. "akismet/akismet.php".
 	 * @param bool   $network_wide Whether activated network-wide.
@@ -58,6 +58,10 @@ final class PluginSensor implements SensorInterface {
 	 * @return void
 	 */
 	public function on_activated( $plugin, $network_wide = false ): void {
+		if ( self::is_self( (string) $plugin ) ) {
+			return;
+		}
+
 		$this->record( 'plugin.activated', (string) $plugin, self::details( (string) $plugin ), array( 'network_wide' => (bool) $network_wide ) );
 	}
 

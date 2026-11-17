@@ -278,8 +278,8 @@ final class PostSensor implements SensorInterface {
 		}
 
 		foreach ( self::FIELDS as $field ) {
-			if ( 'post_date' === $field && self::has_floating_date( $post_before ) && self::has_floating_date( $post_after ) ) {
-				continue; // Drafts without a set date get "now" on every save; that's not an edit.
+			if ( 'post_date' === $field && self::has_floating_date( $post_before ) ) {
+				continue; // A draft's date floats ("now" on every save) until it is set or published; not an edit.
 			}
 
 			$activity->change( $field, $post_before->$field, $post_after->$field );

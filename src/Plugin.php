@@ -28,6 +28,7 @@ use WPActivityLedger\Sensors\MetaWatcher;
 use WPActivityLedger\Sensors\OptionSensor;
 use WPActivityLedger\Sensors\PluginSensor;
 use WPActivityLedger\Sensors\PostSensor;
+use WPActivityLedger\Sensors\SelfSensor;
 use WPActivityLedger\Sensors\SensorInterface;
 use WPActivityLedger\Sensors\SensorRegistry;
 use WPActivityLedger\Sensors\TermSensor;
@@ -225,6 +226,7 @@ final class Plugin {
 			'autoupdate' => new AutoUpdateSensor( $this->recorder(), $this->differ() ),
 			'options'    => new OptionSensor( $this->recorder(), $this->differ(), $this->settings() ),
 			'tools'      => new ToolsSensor( $this->recorder() ),
+			'self'       => new SelfSensor( $this->recorder(), $this->differ() ),
 		);
 
 		return $this->sensors;

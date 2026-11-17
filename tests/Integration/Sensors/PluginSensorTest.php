@@ -70,10 +70,12 @@ final class PluginSensorTest extends IntegrationTestCase {
 	 */
 	public function test_own_deactivation_is_skipped(): void {
 		$this->as_user( 'administrator' );
-		$self = plugin_basename( WPAL_FILE );
+		$self  = plugin_basename( WPAL_FILE );
+		$start = self::max_event_id();
 
+		do_action( 'activated_plugin', $self, false );
 		do_action( 'deactivated_plugin', $self, false );
 
-		$this->assertSame( array(), self::events_for( $self ) );
+		$this->assertSame( array(), self::newer_than( self::events_for( $self ), $start ) );
 	}
 }
