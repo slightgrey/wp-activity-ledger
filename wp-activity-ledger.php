@@ -64,4 +64,7 @@ if ( ! file_exists( WPAL_DIR . 'vendor/autoload.php' ) ) {
 
 require_once WPAL_DIR . 'vendor/autoload.php';
 
+register_activation_hook( __FILE__, array( WPActivityLedger\Lifecycle\Activator::class, 'activate' ) );
+register_deactivation_hook( __FILE__, array( WPActivityLedger\Lifecycle\Deactivator::class, 'deactivate' ) );
+
 add_action( 'plugins_loaded', array( WPActivityLedger\Plugin::class, 'boot' ) );
