@@ -60,6 +60,13 @@ final class WooCommerce implements IntegrationInterface {
 	private WooObjectTracker $tracker;
 
 	/**
+	 * Records products, variations, stock and coupons.
+	 *
+	 * @var WooCatalogWatcher
+	 */
+	private WooCatalogWatcher $catalog;
+
+	/**
 	 * Creates the integration.
 	 *
 	 * @param Recorder $recorder Recorder.
@@ -70,6 +77,7 @@ final class WooCommerce implements IntegrationInterface {
 		private readonly Differ $differ
 	) {
 		$this->tracker = new WooObjectTracker( $recorder, $differ );
+		$this->catalog = new WooCatalogWatcher( $recorder, $differ, $this->tracker );
 	}
 
 	/**
@@ -115,6 +123,7 @@ final class WooCommerce implements IntegrationInterface {
 		$loader->add_action( 'woocommerce_order_status_changed', array( $this, 'on_status_changed' ), 10, 4 );
 		$loader->add_action( 'woocommerce_order_refunded', array( $this, 'on_refunded' ), 10, 2 );
 		$loader->add_action( 'woocommerce_order_note_added', array( $this, 'on_note_added' ), 10, 2 );
+		$this->catalog->register( $loader );
 	}
 
 	/**
@@ -132,10 +141,14 @@ final class WooCommerce implements IntegrationInterface {
 			new EventType( 'woocommerce.order_updated', $c, Severity::Notice, __( 'Order edited', 'wp-activity-ledger' ), __( 'Edited order {object}', 'wp-activity-ledger' ) ),
 			new EventType( 'woocommerce.product_created', $c, Severity::Info, __( 'Product created', 'wp-activity-ledger' ), __( 'Created product "{object}"', 'wp-activity-ledger' ) ),
 			new EventType( 'woocommerce.product_updated', $c, Severity::Info, __( 'Product updated', 'wp-activity-ledger' ), __( 'Updated product "{object}"', 'wp-activity-ledger' ) ),
+			new EventType( 'woocommerce.product_trashed', $c, Severity::Notice, __( 'Product trashed', 'wp-activity-ledger' ), __( 'Moved product "{object}" to the trash', 'wp-activity-ledger' ) ),
+			new EventType( 'woocommerce.product_restored', $c, Severity::Info, __( 'Product restored', 'wp-activity-ledger' ), __( 'Restored product "{object}" from the trash', 'wp-activity-ledger' ) ),
 			new EventType( 'woocommerce.product_deleted', $c, Severity::Warning, __( 'Product deleted', 'wp-activity-ledger' ), __( 'Deleted product "{object}"', 'wp-activity-ledger' ) ),
 			new EventType( 'woocommerce.stock_changed', $c, Severity::Info, __( 'Stock changed', 'wp-activity-ledger' ), __( 'Stock of "{object}" changed to {stock}', 'wp-activity-ledger' ) ),
 			new EventType( 'woocommerce.coupon_created', $c, Severity::Notice, __( 'Coupon created', 'wp-activity-ledger' ), __( 'Created coupon "{object}"', 'wp-activity-ledger' ) ),
 			new EventType( 'woocommerce.coupon_updated', $c, Severity::Notice, __( 'Coupon updated', 'wp-activity-ledger' ), __( 'Updated coupon "{object}"', 'wp-activity-ledger' ) ),
+			new EventType( 'woocommerce.coupon_trashed', $c, Severity::Notice, __( 'Coupon trashed', 'wp-activity-ledger' ), __( 'Moved coupon "{object}" to the trash', 'wp-activity-ledger' ) ),
+			new EventType( 'woocommerce.coupon_restored', $c, Severity::Info, __( 'Coupon restored', 'wp-activity-ledger' ), __( 'Restored coupon "{object}" from the trash', 'wp-activity-ledger' ) ),
 			new EventType( 'woocommerce.coupon_deleted', $c, Severity::Warning, __( 'Coupon deleted', 'wp-activity-ledger' ), __( 'Deleted coupon "{object}"', 'wp-activity-ledger' ) ),
 			new EventType( 'woocommerce.settings_changed', $c, Severity::Notice, __( 'WooCommerce settings changed', 'wp-activity-ledger' ), __( 'Changed {count} WooCommerce setting(s)', 'wp-activity-ledger' ) ),
 			new EventType( 'woocommerce.gateway_toggled', $c, Severity::Warning, __( 'Payment method switched', 'wp-activity-ledger' ), __( 'Turned payment method "{object}" {state}', 'wp-activity-ledger' ) ),
@@ -175,7 +188,7 @@ final class WooCommerce implements IntegrationInterface {
 	 * @return void
 	 */
 	public function on_order_save( mixed $order = null ): void {
-		if ( ! $order instanceof \WC_Order || 0 === $order->get_id() || ! self::staff_backend_request() ) {
+		if ( ! $order instanceof \WC_Order || 0 === $order->get_id() || ! self::staff_backend_request( 'edit_shop_orders' ) ) {
 			return;
 		}
 
@@ -212,18 +225,21 @@ final class WooCommerce implements IntegrationInterface {
 	/**
 	 * Tells whether the request is a staff edit from wp-admin or the REST API.
 	 *
+	 * @param string $capability WooCommerce capability the user needs, e.g. "edit_products".
+	 *
 	 * @return bool True for staff edits.
 	 */
-	private static function staff_backend_request(): bool {
+	public static function staff_backend_request( string $capability ): bool {
 		$backend = is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST );
-		$staff   = $backend && is_user_logged_in() && current_user_can( 'edit_shop_orders' ); // phpcs:ignore WordPress.WP.Capabilities.Unknown -- WooCommerce capability.
+		$staff   = $backend && is_user_logged_in() && current_user_can( $capability ); // phpcs:ignore WordPress.WP.Capabilities.Undetermined -- WooCommerce capability.
 
 		/**
 		 * Filters whether WooCommerce object saves in this request count as staff edits.
 		 *
-		 * @param bool $staff True for logged-in shop staff in wp-admin or the REST API.
+		 * @param bool   $staff      True for logged-in shop staff in wp-admin or the REST API.
+		 * @param string $capability Capability that was checked.
 		 */
-		return (bool) apply_filters( 'wpal_woocommerce_staff_edit', $staff );
+		return (bool) apply_filters( 'wpal_woocommerce_staff_edit', $staff, $capability );
 	}
 
 	/**

@@ -86,6 +86,24 @@ final class WooObjectTracker {
 	}
 
 	/**
+	 * Marks an object as created in this request, even if no field changes follow.
+	 *
+	 * @param \WC_Data $data_object Object.
+	 * @param string   $object_type Stored object type.
+	 * @param string   $kind        "*_created" event type.
+	 *
+	 * @return void
+	 */
+	public function mark( \WC_Data $data_object, string $object_type, string $kind ): void {
+		$this->pending[ $object_type . ':' . spl_object_id( $data_object ) ] ??= array(
+			'object'      => $data_object,
+			'object_type' => $object_type,
+			'kind'        => $kind,
+			'fields'      => array(),
+		);
+	}
+
+	/**
 	 * Tells whether a change key is a flattened copy of a grouped one.
 	 *
 	 * WooCommerce reports address changes twice: "billing" => ["city" => …] and "billing_city".
@@ -159,6 +177,9 @@ final class WooObjectTracker {
 				$merged[ $id ] = $item;
 				continue;
 			}
+
+			// The latest instance carries the current name for the label.
+			$merged[ $id ]['object'] = $item['object'];
 
 			foreach ( $item['fields'] as $field => [ $old, $new ] ) {
 				$merged[ $id ]['fields'][ $field ] = array( $merged[ $id ]['fields'][ $field ][0] ?? $old, $new );
