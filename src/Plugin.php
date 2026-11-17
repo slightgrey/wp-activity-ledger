@@ -18,6 +18,11 @@ use WPActivityLedger\Domain\CoreEventTypes;
 use WPActivityLedger\Domain\EventTypeRegistry;
 use WPActivityLedger\Recording\Recorder;
 use WPActivityLedger\Security\Capabilities;
+use WPActivityLedger\Sensors\AuthSensor;
+use WPActivityLedger\Sensors\SensorInterface;
+use WPActivityLedger\Sensors\SensorRegistry;
+use WPActivityLedger\Sensors\UserProfileSensor;
+use WPActivityLedger\Sensors\UserSensor;
 use WPActivityLedger\Settings\Settings;
 
 /**
@@ -76,6 +81,13 @@ final class Plugin {
 	 * @var Differ|null
 	 */
 	private ?Differ $differ = null;
+
+	/**
+	 * Core sensors, keyed by slug.
+	 *
+	 * @var array<string, SensorInterface>|null
+	 */
+	private ?array $sensors = null;
 
 	/**
 	 * Creates the plugin.
@@ -179,6 +191,21 @@ final class Plugin {
 	}
 
 	/**
+	 * Returns the core sensors, keyed by slug.
+	 *
+	 * @return array<string, SensorInterface> Sensors.
+	 */
+	public function core_sensors(): array {
+		$this->sensors ??= array(
+			'auth'    => new AuthSensor( $this->recorder(), $this->repository(), $this->settings() ),
+			'users'   => new UserSensor( $this->recorder(), $this->differ() ),
+			'profile' => new UserProfileSensor( $this->recorder(), $this->differ(), $this->settings() ),
+		);
+
+		return $this->sensors;
+	}
+
+	/**
 	 * Registers the modules once, then hands their hooks to WordPress.
 	 *
 	 * @return void
@@ -196,6 +223,7 @@ final class Plugin {
 		Capabilities::register( $this->loader );
 		$this->recorder()->register( $this->loader );
 		$this->loader->add_action( 'wpal_log', 'wpal_log', 10, 2 );
+		( new SensorRegistry( $this->core_sensors() ) )->register( $this->loader );
 
 		/**
 		 * Fires after the core modules queued their hooks and before they are registered.

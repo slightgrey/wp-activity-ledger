@@ -211,7 +211,7 @@ final class Recorder {
 	 *
 	 * @return Event Event with message.
 	 */
-	private function with_message( Event $event ): Event {
+	public function with_message( Event $event ): Event {
 		return '' !== $event->message ? $event : $event->with( array( 'message' => $this->types->render_message( $event ) ) );
 	}
 
@@ -220,7 +220,7 @@ final class Recorder {
 	 *
 	 * @return string IP.
 	 */
-	private function ip(): string {
+	public function ip(): string {
 		$resolver = new IpResolver(
 			$_SERVER, // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- IpResolver validates every value it reads.
 			(string) $this->settings->get( 'trusted_proxy_header' ),

@@ -114,7 +114,18 @@ final class RequestContext {
 	 * @return string 16 hex characters, or '' without a session.
 	 */
 	public function session_hash(): string {
-		return '' === $this->session_token ? '' : substr( hash( 'sha256', $this->session_token ), 0, 16 );
+		return self::hash_token( $this->session_token );
+	}
+
+	/**
+	 * Hashes a session token the way session_hash() does.
+	 *
+	 * @param string $token Session token.
+	 *
+	 * @return string 16 hex characters, or '' for an empty token.
+	 */
+	public static function hash_token( string $token ): string {
+		return '' === $token ? '' : substr( hash( 'sha256', $token ), 0, 16 );
 	}
 
 	/**

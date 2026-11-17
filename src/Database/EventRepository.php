@@ -141,6 +141,59 @@ final class EventRepository {
 	}
 
 	/**
+	 * Returns the newest event of a type with the same label and IP since a given time.
+	 *
+	 * Used to fold repeated events (e.g. failed logins) into one row.
+	 *
+	 * @param string $event_type Type.
+	 * @param string $label      Object label.
+	 * @param string $ip         IP address.
+	 * @param string $since      UTC "Y-m-d H:i:s".
+	 *
+	 * @return array<string, mixed>|null Typed event, or null when none.
+	 */
+	public function find_recent( string $event_type, string $label, string $ip, string $since ): ?array {
+		$row = $this->db->get_row(
+			$this->db->prepare(
+				'SELECT * FROM ' . Schema::events_table() . ' WHERE event_type = %s AND object_label = %s AND ip = %s AND created_at >= %s ORDER BY id DESC LIMIT 1',
+				$event_type,
+				$label,
+				$ip,
+				$since
+			),
+			ARRAY_A
+		);
+
+		return is_array( $row ) ? RowHydrator::event( $row ) : null;
+	}
+
+	/**
+	 * Updates the context, message and time of an existing event.
+	 *
+	 * @param int                  $id         Event ID.
+	 * @param array<string, mixed> $context    New context.
+	 * @param string               $message    New message.
+	 * @param string               $created_at New UTC time.
+	 *
+	 * @return bool True when a row was updated.
+	 */
+	public function update_summary( int $id, array $context, string $message, string $created_at ): bool {
+		$updated = $this->db->update(
+			Schema::events_table(),
+			array(
+				'context'    => (string) wp_json_encode( $context, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ),
+				'message'    => $message,
+				'created_at' => $created_at,
+			),
+			array( 'id' => $id ),
+			array( '%s', '%s', '%s' ),
+			array( '%d' )
+		);
+
+		return is_int( $updated ) && $updated > 0;
+	}
+
+	/**
 	 * Deletes every event matching the filters, with its changes.
 	 *
 	 * No filters means everything. Paging and sorting keys are ignored.
