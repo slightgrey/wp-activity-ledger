@@ -32,6 +32,7 @@ use WPActivityLedger\Sensors\SensorInterface;
 use WPActivityLedger\Sensors\SensorRegistry;
 use WPActivityLedger\Sensors\TermSensor;
 use WPActivityLedger\Sensors\ThemeSensor;
+use WPActivityLedger\Sensors\ToolsSensor;
 use WPActivityLedger\Sensors\UpgraderSensor;
 use WPActivityLedger\Sensors\UserProfileSensor;
 use WPActivityLedger\Sensors\UserSensor;
@@ -223,6 +224,7 @@ final class Plugin {
 			'themes'     => new ThemeSensor( $this->recorder() ),
 			'autoupdate' => new AutoUpdateSensor( $this->recorder(), $this->differ() ),
 			'options'    => new OptionSensor( $this->recorder(), $this->differ(), $this->settings() ),
+			'tools'      => new ToolsSensor( $this->recorder() ),
 		);
 
 		return $this->sensors;
