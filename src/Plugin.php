@@ -9,11 +9,22 @@ declare( strict_types=1 );
 
 namespace WPActivityLedger;
 
+use WPActivityLedger\Database\EventRepository;
+use WPActivityLedger\Diff\Differ;
+use WPActivityLedger\Diff\Redactor;
+use WPActivityLedger\Support\PatternMatcher;
 use WPActivityLedger\Database\Installer;
+use WPActivityLedger\Domain\CoreEventTypes;
+use WPActivityLedger\Domain\EventTypeRegistry;
+use WPActivityLedger\Recording\Recorder;
 use WPActivityLedger\Security\Capabilities;
+use WPActivityLedger\Settings\Settings;
 
 /**
- * Builds the plugin's modules once per request and hands their hooks to the Loader.
+ * Builds the plugin's services once per request and hands their hooks to the Loader.
+ *
+ * Services are created lazily, because some code paths (activation, deactivation) run
+ * without plugins_loaded firing for this plugin.
  */
 final class Plugin {
 
@@ -30,6 +41,41 @@ final class Plugin {
 	 * @var bool
 	 */
 	private bool $booted = false;
+
+	/**
+	 * Settings service.
+	 *
+	 * @var Settings|null
+	 */
+	private ?Settings $settings = null;
+
+	/**
+	 * Event type registry.
+	 *
+	 * @var EventTypeRegistry|null
+	 */
+	private ?EventTypeRegistry $types = null;
+
+	/**
+	 * Event storage.
+	 *
+	 * @var EventRepository|null
+	 */
+	private ?EventRepository $repository = null;
+
+	/**
+	 * Event recorder.
+	 *
+	 * @var Recorder|null
+	 */
+	private ?Recorder $recorder = null;
+
+	/**
+	 * Differ configured from the settings.
+	 *
+	 * @var Differ|null
+	 */
+	private ?Differ $differ = null;
 
 	/**
 	 * Creates the plugin.
@@ -71,6 +117,68 @@ final class Plugin {
 	}
 
 	/**
+	 * Returns the settings.
+	 *
+	 * @return Settings Settings.
+	 */
+	public function settings(): Settings {
+		$this->settings ??= new Settings();
+
+		return $this->settings;
+	}
+
+	/**
+	 * Returns the event type registry, with the core types queued as a lazy provider.
+	 *
+	 * @return EventTypeRegistry Registry.
+	 */
+	public function types(): EventTypeRegistry {
+		if ( null === $this->types ) {
+			$this->types = new EventTypeRegistry();
+			$this->types->add_provider( array( CoreEventTypes::class, 'register' ) );
+		}
+
+		return $this->types;
+	}
+
+	/**
+	 * Returns the event repository.
+	 *
+	 * @return EventRepository Repository.
+	 */
+	public function repository(): EventRepository {
+		$this->repository ??= new EventRepository();
+
+		return $this->repository;
+	}
+
+	/**
+	 * Returns a Differ configured with the redaction patterns and size limit from the settings.
+	 *
+	 * @return Differ Differ.
+	 */
+	public function differ(): Differ {
+		if ( null === $this->differ ) {
+			$settings     = $this->settings();
+			$redactor     = new Redactor( new PatternMatcher( (array) $settings->get( 'redact_patterns' ) ) );
+			$this->differ = new Differ( $redactor, (int) $settings->get( 'max_value_size' ) );
+		}
+
+		return $this->differ;
+	}
+
+	/**
+	 * Returns the recorder.
+	 *
+	 * @return Recorder Recorder.
+	 */
+	public function recorder(): Recorder {
+		$this->recorder ??= new Recorder( $this->repository(), $this->types(), $this->settings() );
+
+		return $this->recorder;
+	}
+
+	/**
 	 * Registers the modules once, then hands their hooks to WordPress.
 	 *
 	 * @return void
@@ -86,6 +194,8 @@ final class Plugin {
 		$this->loader->add_action( 'admin_notices', array( Installer::class, 'error_notice' ) );
 		$this->loader->add_action( 'network_admin_notices', array( Installer::class, 'error_notice' ) );
 		Capabilities::register( $this->loader );
+		$this->recorder()->register( $this->loader );
+		$this->loader->add_action( 'wpal_log', 'wpal_log', 10, 2 );
 
 		/**
 		 * Fires after the core modules queued their hooks and before they are registered.

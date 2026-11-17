@@ -36,7 +36,7 @@ final class Event {
 	 *
 	 * @param string               $event_type   Registered type key, e.g. "post.updated".
 	 * @param string               $category     Category slug (filled from the registry when empty).
-	 * @param int                  $severity     0 info, 1 notice, 2 warning, 3 critical.
+	 * @param int|null             $severity     0 info, 1 notice, 2 warning, 3 critical (null = the type's default).
 	 * @param string               $object_type  Object kind: post, user, plugin, option, etc.
 	 * @param string               $object_id    Object identifier (string so plugin files and option names fit).
 	 * @param string               $object_label Human label snapshot (title, login, plugin name).
@@ -54,7 +54,7 @@ final class Event {
 	public function __construct(
 		public readonly string $event_type,
 		public readonly string $category = '',
-		public readonly int $severity = 0,
+		public readonly ?int $severity = null,
 		public readonly string $object_type = '',
 		public readonly string $object_id = '',
 		public readonly string $object_label = '',
@@ -117,7 +117,7 @@ final class Event {
 			'user_agent'   => $this->user_agent,
 			'category'     => $this->category,
 			'event_type'   => $this->event_type,
-			'severity'     => $this->severity,
+			'severity'     => $this->severity ?? 0,
 			'object_type'  => $this->object_type,
 			'object_id'    => $this->object_id,
 			'object_label' => $this->object_label,

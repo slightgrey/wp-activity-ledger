@@ -318,36 +318,39 @@ final class EventRepository {
 	}
 
 	/**
-	 * Stores events and their changes with as few queries as possible.
+	 * Stores events and their changes with as few queries as possible, keeping their order.
 	 *
-	 * Events without changes go in multi-row INSERTs. Events with changes are inserted one
-	 * by one, because only a single-row INSERT reliably reports its ID; all their changes
-	 * then go in multi-row INSERTs.
+	 * Runs of events without changes go in multi-row INSERTs. An event with changes is
+	 * inserted on its own at its place in the sequence, because only a single-row INSERT
+	 * reliably reports its ID (MySQL doesn't guarantee consecutive IDs for multi-row
+	 * INSERTs). All changes then go in multi-row INSERTs.
 	 *
 	 * @param array<int, Event> $events Events (created_at must be set).
 	 *
 	 * @return int Number of events stored.
 	 */
 	public function insert_many( array $events ): int {
-		$plain   = array_filter( $events, static fn( Event $e ): bool => array() === $e->changes );
-		$changed = array_filter( $events, static fn( Event $e ): bool => array() !== $e->changes );
-		$stored  = $this->insert_plain( $plain );
-		$rows    = array();
+		$stored = 0;
+		$plain  = array();
+		$rows   = array();
 
-		foreach ( $changed as $event ) {
-			$event_id = $this->insert_one( $event );
-
-			if ( 0 === $event_id ) {
+		foreach ( $events as $event ) {
+			if ( array() === $event->changes ) {
+				$plain[] = $event;
 				continue;
 			}
 
-			++$stored;
+			$stored  += $this->insert_plain( $plain );
+			$plain    = array();
+			$event_id = $this->insert_one( $event );
 
-			foreach ( $event->changes as $change ) {
-				$rows[] = $change->to_row( $event_id );
+			if ( 0 !== $event_id ) {
+				++$stored;
+				array_push( $rows, ...array_map( static fn( $change ) => $change->to_row( $event_id ), $event->changes ) );
 			}
 		}
 
+		$stored += $this->insert_plain( $plain );
 		$this->insert_change_rows( $rows );
 
 		return $stored;
