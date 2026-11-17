@@ -114,6 +114,13 @@ final class Plugin {
 	private ?IntegrationManager $integrations = null;
 
 	/**
+	 * Option noise filter shared by the option sensors.
+	 *
+	 * @var OptionFilter|null
+	 */
+	private ?OptionFilter $option_filter = null;
+
+	/**
 	 * Creates the plugin.
 	 *
 	 * @param Loader $loader Hook loader.
@@ -222,11 +229,22 @@ final class Plugin {
 	public function integrations(): IntegrationManager {
 		$this->integrations ??= new IntegrationManager(
 			array(
-				new WooCommerce( $this->recorder(), $this->differ() ),
+				new WooCommerce( $this->recorder(), $this->differ(), $this->option_filter() ),
 			)
 		);
 
 		return $this->integrations;
+	}
+
+	/**
+	 * Returns the shared option noise filter.
+	 *
+	 * @return OptionFilter Filter.
+	 */
+	public function option_filter(): OptionFilter {
+		$this->option_filter ??= new OptionFilter( $this->settings() );
+
+		return $this->option_filter;
 	}
 
 	/**
@@ -239,7 +257,7 @@ final class Plugin {
 			return $this->sensors;
 		}
 
-		$noise = new OptionFilter( $this->settings() );
+		$noise = $this->option_filter();
 
 		$this->sensors = array(
 			'auth'       => new AuthSensor( $this->recorder(), $this->repository(), $this->settings() ),

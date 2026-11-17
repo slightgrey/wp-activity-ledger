@@ -17,9 +17,11 @@ use WPActivityLedger\Domain\EventType;
 use WPActivityLedger\Domain\Severity;
 use WPActivityLedger\Loader;
 use WPActivityLedger\Recording\Recorder;
+use WPActivityLedger\Sensors\OptionFilter;
 
 /**
- * Records WooCommerce activity: order status changes, refunds and staff notes.
+ * Records WooCommerce activity: orders (status changes, refunds, staff notes and edits),
+ * the catalog (products, stock, coupons) and settings (including payment gateway toggles).
  *
  * Declares compatibility with High-Performance Order Storage (orders are read through
  * the WooCommerce CRUD API only). WooCommerce post types are left out of the content
@@ -67,17 +69,27 @@ final class WooCommerce implements IntegrationInterface {
 	private WooCatalogWatcher $catalog;
 
 	/**
+	 * Records settings and payment gateway toggles.
+	 *
+	 * @var WooSettingsWatcher
+	 */
+	private WooSettingsWatcher $settings;
+
+	/**
 	 * Creates the integration.
 	 *
-	 * @param Recorder $recorder Recorder.
-	 * @param Differ   $differ   Differ.
+	 * @param Recorder     $recorder Recorder.
+	 * @param Differ       $differ   Differ.
+	 * @param OptionFilter $noise    Option noise filter.
 	 */
 	public function __construct(
 		private readonly Recorder $recorder,
-		private readonly Differ $differ
+		private readonly Differ $differ,
+		OptionFilter $noise
 	) {
-		$this->tracker = new WooObjectTracker( $recorder, $differ );
-		$this->catalog = new WooCatalogWatcher( $recorder, $differ, $this->tracker );
+		$this->tracker  = new WooObjectTracker( $recorder, $differ );
+		$this->catalog  = new WooCatalogWatcher( $recorder, $differ, $this->tracker );
+		$this->settings = new WooSettingsWatcher( $recorder, $differ, $noise );
 	}
 
 	/**
@@ -124,6 +136,7 @@ final class WooCommerce implements IntegrationInterface {
 		$loader->add_action( 'woocommerce_order_refunded', array( $this, 'on_refunded' ), 10, 2 );
 		$loader->add_action( 'woocommerce_order_note_added', array( $this, 'on_note_added' ), 10, 2 );
 		$this->catalog->register( $loader );
+		$this->settings->register( $loader );
 	}
 
 	/**
@@ -196,12 +209,13 @@ final class WooCommerce implements IntegrationInterface {
 	}
 
 	/**
-	 * Records the collected object changes. Runs on shutdown (priority 0).
+	 * Records the collected object and settings changes. Runs on shutdown (priority 0).
 	 *
 	 * @return void
 	 */
 	public function record_pending(): void {
 		$this->tracker->record_pending( array( self::class, 'label' ) );
+		$this->settings->record_pending();
 	}
 
 	/**
