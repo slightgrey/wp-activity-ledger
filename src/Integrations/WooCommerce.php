@@ -53,6 +53,13 @@ final class WooCommerce implements IntegrationInterface {
 	);
 
 	/**
+	 * Diffs orders, products and coupons on save.
+	 *
+	 * @var WooObjectTracker
+	 */
+	private WooObjectTracker $tracker;
+
+	/**
 	 * Creates the integration.
 	 *
 	 * @param Recorder $recorder Recorder.
@@ -62,6 +69,7 @@ final class WooCommerce implements IntegrationInterface {
 		private readonly Recorder $recorder,
 		private readonly Differ $differ
 	) {
+		$this->tracker = new WooObjectTracker( $recorder, $differ );
 	}
 
 	/**
@@ -102,6 +110,8 @@ final class WooCommerce implements IntegrationInterface {
 		$loader->add_action( 'before_woocommerce_init', array( $this, 'declare_compatibility' ), 10, 0 );
 		$loader->add_filter( 'wpal_post_sensor_skip_types', array( $this, 'skip_post_types' ), 10, 1 );
 		$loader->add_filter( 'wpal_ignored_option_patterns', array( $this, 'ignore_noise_options' ), 10, 1 );
+		$loader->add_action( 'woocommerce_before_order_object_save', array( $this, 'on_order_save' ), 10, 1 );
+		$loader->add_action( 'shutdown', array( $this, 'record_pending' ), 0, 0 );
 		$loader->add_action( 'woocommerce_order_status_changed', array( $this, 'on_status_changed' ), 10, 4 );
 		$loader->add_action( 'woocommerce_order_refunded', array( $this, 'on_refunded' ), 10, 2 );
 		$loader->add_action( 'woocommerce_order_note_added', array( $this, 'on_note_added' ), 10, 2 );
@@ -152,6 +162,68 @@ final class WooCommerce implements IntegrationInterface {
 	 */
 	public function skip_post_types( $types ): array {
 		return array_values( array_unique( array_merge( array_map( 'strval', (array) $types ), self::POST_TYPES ) ) );
+	}
+
+	/**
+	 * Collects field changes of an existing order edited by staff in wp-admin or via REST.
+	 *
+	 * Front-end checkout and gateway callbacks are left to the status change event. The
+	 * status itself is skipped here (it has its own event).
+	 *
+	 * @param mixed $order Order about to be saved.
+	 *
+	 * @return void
+	 */
+	public function on_order_save( mixed $order = null ): void {
+		if ( ! $order instanceof \WC_Order || 0 === $order->get_id() || ! self::staff_backend_request() ) {
+			return;
+		}
+
+		$this->tracker->collect( $order, 'shop_order', 'woocommerce.order_updated', array( 'status' ) );
+	}
+
+	/**
+	 * Records the collected object changes. Runs on shutdown (priority 0).
+	 *
+	 * @return void
+	 */
+	public function record_pending(): void {
+		$this->tracker->record_pending( array( self::class, 'label' ) );
+	}
+
+	/**
+	 * Returns the label of a WooCommerce object ("#123" for orders, the name otherwise).
+	 *
+	 * @param \WC_Data $data_object Object.
+	 *
+	 * @return string Label.
+	 */
+	public static function label( \WC_Data $data_object ): string {
+		if ( $data_object instanceof \WC_Order ) {
+			return '#' . $data_object->get_order_number();
+		}
+
+		$name = method_exists( $data_object, 'get_name' ) ? (string) $data_object->get_name() : '';
+		$name = '' === $name && method_exists( $data_object, 'get_code' ) ? (string) $data_object->get_code() : $name;
+
+		return '' === $name ? '#' . $data_object->get_id() : $name;
+	}
+
+	/**
+	 * Tells whether the request is a staff edit from wp-admin or the REST API.
+	 *
+	 * @return bool True for staff edits.
+	 */
+	private static function staff_backend_request(): bool {
+		$backend = is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST );
+		$staff   = $backend && is_user_logged_in() && current_user_can( 'edit_shop_orders' ); // phpcs:ignore WordPress.WP.Capabilities.Unknown -- WooCommerce capability.
+
+		/**
+		 * Filters whether WooCommerce object saves in this request count as staff edits.
+		 *
+		 * @param bool $staff True for logged-in shop staff in wp-admin or the REST API.
+		 */
+		return (bool) apply_filters( 'wpal_woocommerce_staff_edit', $staff );
 	}
 
 	/**

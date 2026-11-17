@@ -68,6 +68,17 @@ final class IntegrationManager {
 	}
 
 	/**
+	 * Returns an active integration by slug.
+	 *
+	 * @param string $slug Slug.
+	 *
+	 * @return IntegrationInterface|null The integration, or null when not active.
+	 */
+	public function get( string $slug ): ?IntegrationInterface {
+		return $this->active[ $slug ] ?? null;
+	}
+
+	/**
 	 * Returns the built-in integrations plus those added with the wpal_integrations filter.
 	 *
 	 * @return array<int, IntegrationInterface> Integrations.
