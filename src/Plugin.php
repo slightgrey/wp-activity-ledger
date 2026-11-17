@@ -9,6 +9,8 @@ declare( strict_types=1 );
 
 namespace WPActivityLedger;
 
+use WPActivityLedger\Database\Installer;
+
 /**
  * Builds the plugin's modules once per request and hands their hooks to the Loader.
  */
@@ -78,6 +80,10 @@ final class Plugin {
 		}
 
 		$this->booted = true;
+
+		Installer::maybe_upgrade();
+		$this->loader->add_action( 'admin_notices', array( Installer::class, 'error_notice' ) );
+		$this->loader->add_action( 'network_admin_notices', array( Installer::class, 'error_notice' ) );
 
 		/**
 		 * Fires after the core modules queued their hooks and before they are registered.
