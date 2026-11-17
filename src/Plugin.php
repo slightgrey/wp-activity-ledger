@@ -19,10 +19,15 @@ use WPActivityLedger\Domain\EventTypeRegistry;
 use WPActivityLedger\Recording\Recorder;
 use WPActivityLedger\Security\Capabilities;
 use WPActivityLedger\Sensors\AuthSensor;
+use WPActivityLedger\Sensors\CommentSensor;
+use WPActivityLedger\Sensors\CustomizerSensor;
+use WPActivityLedger\Sensors\MediaSensor;
+use WPActivityLedger\Sensors\MenuSensor;
 use WPActivityLedger\Sensors\MetaWatcher;
 use WPActivityLedger\Sensors\PostSensor;
 use WPActivityLedger\Sensors\SensorInterface;
 use WPActivityLedger\Sensors\SensorRegistry;
+use WPActivityLedger\Sensors\TermSensor;
 use WPActivityLedger\Sensors\UserProfileSensor;
 use WPActivityLedger\Sensors\UserSensor;
 use WPActivityLedger\Settings\Settings;
@@ -199,10 +204,15 @@ final class Plugin {
 	 */
 	public function core_sensors(): array {
 		$this->sensors ??= array(
-			'auth'    => new AuthSensor( $this->recorder(), $this->repository(), $this->settings() ),
-			'users'   => new UserSensor( $this->recorder(), $this->differ() ),
-			'profile' => new UserProfileSensor( $this->recorder(), $this->differ(), $this->settings() ),
-			'posts'   => new PostSensor( $this->recorder(), $this->differ(), new MetaWatcher( $this->settings() ) ),
+			'auth'       => new AuthSensor( $this->recorder(), $this->repository(), $this->settings() ),
+			'users'      => new UserSensor( $this->recorder(), $this->differ() ),
+			'profile'    => new UserProfileSensor( $this->recorder(), $this->differ(), $this->settings() ),
+			'posts'      => new PostSensor( $this->recorder(), $this->differ(), new MetaWatcher( $this->settings() ) ),
+			'media'      => new MediaSensor( $this->recorder(), $this->differ() ),
+			'comments'   => new CommentSensor( $this->recorder(), $this->differ() ),
+			'terms'      => new TermSensor( $this->recorder(), $this->differ() ),
+			'menus'      => new MenuSensor( $this->recorder(), $this->differ() ),
+			'customizer' => new CustomizerSensor( $this->recorder(), $this->differ() ),
 		);
 
 		return $this->sensors;

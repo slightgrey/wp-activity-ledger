@@ -34,7 +34,7 @@ final class PostActivity {
 	 *
 	 * @var string
 	 */
-	private string $kind = 'post.updated';
+	private string $kind;
 
 	/**
 	 * Changed fields: field => [first old value, latest new value].
@@ -53,9 +53,11 @@ final class PostActivity {
 	/**
 	 * Creates the activity.
 	 *
-	 * @param \WP_Post $post The post (latest known state).
+	 * @param \WP_Post           $post The post (latest known state).
+	 * @param array<string, int> $rank Event types from least (first, the default) to most significant.
 	 */
-	public function __construct( private \WP_Post $post ) {
+	public function __construct( private \WP_Post $post, private readonly array $rank = self::RANK ) {
+		$this->kind = (string) array_key_first( $rank );
 	}
 
 	/**
@@ -66,7 +68,7 @@ final class PostActivity {
 	 * @return void
 	 */
 	public function promote( string $kind ): void {
-		if ( ( self::RANK[ $kind ] ?? -1 ) > self::RANK[ $this->kind ] ) {
+		if ( ( $this->rank[ $kind ] ?? -1 ) > ( $this->rank[ $this->kind ] ?? -1 ) ) {
 			$this->kind = $kind;
 		}
 	}
