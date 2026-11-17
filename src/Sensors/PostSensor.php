@@ -278,6 +278,10 @@ final class PostSensor implements SensorInterface {
 		}
 
 		foreach ( self::FIELDS as $field ) {
+			if ( 'post_date' === $field && self::has_floating_date( $post_before ) && self::has_floating_date( $post_after ) ) {
+				continue; // Drafts without a set date get "now" on every save; that's not an edit.
+			}
+
 			$activity->change( $field, $post_before->$field, $post_after->$field );
 		}
 	}
@@ -340,6 +344,17 @@ final class PostSensor implements SensorInterface {
 				changes: $changes
 			)
 		);
+	}
+
+	/**
+	 * Tells whether a post has no fixed date yet (unpublished posts with an empty GMT date).
+	 *
+	 * @param \WP_Post $post Post.
+	 *
+	 * @return bool True when the date floats.
+	 */
+	private static function has_floating_date( \WP_Post $post ): bool {
+		return '0000-00-00 00:00:00' === $post->post_date_gmt;
 	}
 
 	/**

@@ -64,6 +64,39 @@ final class Differ {
 	}
 
 	/**
+	 * Compares a stored value (e.g. an option): arrays key by key ("{field}:{key}"),
+	 * anything else as one field. Serialized and JSON strings count as arrays.
+	 *
+	 * @param string $field     Field name (and prefix for array keys).
+	 * @param mixed  $old_value Old value.
+	 * @param mixed  $new_value New value.
+	 *
+	 * @return array<int, Change> Changes.
+	 */
+	public function diff_value( string $field, mixed $old_value, mixed $new_value ): array {
+		$old_value = self::decode( $old_value );
+		$new_value = self::decode( $new_value );
+
+		if ( ! is_array( $old_value ) && ! is_array( $new_value ) ) {
+			$change = $this->compare( $field, $old_value, $new_value );
+
+			return null === $change ? array() : array( $change );
+		}
+
+		$before = is_array( $old_value ) ? $old_value : array();
+		$after  = is_array( $new_value ) ? $new_value : array();
+
+		// Keys are redacted on their own name, and the whole value when the field itself is secret.
+		if ( $this->redactor->is_sensitive( $field ) ) {
+			$change = $this->compare( $field, $old_value, $new_value );
+
+			return null === $change ? array() : array( $change );
+		}
+
+		return $this->diff( $before, $after, null, $field . ':' );
+	}
+
+	/**
 	 * Compares one value.
 	 *
 	 * @param string      $field        Field name stored on the change.

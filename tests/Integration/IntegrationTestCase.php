@@ -57,6 +57,30 @@ abstract class IntegrationTestCase extends TestCase {
 	}
 
 	/**
+	 * Returns the highest event ID so far, so tests can ignore rows from real site activity.
+	 *
+	 * @return int Highest ID (0 when empty).
+	 */
+	protected static function max_event_id(): int {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB -- Test helper on the plugin's own table.
+		return (int) $wpdb->get_var( 'SELECT IFNULL(MAX(id), 0) FROM ' . \WPActivityLedger\Database\Schema::events_table() );
+	}
+
+	/**
+	 * Keeps only events newer than an ID.
+	 *
+	 * @param array<int, array<string, mixed>> $events Events.
+	 * @param int                              $after  ID boundary.
+	 *
+	 * @return array<int, array<string, mixed>> Newer events, re-indexed.
+	 */
+	protected static function newer_than( array $events, int $after ): array {
+		return array_values( array_filter( $events, static fn( array $e ): bool => (int) $e['id'] > $after ) );
+	}
+
+	/**
 	 * Creates a user with the given role (rolled back after the test) and logs in as them.
 	 *
 	 * @param string $role Role slug.

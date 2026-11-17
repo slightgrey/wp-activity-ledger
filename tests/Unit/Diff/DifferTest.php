@@ -180,6 +180,42 @@ final class DifferTest extends TestCase {
 	}
 
 	/**
+	 * diff_value() splits arrays by key, compares scalars as one field, and keeps secret
+	 * options whole.
+	 *
+	 * @return void
+	 */
+	public function test_diff_value(): void {
+		$differ = $this->differ();
+
+		$this->assertSame(
+			array( 'mail:host' ),
+			array_map(
+				static fn( Change $c ): string => $c->field,
+				$differ->diff_value(
+					'mail',
+					serialize(
+						array(
+							'host' => 'a',
+							'port' => 25,
+						)
+					),
+					array(
+						'host' => 'b',
+						'port' => '25',
+					)
+				)
+			)
+		);
+		$this->assertCount( 1, $differ->diff_value( 'blogname', 'Old', 'New' ) );
+		$this->assertSame( array(), $differ->diff_value( 'blogname', 'Same', 'Same' ) );
+
+		$secret = $differ->diff_value( 'smtp_pass', array( 'a' => 1 ), array( 'a' => 2 ) );
+		$this->assertSame( 'smtp_pass', $secret[0]->field );
+		$this->assertSame( Redactor::MARKER, $secret[0]->new_value );
+	}
+
+	/**
 	 * Ignored fields are skipped, and the prefix is added to field names.
 	 *
 	 * @return void

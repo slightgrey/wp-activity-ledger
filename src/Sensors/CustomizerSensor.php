@@ -197,21 +197,26 @@ final class CustomizerSensor implements SensorInterface {
 	 * @return array<int, Change> Changes.
 	 */
 	private function option_changes( string $option, mixed $old_value, mixed $value ): array {
-		$old_value = Differ::decode( $old_value );
-		$value     = Differ::decode( $value );
+		$field = str_starts_with( $option, 'theme_mods_' ) ? 'theme_mod' : $option;
 
-		if ( is_array( $old_value ) || is_array( $value ) ) {
-			$prefix = str_starts_with( $option, 'theme_mods_' ) ? 'theme_mod:' : $option . ':';
-			$old    = is_array( $old_value ) ? $old_value : array();
-			$new    = is_array( $value ) ? $value : array();
-			unset( $old['_multiwidget'], $new['_multiwidget'] );
+		return $this->differ->diff_value( $field, self::without_multiwidget( $old_value ), self::without_multiwidget( $value ) );
+	}
 
-			return $this->differ->diff( $old, $new, null, $prefix );
+	/**
+	 * Removes the "_multiwidget" bookkeeping key from widget option arrays.
+	 *
+	 * @param mixed $value Option value.
+	 *
+	 * @return mixed Value without the key.
+	 */
+	private static function without_multiwidget( mixed $value ): mixed {
+		$value = Differ::decode( $value );
+
+		if ( is_array( $value ) ) {
+			unset( $value['_multiwidget'] );
 		}
 
-		$change = $this->differ->compare( $option, $old_value, $value );
-
-		return null === $change ? array() : array( $change );
+		return $value;
 	}
 
 	/**

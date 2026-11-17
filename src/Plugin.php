@@ -19,15 +19,20 @@ use WPActivityLedger\Domain\EventTypeRegistry;
 use WPActivityLedger\Recording\Recorder;
 use WPActivityLedger\Security\Capabilities;
 use WPActivityLedger\Sensors\AuthSensor;
+use WPActivityLedger\Sensors\AutoUpdateSensor;
 use WPActivityLedger\Sensors\CommentSensor;
 use WPActivityLedger\Sensors\CustomizerSensor;
 use WPActivityLedger\Sensors\MediaSensor;
 use WPActivityLedger\Sensors\MenuSensor;
 use WPActivityLedger\Sensors\MetaWatcher;
+use WPActivityLedger\Sensors\OptionSensor;
+use WPActivityLedger\Sensors\PluginSensor;
 use WPActivityLedger\Sensors\PostSensor;
 use WPActivityLedger\Sensors\SensorInterface;
 use WPActivityLedger\Sensors\SensorRegistry;
 use WPActivityLedger\Sensors\TermSensor;
+use WPActivityLedger\Sensors\ThemeSensor;
+use WPActivityLedger\Sensors\UpgraderSensor;
 use WPActivityLedger\Sensors\UserProfileSensor;
 use WPActivityLedger\Sensors\UserSensor;
 use WPActivityLedger\Settings\Settings;
@@ -213,6 +218,11 @@ final class Plugin {
 			'terms'      => new TermSensor( $this->recorder(), $this->differ() ),
 			'menus'      => new MenuSensor( $this->recorder(), $this->differ() ),
 			'customizer' => new CustomizerSensor( $this->recorder(), $this->differ() ),
+			'plugins'    => new PluginSensor( $this->recorder() ),
+			'upgrader'   => new UpgraderSensor( $this->recorder() ),
+			'themes'     => new ThemeSensor( $this->recorder() ),
+			'autoupdate' => new AutoUpdateSensor( $this->recorder(), $this->differ() ),
+			'options'    => new OptionSensor( $this->recorder(), $this->differ(), $this->settings() ),
 		);
 
 		return $this->sensors;

@@ -53,7 +53,7 @@ final class Settings {
 			'store_user_agent'            => true,
 			'trusted_proxy_header'        => '',
 			'max_value_size'              => 10240,
-			'ignored_option_patterns'     => array( '_transient_*', '_site_transient_*', 'cron', '*_lock', 'rewrite_rules', 'recently_activated', 'active_plugins', 'uninstall_plugins', 'auto_updater.lock', 'can_compress_scripts', '*_cache*', '*_last_checked', 'jetpack_*sync*', 'action_scheduler_*', 'wpal_db_*', 'wpal_github_release' ),
+			'ignored_option_patterns'     => array( '_transient_*', '_site_transient_*', 'cron', '*_lock', 'rewrite_rules', 'recently_activated', 'active_plugins', 'uninstall_plugins', 'auto_updater.lock', 'can_compress_scripts', '*_cache*', '*_last_checked', 'jetpack_*sync*', 'action_scheduler_*', 'wpal_db_*', 'wpal_github_release', 'user_count' ),
 			'ignored_meta_keys'           => array( '_edit_lock', '_edit_last', 'session_tokens', '_wp_old_slug', '_wp_old_date', '_encloseme', '_pingme', '_wp_trash_meta_*', '_wp_desired_post_slug', 'wp_*user-settings*', 'wp_*dashboard_quick_press_last_post_id', 'community-events-location', '_elementor_css', '_elementor_page_assets', '_elementor_element_cache' ),
 			'redact_patterns'             => array( '*pass*', '*secret*', '*token*', '*api_key*', '*apikey*', '*license*', '*private_key*', '*auth_key*', '*salt*' ),
 			'delete_data_on_uninstall'    => false,
