@@ -19,6 +19,8 @@ use WPActivityLedger\Domain\EventTypeRegistry;
 use WPActivityLedger\Recording\Recorder;
 use WPActivityLedger\Security\Capabilities;
 use WPActivityLedger\Sensors\AuthSensor;
+use WPActivityLedger\Sensors\MetaWatcher;
+use WPActivityLedger\Sensors\PostSensor;
 use WPActivityLedger\Sensors\SensorInterface;
 use WPActivityLedger\Sensors\SensorRegistry;
 use WPActivityLedger\Sensors\UserProfileSensor;
@@ -200,6 +202,7 @@ final class Plugin {
 			'auth'    => new AuthSensor( $this->recorder(), $this->repository(), $this->settings() ),
 			'users'   => new UserSensor( $this->recorder(), $this->differ() ),
 			'profile' => new UserProfileSensor( $this->recorder(), $this->differ(), $this->settings() ),
+			'posts'   => new PostSensor( $this->recorder(), $this->differ(), new MetaWatcher( $this->settings() ) ),
 		);
 
 		return $this->sensors;

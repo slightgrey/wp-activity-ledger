@@ -14,6 +14,7 @@ use WPActivityLedger\Domain\Event;
 use WPActivityLedger\Loader;
 use WPActivityLedger\Recording\Recorder;
 use WPActivityLedger\Settings\Settings;
+use WPActivityLedger\Support\FilterValue;
 use WPActivityLedger\Support\PatternMatcher;
 
 /**
@@ -283,18 +284,6 @@ final class UserProfileSensor implements SensorInterface {
 	}
 
 	/**
-	 * Returns a filter result as a list of strings (third-party filters may return anything).
-	 *
-	 * @param mixed              $value    Filter result.
-	 * @param array<int, string> $fallback Used when the result is not an array.
-	 *
-	 * @return array<int, string> Strings.
-	 */
-	private static function string_list( mixed $value, array $fallback ): array {
-		return is_array( $value ) ? array_values( array_map( 'strval', array_filter( $value, 'is_scalar' ) ) ) : $fallback;
-	}
-
-	/**
 	 * Tells whether a user meta key is tracked.
 	 *
 	 * @param string $key Meta key.
@@ -309,7 +298,7 @@ final class UserProfileSensor implements SensorInterface {
 			 * @param array<int, string> $patterns Glob patterns.
 			 */
 			$patterns      = apply_filters( 'wpal_ignored_meta_keys', array_merge( self::NOISE_META, (array) $this->settings->get( 'ignored_meta_keys' ) ) );
-			$this->ignored = new PatternMatcher( self::string_list( $patterns, self::NOISE_META ) );
+			$this->ignored = new PatternMatcher( FilterValue::strings( $patterns, self::NOISE_META ) );
 		}
 
 		return '' !== $key && ! $this->ignored->matches( $key );

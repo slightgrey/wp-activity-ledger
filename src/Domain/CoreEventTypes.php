@@ -12,7 +12,7 @@ namespace WPActivityLedger\Domain;
 /**
  * Registers every core event type. Used as a lazy provider of the EventTypeRegistry.
  *
- * Template placeholders: {object}, {object_id}, {object_type}, {user}, {type} and any
+ * Template placeholders: {object}, {object_id}, {object_type}, {type_label}, {user}, {type} and any
  * scalar context key (see EventTypeRegistry::render_message()).
  */
 final class CoreEventTypes {
@@ -97,14 +97,14 @@ final class CoreEventTypes {
 		$c = Category::Content;
 
 		return array(
-			array( 'post.created', $c, Severity::Info, __( 'Content created', 'wp-activity-ledger' ), __( 'Created {object_type} "{object}"', 'wp-activity-ledger' ) ),
-			array( 'post.updated', $c, Severity::Info, __( 'Content updated', 'wp-activity-ledger' ), __( 'Updated {object_type} "{object}"', 'wp-activity-ledger' ) ),
-			array( 'post.published', $c, Severity::Notice, __( 'Content published', 'wp-activity-ledger' ), __( 'Published {object_type} "{object}"', 'wp-activity-ledger' ) ),
-			array( 'post.scheduled', $c, Severity::Info, __( 'Content scheduled', 'wp-activity-ledger' ), __( 'Scheduled {object_type} "{object}" for {date}', 'wp-activity-ledger' ) ),
-			array( 'post.unpublished', $c, Severity::Notice, __( 'Content unpublished', 'wp-activity-ledger' ), __( 'Unpublished {object_type} "{object}" (now {status})', 'wp-activity-ledger' ) ),
-			array( 'post.trashed', $c, Severity::Notice, __( 'Content trashed', 'wp-activity-ledger' ), __( 'Moved {object_type} "{object}" to the trash', 'wp-activity-ledger' ) ),
-			array( 'post.restored', $c, Severity::Info, __( 'Content restored', 'wp-activity-ledger' ), __( 'Restored {object_type} "{object}" from the trash', 'wp-activity-ledger' ) ),
-			array( 'post.deleted', $c, Severity::Warning, __( 'Content deleted', 'wp-activity-ledger' ), __( 'Permanently deleted {object_type} "{object}"', 'wp-activity-ledger' ) ),
+			array( 'post.created', $c, Severity::Info, __( 'Content created', 'wp-activity-ledger' ), __( 'Created {type_label} "{object}"', 'wp-activity-ledger' ) ),
+			array( 'post.updated', $c, Severity::Info, __( 'Content updated', 'wp-activity-ledger' ), __( 'Updated {type_label} "{object}"', 'wp-activity-ledger' ) ),
+			array( 'post.published', $c, Severity::Notice, __( 'Content published', 'wp-activity-ledger' ), __( 'Published {type_label} "{object}"', 'wp-activity-ledger' ) ),
+			array( 'post.scheduled', $c, Severity::Info, __( 'Content scheduled', 'wp-activity-ledger' ), __( 'Scheduled {type_label} "{object}" for {date}', 'wp-activity-ledger' ) ),
+			array( 'post.unpublished', $c, Severity::Notice, __( 'Content unpublished', 'wp-activity-ledger' ), __( 'Unpublished {type_label} "{object}" (now {status})', 'wp-activity-ledger' ) ),
+			array( 'post.trashed', $c, Severity::Notice, __( 'Content trashed', 'wp-activity-ledger' ), __( 'Moved {type_label} "{object}" to the trash', 'wp-activity-ledger' ) ),
+			array( 'post.restored', $c, Severity::Info, __( 'Content restored', 'wp-activity-ledger' ), __( 'Restored {type_label} "{object}" from the trash', 'wp-activity-ledger' ) ),
+			array( 'post.deleted', $c, Severity::Warning, __( 'Content deleted', 'wp-activity-ledger' ), __( 'Permanently deleted {type_label} "{object}"', 'wp-activity-ledger' ) ),
 		);
 	}
 

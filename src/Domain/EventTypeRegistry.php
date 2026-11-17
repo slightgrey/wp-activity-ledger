@@ -87,8 +87,8 @@ final class EventTypeRegistry {
 	 * Renders an event's message from its type's template.
 	 *
 	 * Placeholders: {object} (label, or ID when no label), {object_id}, {object_type},
-	 * {user}, {type}, and any scalar context key, e.g. {count}. Unknown placeholders
-	 * are removed.
+	 * {type_label} (context "type_label", else the object type), {user}, {type}, and any
+	 * scalar context key, e.g. {count}. Unknown placeholders are removed.
 	 *
 	 * @param Event $event Event.
 	 *
@@ -194,6 +194,7 @@ final class EventTypeRegistry {
 				'object'      => '' !== $event->object_label ? $event->object_label : $event->object_id,
 				'object_id'   => $event->object_id,
 				'object_type' => $event->object_type,
+				'type_label'  => (string) ( $values['type_label'] ?? $event->object_type ),
 				'user'        => $event->user_login,
 				'type'        => null === $type ? $event->event_type : $type->label,
 			)
