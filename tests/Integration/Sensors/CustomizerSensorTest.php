@@ -61,7 +61,7 @@ final class CustomizerSensorTest extends IntegrationTestCase {
 		$fields = array_column( $event['changes'], null, 'field' );
 		$this->assertSame( $title, $fields['blogname']['new'] );
 		$this->assertSame( '#ff0000', $fields['theme_mod:wpal_test_color']['new'] );
-		$this->assertSame( 'Saved 2 Customizer setting(s)', $event['message'] );
+		$this->assertSame( 'Saved 2 Customizer setting(s)', $event['message'], 'Fields: ' . implode( ', ', array_keys( $fields ) ) );
 		$this->assertFalse( apply_filters( 'wpal_option_is_claimed', false, 'blogname' ), 'Outside a save, options are not claimed.' );
 	}
 

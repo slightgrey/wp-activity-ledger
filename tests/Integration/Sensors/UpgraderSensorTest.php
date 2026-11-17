@@ -50,27 +50,15 @@ final class UpgraderSensorTest extends IntegrationTestCase {
 	public function test_plugin_install_from_upload(): void {
 		$this->as_user( 'administrator' );
 
-		$upgrader       = new class() {
-			/**
-			 * Installer skin.
-			 *
-			 * @var object
-			 */
-			public object $skin;
-
-			/**
-			 * Sets the skin.
-			 */
-			public function __construct() {
-				$this->skin = (object) array( 'type' => 'upload' );
-			}
-
+		// A real Plugin_Upgrader (other plugins listen on the hook and type-check it), with the
+		// installed plugin faked.
+		$upgrader = new class( new \Plugin_Installer_Skin( array( 'type' => 'upload' ) ) ) extends \Plugin_Upgrader {
 			/**
 			 * Returns the installed plugin file.
 			 *
 			 * @return string File.
 			 */
-			public function plugin_info(): string {
+			public function plugin_info() {
 				return 'hello.php';
 			}
 		};
@@ -103,7 +91,7 @@ final class UpgraderSensorTest extends IntegrationTestCase {
 		apply_filters( 'upgrader_pre_install', true, array( 'plugin' => 'akismet/akismet.php' ) );
 		do_action(
 			'upgrader_process_complete',
-			new \stdClass(),
+			new \Plugin_Upgrader( new \Automatic_Upgrader_Skin() ),
 			array(
 				'action'  => 'update',
 				'type'    => 'plugin',
@@ -131,7 +119,7 @@ final class UpgraderSensorTest extends IntegrationTestCase {
 		apply_filters( 'upgrader_pre_install', true, array( 'theme' => $theme ) );
 		do_action(
 			'upgrader_process_complete',
-			new \stdClass(),
+			new \Theme_Upgrader( new \Automatic_Upgrader_Skin() ),
 			array(
 				'action' => 'update',
 				'type'   => 'theme',

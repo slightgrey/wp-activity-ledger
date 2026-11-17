@@ -16,6 +16,8 @@ use WPActivityLedger\Support\PatternMatcher;
 use WPActivityLedger\Database\Installer;
 use WPActivityLedger\Domain\CoreEventTypes;
 use WPActivityLedger\Domain\EventTypeRegistry;
+use WPActivityLedger\Integrations\IntegrationManager;
+use WPActivityLedger\Integrations\WooCommerce;
 use WPActivityLedger\Recording\Recorder;
 use WPActivityLedger\Security\Capabilities;
 use WPActivityLedger\Sensors\AuthSensor;
@@ -25,6 +27,7 @@ use WPActivityLedger\Sensors\CustomizerSensor;
 use WPActivityLedger\Sensors\MediaSensor;
 use WPActivityLedger\Sensors\MenuSensor;
 use WPActivityLedger\Sensors\MetaWatcher;
+use WPActivityLedger\Sensors\OptionFilter;
 use WPActivityLedger\Sensors\OptionSensor;
 use WPActivityLedger\Sensors\PluginSensor;
 use WPActivityLedger\Sensors\PostSensor;
@@ -102,6 +105,13 @@ final class Plugin {
 	 * @var array<string, SensorInterface>|null
 	 */
 	private ?array $sensors = null;
+
+	/**
+	 * Integration manager.
+	 *
+	 * @var IntegrationManager|null
+	 */
+	private ?IntegrationManager $integrations = null;
 
 	/**
 	 * Creates the plugin.
@@ -205,12 +215,33 @@ final class Plugin {
 	}
 
 	/**
+	 * Returns the integration manager with the built-in integrations.
+	 *
+	 * @return IntegrationManager Manager.
+	 */
+	public function integrations(): IntegrationManager {
+		$this->integrations ??= new IntegrationManager(
+			array(
+				new WooCommerce( $this->recorder(), $this->differ() ),
+			)
+		);
+
+		return $this->integrations;
+	}
+
+	/**
 	 * Returns the core sensors, keyed by slug.
 	 *
 	 * @return array<string, SensorInterface> Sensors.
 	 */
 	public function core_sensors(): array {
-		$this->sensors ??= array(
+		if ( null !== $this->sensors ) {
+			return $this->sensors;
+		}
+
+		$noise = new OptionFilter( $this->settings() );
+
+		$this->sensors = array(
 			'auth'       => new AuthSensor( $this->recorder(), $this->repository(), $this->settings() ),
 			'users'      => new UserSensor( $this->recorder(), $this->differ() ),
 			'profile'    => new UserProfileSensor( $this->recorder(), $this->differ(), $this->settings() ),
@@ -219,12 +250,12 @@ final class Plugin {
 			'comments'   => new CommentSensor( $this->recorder(), $this->differ() ),
 			'terms'      => new TermSensor( $this->recorder(), $this->differ() ),
 			'menus'      => new MenuSensor( $this->recorder(), $this->differ() ),
-			'customizer' => new CustomizerSensor( $this->recorder(), $this->differ() ),
+			'customizer' => new CustomizerSensor( $this->recorder(), $this->differ(), $noise ),
 			'plugins'    => new PluginSensor( $this->recorder() ),
 			'upgrader'   => new UpgraderSensor( $this->recorder() ),
 			'themes'     => new ThemeSensor( $this->recorder() ),
 			'autoupdate' => new AutoUpdateSensor( $this->recorder(), $this->differ() ),
-			'options'    => new OptionSensor( $this->recorder(), $this->differ(), $this->settings() ),
+			'options'    => new OptionSensor( $this->recorder(), $this->differ(), $noise ),
 			'tools'      => new ToolsSensor( $this->recorder() ),
 			'self'       => new SelfSensor( $this->recorder(), $this->differ() ),
 		);
@@ -251,6 +282,7 @@ final class Plugin {
 		$this->recorder()->register( $this->loader );
 		$this->loader->add_action( 'wpal_log', 'wpal_log', 10, 2 );
 		( new SensorRegistry( $this->core_sensors() ) )->register( $this->loader );
+		$this->integrations()->load( $this->loader, $this->types() );
 
 		/**
 		 * Fires after the core modules queued their hooks and before they are registered.

@@ -9,3 +9,5 @@ parameters:
 		- src
 	bootstrapFiles:
 		- tests/phpstan-bootstrap.php
+	scanFiles:
+		- vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php

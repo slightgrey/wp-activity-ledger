@@ -13,46 +13,15 @@ use WPActivityLedger\Diff\Differ;
 use WPActivityLedger\Domain\Event;
 use WPActivityLedger\Loader;
 use WPActivityLedger\Recording\Recorder;
-use WPActivityLedger\Settings\Settings;
-use WPActivityLedger\Support\FilterValue;
-use WPActivityLedger\Support\PatternMatcher;
 
 /**
  * Records option changes, all changes of one request in one "option.updated" event,
  * labelled with the settings page they came from.
  *
- * Skipped: ignored patterns (settings + wpal_ignored_option_patterns), Activity Ledger's
- * own options (the self sensor records those), and options another sensor claims via
+ * Skipped: noise (see OptionFilter), and options another sensor claims via
  * wpal_option_is_claimed (widgets, Customizer, auto-updates, integrations).
  */
 final class OptionSensor implements SensorInterface {
-
-	/**
-	 * Options always skipped here: Activity Ledger's own (the self sensor records them) and
-	 * values WordPress or common plugins rewrite on their own. Kept in code, not settings,
-	 * so updates of this list reach existing sites.
-	 */
-	private const NOISE = array(
-		'wpal_*',
-		'_transient_*',
-		'_site_transient_*',
-		'cron',
-		'*_lock',
-		'rewrite_rules',
-		'user_count',
-		'recently_activated',
-		'active_plugins',
-		'uninstall_plugins',
-		'db_upgraded',
-		'finished_updating_comment_type',
-		'auto_core_update_*',
-		'can_compress_scripts',
-		'*_last_checked',
-		'*_cache*',
-		'action_scheduler_*',
-		'jetpack_*sync*',
-		'_elementor_*',
-	);
 
 	/**
 	 * Changed options: option => [first old value, latest new value].
@@ -69,23 +38,16 @@ final class OptionSensor implements SensorInterface {
 	private array $deleting = array();
 
 	/**
-	 * Ignored-option matcher, built on first use.
-	 *
-	 * @var PatternMatcher|null
-	 */
-	private ?PatternMatcher $ignored = null;
-
-	/**
 	 * Creates the sensor.
 	 *
-	 * @param Recorder $recorder Recorder.
-	 * @param Differ   $differ   Differ.
-	 * @param Settings $settings Settings (ignored option patterns).
+	 * @param Recorder     $recorder Recorder.
+	 * @param Differ       $differ   Differ.
+	 * @param OptionFilter $noise    Decides which options are noise.
 	 */
 	public function __construct(
 		private readonly Recorder $recorder,
 		private readonly Differ $differ,
-		private readonly Settings $settings
+		private readonly OptionFilter $noise
 	) {
 	}
 
@@ -217,7 +179,7 @@ final class OptionSensor implements SensorInterface {
 	 * @return bool True when tracked.
 	 */
 	private function tracks( string $option ): bool {
-		if ( '' === $option || $this->ignored()->matches( $option ) ) {
+		if ( $this->noise->is_noise( $option ) ) {
 			return false;
 		}
 
@@ -228,27 +190,6 @@ final class OptionSensor implements SensorInterface {
 		 * @param string $option  Option name.
 		 */
 		return ! apply_filters( 'wpal_option_is_claimed', false, $option );
-	}
-
-	/**
-	 * Returns the ignored-option matcher.
-	 *
-	 * @return PatternMatcher Matcher.
-	 */
-	private function ignored(): PatternMatcher {
-		if ( null === $this->ignored ) {
-			$defaults = array_map( 'strval', (array) $this->settings->get( 'ignored_option_patterns' ) );
-
-			/**
-			 * Filters the ignored option name patterns.
-			 *
-			 * @param array<int, string> $patterns Glob patterns.
-			 */
-			$patterns      = FilterValue::strings( apply_filters( 'wpal_ignored_option_patterns', $defaults ), $defaults );
-			$this->ignored = new PatternMatcher( array_merge( self::NOISE, $patterns ) );
-		}
-
-		return $this->ignored;
 	}
 
 	/**

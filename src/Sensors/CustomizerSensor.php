@@ -50,12 +50,14 @@ final class CustomizerSensor implements SensorInterface {
 	/**
 	 * Creates the sensor.
 	 *
-	 * @param Recorder $recorder Recorder.
-	 * @param Differ   $differ   Differ.
+	 * @param Recorder     $recorder Recorder.
+	 * @param Differ       $differ   Differ.
+	 * @param OptionFilter $noise    Skips noise options written during a save (transients, caches).
 	 */
 	public function __construct(
 		private readonly Recorder $recorder,
-		private readonly Differ $differ
+		private readonly Differ $differ,
+		private readonly OptionFilter $noise
 	) {
 	}
 
@@ -176,6 +178,10 @@ final class CustomizerSensor implements SensorInterface {
 	 * @return void
 	 */
 	private function collect( string $option, mixed $old_value, mixed $value ): void {
+		if ( $this->noise->is_noise( $option ) ) {
+			return;
+		}
+
 		if ( $this->in_customizer ) {
 			array_push( $this->customizer_changes, ...$this->option_changes( $option, $old_value, $value ) );
 			return;
