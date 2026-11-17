@@ -28,18 +28,11 @@ use WPActivityLedger\Sensors\OptionFilter;
 final class WooSettingsWatcher {
 
 	/**
-	 * Changed options: option => [first old value, latest new value].
+	 * Collects the WooCommerce option changes.
 	 *
-	 * @var array<string, array{0: mixed, 1: mixed}>
+	 * @var OptionCollector
 	 */
-	private array $pending = array();
-
-	/**
-	 * Values captured before deletion: option => value.
-	 *
-	 * @var array<string, mixed>
-	 */
-	private array $deleting = array();
+	private OptionCollector $options;
 
 	/**
 	 * Creates the watcher.
@@ -51,8 +44,12 @@ final class WooSettingsWatcher {
 	public function __construct(
 		private readonly Recorder $recorder,
 		private readonly Differ $differ,
-		private readonly OptionFilter $noise
+		OptionFilter $noise
 	) {
+		$this->options = new OptionCollector(
+			static fn( string $option ): bool => str_starts_with( $option, 'woocommerce_' ),
+			static fn( string $option ): bool => ! $noise->is_noise( $option )
+		);
 	}
 
 	/**
@@ -63,75 +60,7 @@ final class WooSettingsWatcher {
 	 * @return void
 	 */
 	public function register( Loader $loader ): void {
-		$loader->add_filter( 'wpal_option_is_claimed', array( $this, 'claims_option' ), 10, 2 );
-		$loader->add_action( 'updated_option', array( $this, 'on_updated' ), 10, 3 );
-		$loader->add_action( 'added_option', array( $this, 'on_added' ), 10, 2 );
-		$loader->add_action( 'delete_option', array( $this, 'before_delete' ), 10, 1 );
-		$loader->add_action( 'deleted_option', array( $this, 'on_deleted' ), 10, 1 );
-	}
-
-	/**
-	 * Claims the WooCommerce options for this watcher.
-	 *
-	 * @param mixed  $claimed Whether another sensor already claimed it.
-	 * @param string $option  Option name.
-	 *
-	 * @return bool True when claimed.
-	 */
-	public function claims_option( $claimed, $option ): bool {
-		return (bool) $claimed || self::is_woocommerce_option( (string) $option );
-	}
-
-	/**
-	 * Collects an updated option.
-	 *
-	 * @param string $option    Option name.
-	 * @param mixed  $old_value Old value.
-	 * @param mixed  $value     New value.
-	 *
-	 * @return void
-	 */
-	public function on_updated( $option, $old_value, $value ): void {
-		$this->collect( (string) $option, $old_value, $value );
-	}
-
-	/**
-	 * Collects an added option.
-	 *
-	 * @param string $option Option name.
-	 * @param mixed  $value  Value.
-	 *
-	 * @return void
-	 */
-	public function on_added( $option, $value ): void {
-		$this->collect( (string) $option, null, $value );
-	}
-
-	/**
-	 * Remembers an option's value before it is deleted.
-	 *
-	 * @param string $option Option name.
-	 *
-	 * @return void
-	 */
-	public function before_delete( $option ): void {
-		if ( $this->tracks( (string) $option ) ) {
-			$this->deleting[ (string) $option ] = get_option( (string) $option );
-		}
-	}
-
-	/**
-	 * Collects a deleted option.
-	 *
-	 * @param string $option Option name.
-	 *
-	 * @return void
-	 */
-	public function on_deleted( $option ): void {
-		if ( array_key_exists( (string) $option, $this->deleting ) ) {
-			$this->collect( (string) $option, $this->deleting[ (string) $option ], null );
-			unset( $this->deleting[ (string) $option ] );
-		}
+		$this->options->register( $loader );
 	}
 
 	/**
@@ -140,11 +69,9 @@ final class WooSettingsWatcher {
 	 * @return void
 	 */
 	public function record_pending(): void {
-		$pending       = $this->pending;
-		$this->pending = array();
-		$changes       = array();
+		$changes = array();
 
-		foreach ( $pending as $option => [ $old, $new ] ) {
+		foreach ( $this->options->take() as $option => [ $old, $new ] ) {
 			[ $old, $new ] = $this->split_gateway_toggle( $option, $old, $new );
 			array_push( $changes, ...$this->differ->diff_value( $option, $old, $new ) );
 		}
@@ -236,46 +163,6 @@ final class WooSettingsWatcher {
 				changes: $changes
 			)
 		);
-	}
-
-	/**
-	 * Adds an option change, keeping the first old value and the latest new value.
-	 *
-	 * @param string $option    Option name.
-	 * @param mixed  $old_value Old value.
-	 * @param mixed  $value     New value.
-	 *
-	 * @return void
-	 */
-	private function collect( string $option, mixed $old_value, mixed $value ): void {
-		if ( ! $this->tracks( $option ) ) {
-			return;
-		}
-
-		$first                    = array_key_exists( $option, $this->pending ) ? $this->pending[ $option ][0] : $old_value;
-		$this->pending[ $option ] = array( $first, $value );
-	}
-
-	/**
-	 * Tells whether an option is recorded here.
-	 *
-	 * @param string $option Option name.
-	 *
-	 * @return bool True for WooCommerce options that aren't noise.
-	 */
-	private function tracks( string $option ): bool {
-		return self::is_woocommerce_option( $option ) && ! $this->noise->is_noise( $option );
-	}
-
-	/**
-	 * Tells whether an option belongs to WooCommerce.
-	 *
-	 * @param string $option Option name.
-	 *
-	 * @return bool True for "woocommerce_*" options.
-	 */
-	private static function is_woocommerce_option( string $option ): bool {
-		return str_starts_with( $option, 'woocommerce_' );
 	}
 
 	/**

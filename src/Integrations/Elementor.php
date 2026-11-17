@@ -17,9 +17,11 @@ use WPActivityLedger\Domain\EventType;
 use WPActivityLedger\Domain\Severity;
 use WPActivityLedger\Loader;
 use WPActivityLedger\Recording\Recorder;
+use WPActivityLedger\Sensors\OptionFilter;
 
 /**
- * Records Elementor activity: documents (pages, posts) saved in the editor.
+ * Records Elementor activity: documents (pages, posts) saved in the editor, the template
+ * library and site kit (ElementorLibrary), and Elementor settings (ElementorSettingsWatcher).
  *
  * One save records one "elementor.document_saved" event with the element count and status
  * changes. The content sensor's "post.updated" for the same post in the same request is
@@ -55,15 +57,33 @@ final class Elementor implements IntegrationInterface {
 	private array $absorbed = array();
 
 	/**
+	 * Records templates and the site kit.
+	 *
+	 * @var ElementorLibrary
+	 */
+	private ElementorLibrary $library;
+
+	/**
+	 * Records Elementor settings.
+	 *
+	 * @var ElementorSettingsWatcher
+	 */
+	private ElementorSettingsWatcher $settings;
+
+	/**
 	 * Creates the integration.
 	 *
-	 * @param Recorder $recorder Recorder.
-	 * @param Differ   $differ   Differ.
+	 * @param Recorder     $recorder Recorder.
+	 * @param Differ       $differ   Differ.
+	 * @param OptionFilter $noise    Option noise filter.
 	 */
 	public function __construct(
 		private readonly Recorder $recorder,
-		private readonly Differ $differ
+		private readonly Differ $differ,
+		OptionFilter $noise
 	) {
+		$this->library  = new ElementorLibrary( $recorder, $differ );
+		$this->settings = new ElementorSettingsWatcher( $recorder, $differ, $noise );
 	}
 
 	/**
@@ -107,6 +127,8 @@ final class Elementor implements IntegrationInterface {
 		$loader->add_action( 'elementor/document/after_save', array( $this, 'after_save' ), 10, 1 );
 		$loader->add_filter( 'wpal_event_before_save', array( $this, 'absorb_post_update' ), 10, 1 );
 		$loader->add_action( 'shutdown', array( $this, 'record_pending' ), 0, 0 );
+		$this->library->register( $loader );
+		$this->settings->register( $loader );
 	}
 
 	/**
@@ -115,8 +137,18 @@ final class Elementor implements IntegrationInterface {
 	 * @return array<int, EventType> Types.
 	 */
 	public function event_types(): array {
+		$c = Category::Elementor;
+
 		return array(
-			new EventType( 'elementor.document_saved', Category::Elementor, Severity::Info, __( 'Edited with Elementor', 'wp-activity-ledger' ), __( 'Edited {type_label} "{object}" with Elementor', 'wp-activity-ledger' ) ),
+			new EventType( 'elementor.document_saved', $c, Severity::Info, __( 'Edited with Elementor', 'wp-activity-ledger' ), __( 'Edited {type_label} "{object}" with Elementor', 'wp-activity-ledger' ) ),
+			new EventType( 'elementor.template_created', $c, Severity::Info, __( 'Template created', 'wp-activity-ledger' ), __( 'Created Elementor template "{object}"', 'wp-activity-ledger' ) ),
+			new EventType( 'elementor.template_updated', $c, Severity::Info, __( 'Template updated', 'wp-activity-ledger' ), __( 'Edited Elementor template "{object}"', 'wp-activity-ledger' ) ),
+			new EventType( 'elementor.template_trashed', $c, Severity::Notice, __( 'Template trashed', 'wp-activity-ledger' ), __( 'Moved Elementor template "{object}" to the trash', 'wp-activity-ledger' ) ),
+			new EventType( 'elementor.template_restored', $c, Severity::Info, __( 'Template restored', 'wp-activity-ledger' ), __( 'Restored Elementor template "{object}" from the trash', 'wp-activity-ledger' ) ),
+			new EventType( 'elementor.template_deleted', $c, Severity::Warning, __( 'Template deleted', 'wp-activity-ledger' ), __( 'Deleted Elementor template "{object}"', 'wp-activity-ledger' ) ),
+			new EventType( 'elementor.kit_updated', $c, Severity::Notice, __( 'Site Settings changed', 'wp-activity-ledger' ), __( 'Changed {count} Elementor Site Setting(s)', 'wp-activity-ledger' ) ),
+			new EventType( 'elementor.settings_changed', $c, Severity::Notice, __( 'Elementor settings changed', 'wp-activity-ledger' ), __( 'Changed {count} Elementor setting(s)', 'wp-activity-ledger' ) ),
+			new EventType( 'elementor.conditions_changed', $c, Severity::Notice, __( 'Display conditions changed', 'wp-activity-ledger' ), __( 'Changed Elementor theme-builder display conditions', 'wp-activity-ledger' ) ),
 		);
 	}
 
@@ -141,7 +173,9 @@ final class Elementor implements IntegrationInterface {
 	public function before_save( mixed $document = null ): void {
 		$post = self::post_of( $document );
 
-		if ( null !== $post ) {
+		if ( null !== $post && self::LIBRARY_TYPE === $post->post_type ) {
+			$this->library->before_save( $post );
+		} elseif ( null !== $post ) {
 			$this->before[ $post->ID ] ??= array(
 				'elements' => self::element_count( $post->ID ),
 				'status'   => $post->post_status,
@@ -158,6 +192,12 @@ final class Elementor implements IntegrationInterface {
 	 */
 	public function after_save( mixed $document = null ): void {
 		$post = self::post_of( $document );
+
+		if ( null !== $post && self::LIBRARY_TYPE === $post->post_type ) {
+			$this->library->after_save( $post );
+
+			return;
+		}
 
 		if ( null === $post || ! array_key_exists( $post->ID, $this->before ) ) {
 			return;
@@ -190,7 +230,7 @@ final class Elementor implements IntegrationInterface {
 	}
 
 	/**
-	 * Records one event per saved document. Runs on shutdown (priority 0).
+	 * Records saved documents, library and settings changes. Runs on shutdown (priority 0).
 	 *
 	 * @return void
 	 */
@@ -204,6 +244,9 @@ final class Elementor implements IntegrationInterface {
 		foreach ( $saved as $post_id => $item ) {
 			$this->record_save( $item, $absorbed[ $post_id ] ?? array() );
 		}
+
+		$this->library->record_pending();
+		$this->settings->record_pending();
 	}
 
 	/**
@@ -255,7 +298,7 @@ final class Elementor implements IntegrationInterface {
 	}
 
 	/**
-	 * Returns the post of a document that is recorded here (not autosaves, revisions or library items).
+	 * Returns the post of a document that is recorded (not autosaves or revisions).
 	 *
 	 * @param mixed $document Elementor document.
 	 *
@@ -268,7 +311,7 @@ final class Elementor implements IntegrationInterface {
 
 		$post = $document->get_post();
 
-		if ( ! $post instanceof \WP_Post || in_array( $post->post_type, array( 'revision', self::LIBRARY_TYPE ), true ) ) {
+		if ( ! $post instanceof \WP_Post || 'revision' === $post->post_type ) {
 			return null;
 		}
 
@@ -282,7 +325,7 @@ final class Elementor implements IntegrationInterface {
 	 *
 	 * @return int Element count.
 	 */
-	private static function element_count( int $post_id ): int {
+	public static function element_count( int $post_id ): int {
 		$data     = get_post_meta( $post_id, '_elementor_data', true );
 		$elements = is_string( $data ) ? json_decode( $data, true ) : $data;
 

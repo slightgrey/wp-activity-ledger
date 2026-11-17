@@ -55,6 +55,18 @@ final class WooCommerce implements IntegrationInterface {
 	);
 
 	/**
+	 * User meta WooCommerce maintains on its own (carts, activity, order stats).
+	 */
+	public const NOISE_META = array(
+		'_woocommerce_load_saved_cart_after_login',
+		'_woocommerce_persistent_cart_*',
+		'wc_last_active',
+		'_order_count',
+		'_money_spent',
+		'_last_order',
+	);
+
+	/**
 	 * Diffs orders, products and coupons on save.
 	 *
 	 * @var WooObjectTracker
@@ -130,6 +142,7 @@ final class WooCommerce implements IntegrationInterface {
 		$loader->add_action( 'before_woocommerce_init', array( $this, 'declare_compatibility' ), 10, 0 );
 		$loader->add_filter( 'wpal_post_sensor_skip_types', array( $this, 'skip_post_types' ), 10, 1 );
 		$loader->add_filter( 'wpal_ignored_option_patterns', array( $this, 'ignore_noise_options' ), 10, 1 );
+		$loader->add_filter( 'wpal_ignored_meta_keys', array( $this, 'ignore_noise_meta' ), 10, 1 );
 		$loader->add_action( 'woocommerce_before_order_object_save', array( $this, 'on_order_save' ), 10, 1 );
 		$loader->add_action( 'shutdown', array( $this, 'record_pending' ), 0, 0 );
 		$loader->add_action( 'woocommerce_order_status_changed', array( $this, 'on_status_changed' ), 10, 4 );
@@ -265,6 +278,17 @@ final class WooCommerce implements IntegrationInterface {
 	 */
 	public function ignore_noise_options( $patterns ): array {
 		return array_values( array_unique( array_merge( array_map( 'strval', (array) $patterns ), self::NOISE_OPTIONS ) ) );
+	}
+
+	/**
+	 * Adds WooCommerce's self-maintained user meta to the ignored meta keys.
+	 *
+	 * @param mixed $keys Ignored meta key patterns.
+	 *
+	 * @return array<int, string> Ignored meta key patterns.
+	 */
+	public function ignore_noise_meta( $keys ): array {
+		return array_values( array_unique( array_merge( array_map( 'strval', (array) $keys ), self::NOISE_META ) ) );
 	}
 
 	/**

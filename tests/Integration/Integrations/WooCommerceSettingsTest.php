@@ -132,6 +132,41 @@ final class WooCommerceSettingsTest extends WooCommerceTestCase {
 	}
 
 	/**
+	 * WooCommerce's own user meta (saved cart flag on login) is not a profile change.
+	 *
+	 * @return void
+	 */
+	public function test_noise_user_meta_is_ignored(): void {
+		// A user from before this run (the profile sensor skips users registered in the request).
+		$user_id = (int) get_users(
+			array(
+				'number'  => 1,
+				'orderby' => 'ID',
+				'fields'  => 'ID',
+			)
+		)[0];
+		$start   = self::max_event_id();
+
+		update_user_meta( $user_id, '_woocommerce_load_saved_cart_after_login', 'x' . wp_rand() );
+		$sensor = Plugin::instance()->core_sensors()['profile'];
+		self::assertInstanceOf( \WPActivityLedger\Sensors\UserProfileSensor::class, $sensor );
+		$sensor->record_pending();
+		Plugin::instance()->recorder()->flush();
+
+		$items = self::newer_than(
+			Plugin::instance()->repository()->query(
+				array(
+					'type'  => 'user.updated',
+					'order' => 'desc',
+				)
+			)['items'],
+			$start
+		);
+
+		$this->assertSame( array(), $items );
+	}
+
+	/**
 	 * Settles, then returns new WooCommerce settings/gateway and core option events, oldest first.
 	 *
 	 * @param int $after ID boundary.

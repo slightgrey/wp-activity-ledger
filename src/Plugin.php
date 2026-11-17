@@ -231,7 +231,7 @@ final class Plugin {
 		$this->integrations ??= new IntegrationManager(
 			array(
 				new WooCommerce( $this->recorder(), $this->differ(), $this->option_filter() ),
-				new Elementor( $this->recorder(), $this->differ() ),
+				new Elementor( $this->recorder(), $this->differ(), $this->option_filter() ),
 			)
 		);
 

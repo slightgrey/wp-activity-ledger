@@ -97,7 +97,9 @@ final class ElementorDocumentTest extends IntegrationTestCase {
 			)
 		);
 
-		$this->assertSame( array(), self::events_for( (int) $id, $start ) );
+		$types = array_column( self::events_for( (int) $id, $start ), 'event_type' );
+
+		$this->assertSame( array(), array_values( array_filter( $types, static fn( string $type ): bool => str_starts_with( $type, 'post.' ) ) ) );
 	}
 
 	/**
