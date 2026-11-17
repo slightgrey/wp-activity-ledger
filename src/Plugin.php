@@ -17,6 +17,7 @@ use WPActivityLedger\Database\Installer;
 use WPActivityLedger\Domain\CoreEventTypes;
 use WPActivityLedger\Domain\EventTypeRegistry;
 use WPActivityLedger\Integrations\IntegrationManager;
+use WPActivityLedger\Integrations\Elementor;
 use WPActivityLedger\Integrations\WooCommerce;
 use WPActivityLedger\Recording\Recorder;
 use WPActivityLedger\Security\Capabilities;
@@ -230,6 +231,7 @@ final class Plugin {
 		$this->integrations ??= new IntegrationManager(
 			array(
 				new WooCommerce( $this->recorder(), $this->differ(), $this->option_filter() ),
+				new Elementor( $this->recorder(), $this->differ() ),
 			)
 		);
 
