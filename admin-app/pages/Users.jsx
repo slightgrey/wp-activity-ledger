@@ -14,6 +14,7 @@ import { api } from '@/lib/api';
 import { config } from '@/lib/config';
 import { formatDateTime, relativeTime } from '@/lib/format';
 import { cn } from '@/lib/utils';
+import { __, sprintf } from '@/lib/i18n';
 
 const PER_PAGE = 100;
 const ALL = 'all';
@@ -82,7 +83,7 @@ export default function Users() {
               setSearch(e.target.value);
               setPage(1);
             }}
-            placeholder="Search by name, login or email…"
+            placeholder={__( 'Search by name, login or email…', 'wp-activity-ledger' )}
           />
         </div>
         <Select
@@ -96,7 +97,7 @@ export default function Users() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={ALL}>Any role</SelectItem>
+            <SelectItem value={ALL}>{__( 'Any role', 'wp-activity-ledger' )}</SelectItem>
             {(meta.data?.roles ?? []).map((r) => (
               <SelectItem key={r.slug} value={r.slug}>
                 {r.name}
@@ -107,19 +108,19 @@ export default function Users() {
       </div>
 
       <p className="text-sm text-muted-foreground">
-        {users.isLoading ? 'Loading…' : `${(users.data?.total ?? 0).toLocaleString()} users`} · event counts cover the last 30 days
+        {users.isLoading ? __( 'Loading…', 'wp-activity-ledger' ) : sprintf( __( '%s users', 'wp-activity-ledger' ), (users.data?.total ?? 0).toLocaleString() )}{' '}{__( '· event counts cover the last 30 days', 'wp-activity-ledger' )}
       </p>
 
       <div className="rounded-lg border bg-card">
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
-              <SortHead label="User" sortKey="login" sort={sort} onSort={setSort} />
-              <TableHead>Roles</TableHead>
-              <SortHead label="Last activity" sortKey="last_activity" sort={sort} onSort={setSort} />
-              <TableHead>Last login</TableHead>
-              <SortHead label="Events" sortKey="events" sort={sort} onSort={setSort} className="text-right" />
-              <TableHead className="text-right">Failed logins</TableHead>
+              <SortHead label={__( 'User', 'wp-activity-ledger' )} sortKey="login" sort={sort} onSort={setSort} />
+              <TableHead>{__( 'Roles', 'wp-activity-ledger' )}</TableHead>
+              <SortHead label={__( 'Last activity', 'wp-activity-ledger' )} sortKey="last_activity" sort={sort} onSort={setSort} />
+              <TableHead>{__( 'Last login', 'wp-activity-ledger' )}</TableHead>
+              <SortHead label={__( 'Events', 'wp-activity-ledger' )} sortKey="events" sort={sort} onSort={setSort} className="text-right" />
+              <TableHead className="text-right">{__( 'Failed logins', 'wp-activity-ledger' )}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -159,19 +160,19 @@ export default function Users() {
             ))}
           </TableBody>
         </Table>
-        {users.data && rows.length === 0 && <p className="p-8 text-center text-sm text-muted-foreground">No users match.</p>}
+        {users.data && rows.length === 0 && <p className="p-8 text-center text-sm text-muted-foreground">{__( 'No users match.', 'wp-activity-ledger' )}</p>}
         {users.isError && <p className="p-6 text-center text-sm text-destructive">{users.error.message}</p>}
       </div>
 
       {totalPages > 1 && (
         <div className="flex items-center justify-end gap-2 text-sm">
           <span className="text-muted-foreground">
-            Page {page} of {totalPages}
+            {__( 'Page', 'wp-activity-ledger' )}{' '}{page} of {totalPages}
           </span>
-          <Button variant="outline" size="icon" disabled={page <= 1} onClick={() => setPage(page - 1)} aria-label="Previous page">
+          <Button variant="outline" size="icon" disabled={page <= 1} onClick={() => setPage(page - 1)} aria-label={__( 'Previous page', 'wp-activity-ledger' )}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="icon" disabled={page >= totalPages} onClick={() => setPage(page + 1)} aria-label="Next page">
+          <Button variant="outline" size="icon" disabled={page >= totalPages} onClick={() => setPage(page + 1)} aria-label={__( 'Next page', 'wp-activity-ledger' )}>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>

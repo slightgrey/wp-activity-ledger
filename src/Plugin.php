@@ -386,6 +386,7 @@ final class Plugin {
 		$this->booted = true;
 
 		Installer::maybe_upgrade();
+		$this->loader->add_action( 'init', array( self::class, 'load_textdomain' ), 1, 0 );
 		$this->loader->add_action( 'admin_notices', array( Installer::class, 'error_notice' ) );
 		$this->loader->add_action( 'network_admin_notices', array( Installer::class, 'error_notice' ) );
 		Capabilities::register( $this->loader );
@@ -415,6 +416,16 @@ final class Plugin {
 		do_action( 'wpal_register', $this->loader );
 
 		$this->loader->run();
+	}
+
+	/**
+	 * Loads the plugin's translations from its languages/ folder (WordPress loads the ones in
+	 * wp-content/languages/plugins/ on its own).
+	 *
+	 * @return void
+	 */
+	public static function load_textdomain(): void {
+		load_plugin_textdomain( 'wp-activity-ledger', false, dirname( plugin_basename( WPAL_FILE ) ) . '/languages' );
 	}
 
 	/**

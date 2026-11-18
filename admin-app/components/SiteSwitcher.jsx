@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { api, setSite } from '@/lib/api';
+import { __ } from '@/lib/i18n';
 
 /**
  * Network admin only: picks the site whose log, dashboard and users are shown. Switching
@@ -32,13 +33,13 @@ export default function SiteSwitcher() {
 
   return (
     <Select value={site ? String(site) : undefined} onValueChange={choose}>
-      <SelectTrigger className="w-64" aria-label="Site">
-        <SelectValue placeholder="Choose a site" />
+      <SelectTrigger className="w-64" aria-label={__( 'Site', 'wp-activity-ledger' )}>
+        <SelectValue placeholder={__( 'Choose a site', 'wp-activity-ledger' )} />
       </SelectTrigger>
       <SelectContent>
         {sites.data.map((s) => (
           <SelectItem key={s.id} value={String(s.id)}>
-            {s.name || s.url} {s.main ? '(main site, network events)' : ''}
+            {s.name || s.url} {s.main ? __( '(main site, network events)', 'wp-activity-ledger' ) : ''}
           </SelectItem>
         ))}
       </SelectContent>

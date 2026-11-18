@@ -8,22 +8,23 @@ import UserPicker from '@/components/UserPicker';
 import { useDebounced } from '@/hooks/useDebounced';
 import { hasFilters } from '@/lib/filters';
 import { categoryLabel } from '@/lib/format';
+import { __ } from '@/lib/i18n';
 
 const ALL = 'all';
 
 const RANGE_OPTIONS = [
-  { value: ALL, label: 'All time' },
-  { value: '24h', label: 'Last 24 hours' },
-  { value: '7d', label: 'Last 7 days' },
-  { value: '30d', label: 'Last 30 days' },
-  { value: 'custom', label: 'Custom range' },
+  { value: ALL, label: __( 'All time', 'wp-activity-ledger' ) },
+  { value: '24h', label: __( 'Last 24 hours', 'wp-activity-ledger' ) },
+  { value: '7d', label: __( 'Last 7 days', 'wp-activity-ledger' ) },
+  { value: '30d', label: __( 'Last 30 days', 'wp-activity-ledger' ) },
+  { value: 'custom', label: __( 'Custom range', 'wp-activity-ledger' ) },
 ];
 
 const SEVERITY_OPTIONS = [
-  { value: ALL, label: 'Any severity' },
-  { value: 'notice', label: 'Notice and up' },
-  { value: 'warning', label: 'Warning and up' },
-  { value: 'critical', label: 'Critical only' },
+  { value: ALL, label: __( 'Any severity', 'wp-activity-ledger' ) },
+  { value: 'notice', label: __( 'Notice and up', 'wp-activity-ledger' ) },
+  { value: 'warning', label: __( 'Warning and up', 'wp-activity-ledger' ) },
+  { value: 'critical', label: __( 'Critical only', 'wp-activity-ledger' ) },
 ];
 
 /**
@@ -70,7 +71,7 @@ export default function FilterBar({ filters, onChange, onClear, meta, hidden = [
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative min-w-[200px] flex-1">
           <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <DebouncedInput className="pl-8" value={filters.search} onChange={(search) => onChange({ search })} placeholder="Search messages and objects…" />
+          <DebouncedInput className="pl-8" value={filters.search} onChange={(search) => onChange({ search })} placeholder={__( 'Search messages and objects…', 'wp-activity-ledger' )} />
         </div>
         <Select value={filters.range || ALL} onValueChange={(range) => onChange({ range: range === ALL ? '' : range })}>
           <SelectTrigger className="w-40">
@@ -86,8 +87,8 @@ export default function FilterBar({ filters, onChange, onClear, meta, hidden = [
         </Select>
         {filters.range === 'custom' && (
           <>
-            <Input type="date" className="w-40" value={filters.from} onChange={(e) => onChange({ from: e.target.value })} aria-label="From" />
-            <Input type="date" className="w-40" value={filters.to} onChange={(e) => onChange({ to: e.target.value })} aria-label="To" />
+            <Input type="date" className="w-40" value={filters.from} onChange={(e) => onChange({ from: e.target.value })} aria-label={__( 'From', 'wp-activity-ledger' )} />
+            <Input type="date" className="w-40" value={filters.to} onChange={(e) => onChange({ to: e.target.value })} aria-label={__( 'To', 'wp-activity-ledger' )} />
           </>
         )}
         {!hidden.includes('user') && <UserPicker value={filters.user} onChange={(user) => onChange({ user })} />}
@@ -96,7 +97,7 @@ export default function FilterBar({ filters, onChange, onClear, meta, hidden = [
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={ALL}>Any role</SelectItem>
+            <SelectItem value={ALL}>{__( 'Any role', 'wp-activity-ledger' )}</SelectItem>
             {(meta?.roles ?? []).map((r) => (
               <SelectItem key={r.slug} value={r.slug}>
                 {r.name}
@@ -104,8 +105,8 @@ export default function FilterBar({ filters, onChange, onClear, meta, hidden = [
             ))}
           </SelectContent>
         </Select>
-        <MultiSelect label="Category" className="w-36" options={categories} value={filters.category} onChange={(category) => onChange({ category })} />
-        <MultiSelect label="Event" className="w-36" options={types} value={filters.type} onChange={(type) => onChange({ type })} />
+        <MultiSelect label={__( 'Category', 'wp-activity-ledger' )} className="w-36" options={categories} value={filters.category} onChange={(category) => onChange({ category })} />
+        <MultiSelect label={__( 'Event', 'wp-activity-ledger' )} className="w-36" options={types} value={filters.type} onChange={(type) => onChange({ type })} />
         <Select value={filters.severity || ALL} onValueChange={(severity) => onChange({ severity: severity === ALL ? '' : severity })}>
           <SelectTrigger className="w-40">
             <SelectValue />
@@ -120,21 +121,21 @@ export default function FilterBar({ filters, onChange, onClear, meta, hidden = [
         </Select>
         <Button variant="ghost" size="sm" onClick={() => setMore(!more)}>
           <SlidersHorizontal className="h-4 w-4" />
-          More
+          {__( 'More', 'wp-activity-ledger' )}
         </Button>
         {hasFilters(Object.fromEntries(Object.entries(filters).filter(([key]) => !hidden.includes(key)))) && (
           <Button variant="ghost" size="sm" onClick={onClear}>
             <X className="h-4 w-4" />
-            Clear
+            {__( 'Clear', 'wp-activity-ledger' )}
           </Button>
         )}
       </div>
       {more && (
         <div className="flex flex-wrap items-center gap-2">
-          <DebouncedInput className="w-40" value={filters.object_type} onChange={(object_type) => onChange({ object_type })} placeholder="Object type" />
-          <DebouncedInput className="w-40" value={filters.object_id} onChange={(object_id) => onChange({ object_id })} placeholder="Object ID" />
-          <DebouncedInput className="w-40" value={filters.ip} onChange={(ip) => onChange({ ip })} placeholder="IP address" />
-          <DebouncedInput className="w-40" value={filters.session} onChange={(session) => onChange({ session })} placeholder="Session" />
+          <DebouncedInput className="w-40" value={filters.object_type} onChange={(object_type) => onChange({ object_type })} placeholder={__( 'Object type', 'wp-activity-ledger' )} />
+          <DebouncedInput className="w-40" value={filters.object_id} onChange={(object_id) => onChange({ object_id })} placeholder={__( 'Object ID', 'wp-activity-ledger' )} />
+          <DebouncedInput className="w-40" value={filters.ip} onChange={(ip) => onChange({ ip })} placeholder={__( 'IP address', 'wp-activity-ledger' )} />
+          <DebouncedInput className="w-40" value={filters.session} onChange={(session) => onChange({ session })} placeholder={__( 'Session', 'wp-activity-ledger' )} />
         </div>
       )}
     </div>

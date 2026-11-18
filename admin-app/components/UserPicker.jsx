@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useDebounced } from '@/hooks/useDebounced';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import { __, sprintf } from '@/lib/i18n';
 
 /**
  * Picks users with an async search on GET /users?search=.
@@ -32,7 +33,12 @@ export default function UserPicker({ value, onChange }) {
     onChange(value.includes(id) ? value.filter((v) => v !== id) : [...value, id]);
   };
 
-  const summary = value.length === 0 ? 'User' : value.length === 1 ? (names[value[0]] ?? `User #${value[0]}`) : `Users: ${value.length}`;
+  const summary =
+    value.length === 0
+      ? __( 'User', 'wp-activity-ledger' )
+      : value.length === 1
+        ? (names[value[0]] ?? sprintf( __( 'User #%s', 'wp-activity-ledger' ), value[0] ))
+        : sprintf( __( 'Users: %s', 'wp-activity-ledger' ), value.length );
 
   return (
     <Popover>
@@ -44,12 +50,12 @@ export default function UserPicker({ value, onChange }) {
       </PopoverTrigger>
       <PopoverContent className="w-72 p-0">
         <div className="border-b p-2">
-          <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search users…" autoFocus />
+          <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={__( 'Search users…', 'wp-activity-ledger' )} autoFocus />
         </div>
         <div className="max-h-64 overflow-y-auto p-1">
-          {search.length === 0 && <p className="p-2 text-sm text-muted-foreground">Type a name, login or email.</p>}
-          {results.isFetching && <p className="p-2 text-sm text-muted-foreground">Searching…</p>}
-          {results.data?.length === 0 && <p className="p-2 text-sm text-muted-foreground">No users found.</p>}
+          {search.length === 0 && <p className="p-2 text-sm text-muted-foreground">{__( 'Type a name, login or email.', 'wp-activity-ledger' )}</p>}
+          {results.isFetching && <p className="p-2 text-sm text-muted-foreground">{__( 'Searching…', 'wp-activity-ledger' )}</p>}
+          {results.data?.length === 0 && <p className="p-2 text-sm text-muted-foreground">{__( 'No users found.', 'wp-activity-ledger' )}</p>}
           {results.data?.map((user) => (
             <button
               key={user.id}
@@ -68,7 +74,7 @@ export default function UserPicker({ value, onChange }) {
         {value.length > 0 && (
           <div className="border-t p-1">
             <Button variant="ghost" size="sm" className="w-full" onClick={() => onChange([])}>
-              Clear selection
+              {__( 'Clear selection', 'wp-activity-ledger' )}
             </Button>
           </div>
         )}

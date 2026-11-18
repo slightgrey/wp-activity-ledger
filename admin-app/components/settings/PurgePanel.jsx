@@ -9,10 +9,11 @@ import FieldError from '@/components/FieldError';
 import { api } from '@/lib/api';
 import { config } from '@/lib/config';
 import { siteDate } from '@/lib/format';
+import { __, sprintf } from '@/lib/i18n';
 
 const MODES = [
-  { value: 'before', label: 'Events older than a date' },
-  { value: 'all', label: 'All events' },
+  { value: 'before', label: __( 'Events older than a date', 'wp-activity-ledger' ) },
+  { value: 'all', label: __( 'All events', 'wp-activity-ledger' ) },
 ];
 
 /**
@@ -28,7 +29,7 @@ export default function PurgePanel() {
   const purge = useMutation({
     mutationFn: async () => (await api('/purge', { method: 'POST', body: { mode, before, confirm } })).data,
     onSuccess: (result) => {
-      toast({ title: `${result.deleted.toLocaleString()} events deleted` });
+      toast({ title: sprintf( __( '%s events deleted', 'wp-activity-ledger' ), result.deleted.toLocaleString() ) });
       setConfirm('');
       client.invalidateQueries({ queryKey: ['events'] });
       client.invalidateQueries({ queryKey: ['stats'] });
@@ -38,12 +39,12 @@ export default function PurgePanel() {
   return (
     <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4">
       <div className="mb-1 flex items-center gap-2 font-medium text-destructive">
-        <Trash2 className="h-4 w-4" /> Purge logs
+        <Trash2 className="h-4 w-4" />{' '}{__( 'Purge logs', 'wp-activity-ledger' )}
       </div>
-      <p className="mb-3 text-xs text-muted-foreground">Deleted events can&apos;t be restored. The purge itself is recorded and stays in the log.</p>
+      <p className="mb-3 text-xs text-muted-foreground">{__( 'Deleted events can\'t be restored. The purge itself is recorded and stays in the log.', 'wp-activity-ledger' )}</p>
 
       <div className="grid gap-3">
-        <div className="flex flex-wrap gap-4" role="radiogroup" aria-label="What to delete">
+        <div className="flex flex-wrap gap-4" role="radiogroup" aria-label={__( 'What to delete', 'wp-activity-ledger' )}>
           {MODES.map((m) => (
             <label key={m.value} className="flex items-center gap-2 text-sm">
               <input type="radio" name="wpal-purge-mode" value={m.value} checked={mode === m.value} onChange={() => setMode(m.value)} />
@@ -55,20 +56,20 @@ export default function PurgePanel() {
         {mode === 'before' && (
           <div className="flex items-center gap-2">
             <Label htmlFor="wpal-purge-before" className="text-sm font-normal">
-              Delete events before
+              {__( 'Delete events before', 'wp-activity-ledger' )}
             </Label>
             <Input id="wpal-purge-before" type="date" className="w-44" value={before} onChange={(e) => setBefore(e.target.value)} />
-            <span className="text-xs text-muted-foreground">(site time, start of that day)</span>
+            <span className="text-xs text-muted-foreground">{__( '(site time, start of that day)', 'wp-activity-ledger' )}</span>
           </div>
         )}
 
         <div className="flex flex-wrap items-center gap-2">
           <Label htmlFor="wpal-purge-confirm" className="text-sm font-normal">
-            Type <code className="font-semibold">PURGE</code> to confirm
+            {__( 'Type', 'wp-activity-ledger' )}{' '}<code className="font-semibold">PURGE</code>{' '}{__( 'to confirm', 'wp-activity-ledger' )}
           </Label>
           <Input id="wpal-purge-confirm" className="w-32" value={confirm} onChange={(e) => setConfirm(e.target.value)} autoComplete="off" />
           <Button variant="destructive" disabled={confirm !== 'PURGE' || purge.isPending} onClick={() => purge.mutate()}>
-            Purge
+            {__( 'Purge', 'wp-activity-ledger' )}
           </Button>
         </div>
         <FieldError errors={purge.error?.data?.errors} field="confirm" />

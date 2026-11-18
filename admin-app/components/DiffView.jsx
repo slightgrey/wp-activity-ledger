@@ -1,6 +1,7 @@
 import { diffLines } from 'diff';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { __, sprintf } from '@/lib/i18n';
 
 const LONG_TEXT = 120;
 
@@ -25,7 +26,7 @@ function isLongText(oldValue, newValue) {
  */
 function Scalar({ value }) {
   if (value === null || value === undefined) return <span className="text-muted-foreground">—</span>;
-  if (value === '') return <span className="italic text-muted-foreground">(empty)</span>;
+  if (value === '') return <span className="italic text-muted-foreground">{__( '(empty)', 'wp-activity-ledger' )}</span>;
   if (typeof value === 'boolean') return <code>{value ? 'true' : 'false'}</code>;
 
   return <span className="break-all">{String(value)}</span>;
@@ -44,7 +45,7 @@ export function JsonTree({ value, depth = 0 }) {
   return (
     <details open={depth < 1} className="text-xs">
       <summary className="cursor-pointer text-muted-foreground">
-        {Array.isArray(value) ? `Array (${entries.length})` : `Object (${entries.length})`}
+        {Array.isArray(value) ? sprintf( __( 'Array (%s)', 'wp-activity-ledger' ), entries.length ) : sprintf( __( 'Object (%s)', 'wp-activity-ledger' ), entries.length )}
       </summary>
       <ul className="ml-3 border-l pl-2">
         {entries.map(([key, item]) => (
@@ -96,11 +97,11 @@ function ChangeRow({ change }) {
     body = (
       <div className="grid gap-2 md:grid-cols-2">
         <div className="rounded-md border border-red-200 bg-red-50/50 p-2">
-          <div className="mb-1 text-xs font-medium text-red-800">Before</div>
+          <div className="mb-1 text-xs font-medium text-red-800">{__( 'Before', 'wp-activity-ledger' )}</div>
           <JsonTree value={oldValue} />
         </div>
         <div className="rounded-md border border-green-200 bg-green-50/50 p-2">
-          <div className="mb-1 text-xs font-medium text-green-800">After</div>
+          <div className="mb-1 text-xs font-medium text-green-800">{__( 'After', 'wp-activity-ledger' )}</div>
           <JsonTree value={newValue} />
         </div>
       </div>
@@ -125,7 +126,7 @@ function ChangeRow({ change }) {
     <li className="space-y-1.5 py-2">
       <div className="flex items-center gap-2">
         <code className="text-xs font-semibold">{field}</code>
-        {truncated && <span className="text-xs text-amber-700">truncated: values were longer than the stored limit</span>}
+        {truncated && <span className="text-xs text-amber-700">{__( 'truncated: values were longer than the stored limit', 'wp-activity-ledger' )}</span>}
       </div>
       {body}
     </li>
@@ -139,7 +140,7 @@ function ChangeRow({ change }) {
  * @param {Array<{field: string, old: any, new: any, truncated: boolean}>} props.changes Changes.
  */
 export default function DiffView({ changes }) {
-  if (!changes?.length) return <p className="text-sm text-muted-foreground">No field changes were recorded for this event.</p>;
+  if (!changes?.length) return <p className="text-sm text-muted-foreground">{__( 'No field changes were recorded for this event.', 'wp-activity-ledger' )}</p>;
 
   return (
     <ul className="divide-y">

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { GROUPS, bucketKeys, bucketLabel, chartRows } from '@/lib/categoryGroups';
 import { config } from '@/lib/config';
+import { __, sprintf } from '@/lib/i18n';
 
 const SURFACE = '#ffffff';
 const GRID = '#e8e8e4';
@@ -31,7 +32,7 @@ function ChartTooltip({ active, payload, label }) {
         </div>
       ))}
       <div className="mt-1 flex justify-between border-t pt-1 font-medium text-foreground">
-        <span>Total</span>
+        <span>{__( 'Total', 'wp-activity-ledger' )}</span>
         <span className="tabular-nums">{row.total.toLocaleString()}</span>
       </div>
     </div>
@@ -55,7 +56,7 @@ export default function ActivityChart({ stats }) {
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground" aria-label="Legend">
+        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground" aria-label={__( 'Legend', 'wp-activity-ledger' )}>
           {GROUPS.map((g) => (
             <li key={g.key} className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-sm" style={{ background: g.color }} />
@@ -64,7 +65,7 @@ export default function ActivityChart({ stats }) {
           ))}
         </ul>
         <Button variant="ghost" size="sm" onClick={() => setAsTable(!asTable)}>
-          {asTable ? 'Show chart' : 'Show table'}
+          {asTable ? __( 'Show chart', 'wp-activity-ledger' ) : __( 'Show table', 'wp-activity-ledger' )}
         </Button>
       </div>
 
@@ -73,13 +74,13 @@ export default function ActivityChart({ stats }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{bucket === 'hour' ? 'Hour' : 'Day'}</TableHead>
+                <TableHead>{bucket === 'hour' ? __( 'Hour', 'wp-activity-ledger' ) : __( 'Day', 'wp-activity-ledger' )}</TableHead>
                 {GROUPS.map((g) => (
                   <TableHead key={g.key} className="text-right">
                     {g.label}
                   </TableHead>
                 ))}
-                <TableHead className="text-right">Total</TableHead>
+                <TableHead className="text-right">{__( 'Total', 'wp-activity-ledger' )}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -98,7 +99,7 @@ export default function ActivityChart({ stats }) {
           </Table>
         </div>
       ) : (
-        <div className="h-64" role="img" aria-label={`Events per ${bucket}, stacked by category`}>
+        <div className="h-64" role="img" aria-label={sprintf( __( 'Events per %s, stacked by category', 'wp-activity-ledger' ), bucket )}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={rows} margin={{ top: 4, right: 4, bottom: 0, left: -12 }} barCategoryGap={bucket === 'hour' ? 2 : 6}>
               <CartesianGrid vertical={false} stroke={GRID} />

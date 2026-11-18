@@ -10,13 +10,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/toast';
 import FieldError from '@/components/FieldError';
 import { useAlertItems, useAlertMutations, useTestChannel } from '@/hooks/useAlerts';
+import { __, sprintf } from '@/lib/i18n';
 
 export const CHANNEL_TYPES = {
-  email: { label: 'Email', hint: 'Sends an HTML email to each recipient.' },
-  webhook: { label: 'Webhook', hint: 'POSTs signed JSON (X-WPAL-Signature) to your endpoint.' },
-  slack: { label: 'Slack', hint: 'Paste a Slack incoming-webhook URL.' },
-  discord: { label: 'Discord', hint: 'Paste a Discord channel webhook URL.' },
-  teams: { label: 'Microsoft Teams', hint: 'Paste a Teams Workflows (or incoming) webhook URL.' },
+  email: { label: __( 'Email', 'wp-activity-ledger' ), hint: __( 'Sends an HTML email to each recipient.', 'wp-activity-ledger' ) },
+  webhook: { label: __( 'Webhook', 'wp-activity-ledger' ), hint: __( 'POSTs signed JSON (X-WPAL-Signature) to your endpoint.', 'wp-activity-ledger' ) },
+  slack: { label: __( 'Slack', 'wp-activity-ledger' ), hint: __( 'Paste a Slack incoming-webhook URL.', 'wp-activity-ledger' ) },
+  discord: { label: __( 'Discord', 'wp-activity-ledger' ), hint: __( 'Paste a Discord channel webhook URL.', 'wp-activity-ledger' ) },
+  teams: { label: __( 'Microsoft Teams', 'wp-activity-ledger' ), hint: __( 'Paste a Teams Workflows (or incoming) webhook URL.', 'wp-activity-ledger' ) },
 };
 
 /**
@@ -61,7 +62,7 @@ function ChannelDialog({ channel, onClose }) {
       { id: channel?.id, type: form.type, name: form.name, config },
       {
         onSuccess: () => {
-          toast({ title: channel ? 'Channel saved' : 'Channel added' });
+          toast({ title: channel ? __( 'Channel saved', 'wp-activity-ledger' ) : __( 'Channel added', 'wp-activity-ledger' ) });
           onClose();
         },
       }
@@ -73,12 +74,12 @@ function ChannelDialog({ channel, onClose }) {
       <DialogContent>
         <form onSubmit={submit} className="grid gap-4">
           <DialogHeader>
-            <DialogTitle>{channel ? 'Edit channel' : 'Add a channel'}</DialogTitle>
+            <DialogTitle>{channel ? __( 'Edit channel', 'wp-activity-ledger' ) : __( 'Add a channel', 'wp-activity-ledger' )}</DialogTitle>
             <DialogDescription>{CHANNEL_TYPES[form.type].hint}</DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-1.5">
-            <Label>Type</Label>
+            <Label>{__( 'Type', 'wp-activity-ledger' )}</Label>
             <Select value={form.type} onValueChange={(type) => setForm({ ...form, type })} disabled={Boolean(channel)}>
               <SelectTrigger>
                 <SelectValue />
@@ -94,37 +95,37 @@ function ChannelDialog({ channel, onClose }) {
           </div>
 
           <div className="grid gap-1.5">
-            <Label htmlFor="wpal-ch-name">Name</Label>
-            <Input id="wpal-ch-name" value={form.name} onChange={set('name')} placeholder="e.g. Admins" />
+            <Label htmlFor="wpal-ch-name">{__( 'Name', 'wp-activity-ledger' )}</Label>
+            <Input id="wpal-ch-name" value={form.name} onChange={set('name')} placeholder={__( 'e.g. Admins', 'wp-activity-ledger' )} />
             <FieldError errors={errors} field="name" />
           </div>
 
           {form.type === 'email' ? (
             <div className="grid gap-1.5">
-              <Label htmlFor="wpal-ch-recipients">Recipients</Label>
-              <Input id="wpal-ch-recipients" value={form.recipients} onChange={set('recipients')} placeholder="admin@example.com, ops@example.com" />
+              <Label htmlFor="wpal-ch-recipients">{__( 'Recipients', 'wp-activity-ledger' )}</Label>
+              <Input id="wpal-ch-recipients" value={form.recipients} onChange={set('recipients')} placeholder={__( 'admin@example.com, ops@example.com', 'wp-activity-ledger' )} />
               <FieldError errors={errors} field="config.recipients" />
             </div>
           ) : (
             <div className="grid gap-1.5">
-              <Label htmlFor="wpal-ch-url">Webhook URL</Label>
-              <Input id="wpal-ch-url" value={form.url} onChange={set('url')} placeholder="https://…" />
-              {channel && <p className="text-xs text-muted-foreground">Stored URLs are hidden. Leave it as is to keep the current one.</p>}
+              <Label htmlFor="wpal-ch-url">{__( 'Webhook URL', 'wp-activity-ledger' )}</Label>
+              <Input id="wpal-ch-url" value={form.url} onChange={set('url')} placeholder={__( 'https://…', 'wp-activity-ledger' )} />
+              {channel && <p className="text-xs text-muted-foreground">{__( 'Stored URLs are hidden. Leave it as is to keep the current one.', 'wp-activity-ledger' )}</p>}
               <FieldError errors={errors} field="config.url" />
             </div>
           )}
 
           {form.type === 'webhook' && (
             <div className="grid gap-1.5">
-              <Label htmlFor="wpal-ch-secret">Signing secret</Label>
+              <Label htmlFor="wpal-ch-secret">{__( 'Signing secret', 'wp-activity-ledger' )}</Label>
               <div className="flex gap-2">
-                <Input id="wpal-ch-secret" value={form.secret} onChange={set('secret')} placeholder="Generated when empty" />
+                <Input id="wpal-ch-secret" value={form.secret} onChange={set('secret')} placeholder={__( 'Generated when empty', 'wp-activity-ledger' )} />
                 <Button type="button" variant="outline" onClick={() => setForm({ ...form, secret: newSecret() })}>
                   <KeyRound className="h-4 w-4" />
-                  Generate
+                  {__( 'Generate', 'wp-activity-ledger' )}
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground">Copy a new secret now; it is hidden after saving.</p>
+              <p className="text-xs text-muted-foreground">{__( 'Copy a new secret now; it is hidden after saving.', 'wp-activity-ledger' )}</p>
             </div>
           )}
 
@@ -132,10 +133,10 @@ function ChannelDialog({ channel, onClose }) {
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
+              {__( 'Cancel', 'wp-activity-ledger' )}
             </Button>
             <Button type="submit" disabled={save.isPending}>
-              {channel ? 'Save' : 'Add channel'}
+              {channel ? __( 'Save', 'wp-activity-ledger' ) : __( 'Add channel', 'wp-activity-ledger' )}
             </Button>
           </DialogFooter>
         </form>
@@ -159,24 +160,24 @@ export default function ChannelsTab() {
     test.mutate(channel.id, {
       onSuccess: (result) =>
         result.ok
-          ? toast({ title: 'Test alert sent', description: `Check ${channel.name}.` })
-          : toast({ title: 'Test alert failed', description: result.error, variant: 'destructive' }),
-      onError: (error) => toast({ title: 'Test alert failed', description: error.message, variant: 'destructive' }),
+          ? toast({ title: __( 'Test alert sent', 'wp-activity-ledger' ), description: sprintf( __( 'Check %s.', 'wp-activity-ledger' ), channel.name ) })
+          : toast({ title: __( 'Test alert failed', 'wp-activity-ledger' ), description: result.error, variant: 'destructive' }),
+      onError: (error) => toast({ title: __( 'Test alert failed', 'wp-activity-ledger' ), description: error.message, variant: 'destructive' }),
     });
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">Where alerts are sent. Rules pick one or more channels.</p>
+        <p className="text-sm text-muted-foreground">{__( 'Where alerts are sent. Rules pick one or more channels.', 'wp-activity-ledger' )}</p>
         <Button onClick={() => setEditing({})}>
           <Plus className="h-4 w-4" />
-          Add channel
+          {__( 'Add channel', 'wp-activity-ledger' )}
         </Button>
       </div>
 
       <div className="divide-y rounded-lg border bg-card">
         {channels.isLoading && <Skeleton className="m-4 h-10" />}
-        {channels.data?.length === 0 && <p className="p-6 text-center text-sm text-muted-foreground">No channels yet. Add one to start sending alerts.</p>}
+        {channels.data?.length === 0 && <p className="p-6 text-center text-sm text-muted-foreground">{__( 'No channels yet. Add one to start sending alerts.', 'wp-activity-ledger' )}</p>}
         {channels.data?.map((channel) => (
           <div key={channel.id} className="flex flex-wrap items-center justify-between gap-3 p-3">
             <div className="flex min-w-0 items-center gap-3">
@@ -191,12 +192,12 @@ export default function ChannelsTab() {
             <div className="flex gap-1">
               <Button variant="outline" size="sm" disabled={test.isPending} onClick={() => sendTest(channel)}>
                 <Send className="h-4 w-4" />
-                Send test
+                {__( 'Send test', 'wp-activity-ledger' )}
               </Button>
-              <Button variant="ghost" size="icon" aria-label="Edit" onClick={() => setEditing(channel)}>
+              <Button variant="ghost" size="icon" aria-label={__( 'Edit', 'wp-activity-ledger' )} onClick={() => setEditing(channel)}>
                 <Pencil className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" aria-label="Delete" onClick={() => setDeleting(channel)}>
+              <Button variant="ghost" size="icon" aria-label={__( 'Delete', 'wp-activity-ledger' )} onClick={() => setDeleting(channel)}>
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
@@ -209,19 +210,19 @@ export default function ChannelsTab() {
       <Dialog open={Boolean(deleting)} onOpenChange={(open) => !open && setDeleting(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete “{deleting?.name}”?</DialogTitle>
-            <DialogDescription>Rules that use this channel stop sending to it.</DialogDescription>
+            <DialogTitle>{__( 'Delete “', 'wp-activity-ledger' )}{deleting?.name}”?</DialogTitle>
+            <DialogDescription>{__( 'Rules that use this channel stop sending to it.', 'wp-activity-ledger' )}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleting(null)}>
-              Cancel
+              {__( 'Cancel', 'wp-activity-ledger' )}
             </Button>
             <Button
               variant="destructive"
               disabled={remove.isPending}
               onClick={() => remove.mutate(deleting.id, { onSuccess: () => setDeleting(null) })}
             >
-              Delete
+              {__( 'Delete', 'wp-activity-ledger' )}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -14,12 +14,13 @@ import MultiSelect from '@/components/MultiSelect';
 import { useAlertItems, useAlertMutations } from '@/hooks/useAlerts';
 import { useMeta } from '@/hooks/useMeta';
 import { categoryLabel, typeLabel } from '@/lib/format';
+import { __, sprintf } from '@/lib/i18n';
 
 const SEVERITIES = [
-  { value: '0', label: 'Any severity' },
-  { value: '1', label: 'Notice and up' },
-  { value: '2', label: 'Warning and up' },
-  { value: '3', label: 'Critical only' },
+  { value: '0', label: __( 'Any severity', 'wp-activity-ledger' ) },
+  { value: '1', label: __( 'Notice and up', 'wp-activity-ledger' ) },
+  { value: '2', label: __( 'Warning and up', 'wp-activity-ledger' ) },
+  { value: '3', label: __( 'Critical only', 'wp-activity-ledger' ) },
 ];
 
 /**
@@ -29,11 +30,15 @@ function summary(rule, meta) {
   const parts = [];
   const { event_types: types, categories, min_severity: severity, roles } = rule.match;
 
-  if (types.length) parts.push(types.length > 2 ? `${types.length} event types` : types.map((t) => typeLabel(t, meta)).join(', '));
+  if (types.length) parts.push(types.length > 2 ? sprintf( __( '%s event types', 'wp-activity-ledger' ), types.length ) : types.map((t) => typeLabel(t, meta)).join(', '));
   if (categories.length) parts.push(categories.map((c) => categoryLabel(c, meta)).join(', '));
   if (severity > 0) parts.push(SEVERITIES[severity].label.toLowerCase());
-  if (roles.length) parts.push(`by ${roles.join(', ')}`);
-  if (rule.threshold) parts.push(`${rule.threshold.count}× in ${rule.threshold.minutes} min per ${rule.threshold.group_by}`);
+  if (roles.length) parts.push(sprintf( __( 'by %s', 'wp-activity-ledger' ), roles.join(', ') ));
+  if (rule.threshold) {
+    parts.push(
+      sprintf( __( '%1$s× in %2$s min per %3$s', 'wp-activity-ledger' ), rule.threshold.count, rule.threshold.minutes, rule.threshold.group_by === 'user' ? __( 'user', 'wp-activity-ledger' ) : __( 'IP', 'wp-activity-ledger' ) )
+    );
+  }
 
   return parts.join(' · ');
 }
@@ -97,7 +102,7 @@ function RuleDialog({ rule, channels, onClose }) {
       },
       {
         onSuccess: () => {
-          toast({ title: rule ? 'Rule saved' : 'Rule added' });
+          toast({ title: rule ? __( 'Rule saved', 'wp-activity-ledger' ) : __( 'Rule added', 'wp-activity-ledger' ) });
           onClose();
         },
       }
@@ -109,28 +114,28 @@ function RuleDialog({ rule, channels, onClose }) {
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <form onSubmit={submit} className="grid gap-4">
           <DialogHeader>
-            <DialogTitle>{rule ? 'Edit rule' : 'Add a rule'}</DialogTitle>
-            <DialogDescription>An alert is sent when an event meets every condition you set.</DialogDescription>
+            <DialogTitle>{rule ? __( 'Edit rule', 'wp-activity-ledger' ) : __( 'Add a rule', 'wp-activity-ledger' )}</DialogTitle>
+            <DialogDescription>{__( 'An alert is sent when an event meets every condition you set.', 'wp-activity-ledger' )}</DialogDescription>
           </DialogHeader>
 
-          <Field label="Name">
-            <Input value={form.name} onChange={(e) => set({ name: e.target.value })} placeholder="e.g. Plugin changes" />
+          <Field label={__( 'Name', 'wp-activity-ledger' )}>
+            <Input value={form.name} onChange={(e) => set({ name: e.target.value })} placeholder={__( 'e.g. Plugin changes', 'wp-activity-ledger' )} />
             <FieldError errors={errors} field="name" />
           </Field>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="Event types">
-              <MultiSelect label="Any event type" options={types} value={form.event_types} onChange={(event_types) => set({ event_types })} />
+            <Field label={__( 'Event types', 'wp-activity-ledger' )}>
+              <MultiSelect label={__( 'Any event type', 'wp-activity-ledger' )} options={types} value={form.event_types} onChange={(event_types) => set({ event_types })} />
             </Field>
-            <Field label="Categories">
+            <Field label={__( 'Categories', 'wp-activity-ledger' )}>
               <MultiSelect
-                label="Any category"
+                label={__( 'Any category', 'wp-activity-ledger' )}
                 options={(meta?.categories ?? []).map((c) => ({ value: c.slug, label: c.label }))}
                 value={form.categories}
                 onChange={(categories) => set({ categories })}
               />
             </Field>
-            <Field label="Minimum severity">
+            <Field label={__( 'Minimum severity', 'wp-activity-ledger' )}>
               <Select value={form.min_severity} onValueChange={(min_severity) => set({ min_severity })}>
                 <SelectTrigger>
                   <SelectValue />
@@ -144,9 +149,9 @@ function RuleDialog({ rule, channels, onClose }) {
                 </SelectContent>
               </Select>
             </Field>
-            <Field label="Done by roles">
+            <Field label={__( 'Done by roles', 'wp-activity-ledger' )}>
               <MultiSelect
-                label="Any role"
+                label={__( 'Any role', 'wp-activity-ledger' )}
                 options={(meta?.roles ?? []).map((r) => ({ value: r.slug, label: r.name }))}
                 value={form.roles}
                 onChange={(roles) => set({ roles })}
@@ -158,20 +163,20 @@ function RuleDialog({ rule, channels, onClose }) {
           <div className="grid gap-3 rounded-md border p-3">
             <div className="flex items-center gap-2">
               <Switch id="wpal-rule-threshold" checked={form.useThreshold} onCheckedChange={(useThreshold) => set({ useThreshold })} />
-              <Label htmlFor="wpal-rule-threshold">Only alert after repeated events</Label>
+              <Label htmlFor="wpal-rule-threshold">{__( 'Only alert after repeated events', 'wp-activity-ledger' )}</Label>
             </div>
             {form.useThreshold && (
               <div className="flex flex-wrap items-center gap-2 text-sm">
-                <Input type="number" min="2" className="w-20" value={form.count} onChange={(e) => set({ count: e.target.value })} aria-label="Count" />
-                <span>events within</span>
-                <Input type="number" min="1" className="w-20" value={form.minutes} onChange={(e) => set({ minutes: e.target.value })} aria-label="Minutes" />
-                <span>minutes from the same</span>
+                <Input type="number" min="2" className="w-20" value={form.count} onChange={(e) => set({ count: e.target.value })} aria-label={__( 'Count', 'wp-activity-ledger' )} />
+                <span>{__( 'events within', 'wp-activity-ledger' )}</span>
+                <Input type="number" min="1" className="w-20" value={form.minutes} onChange={(e) => set({ minutes: e.target.value })} aria-label={__( 'Minutes', 'wp-activity-ledger' )} />
+                <span>{__( 'minutes from the same', 'wp-activity-ledger' )}</span>
                 <Select value={form.group_by} onValueChange={(group_by) => set({ group_by })}>
                   <SelectTrigger className="w-28">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ip">IP address</SelectItem>
+                    <SelectItem value="ip">{__( 'IP address', 'wp-activity-ledger' )}</SelectItem>
                     <SelectItem value="user">user</SelectItem>
                   </SelectContent>
                 </Select>
@@ -180,27 +185,27 @@ function RuleDialog({ rule, channels, onClose }) {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="Cooldown (minutes)" hint="Quiet time after an alert. 0: none (threshold rules wait one window).">
+            <Field label={__( 'Cooldown (minutes)', 'wp-activity-ledger' )} hint={__( 'Quiet time after an alert. 0: none (threshold rules wait one window).', 'wp-activity-ledger' )}>
               <Input type="number" min="0" value={form.cooldown_minutes} onChange={(e) => set({ cooldown_minutes: e.target.value })} />
             </Field>
-            <Field label="Send to" hint={channels.length ? '' : 'Add a channel on the Channels tab first.'}>
-              <MultiSelect label="No channel" options={channels.map((c) => ({ value: c.id, label: c.name }))} value={form.channels} onChange={(ids) => set({ channels: ids })} />
+            <Field label={__( 'Send to', 'wp-activity-ledger' )} hint={channels.length ? '' : __( 'Add a channel on the Channels tab first.', 'wp-activity-ledger' )}>
+              <MultiSelect label={__( 'No channel', 'wp-activity-ledger' )} options={channels.map((c) => ({ value: c.id, label: c.name }))} value={form.channels} onChange={(ids) => set({ channels: ids })} />
             </Field>
           </div>
 
           <div className="flex items-center gap-2">
             <Switch id="wpal-rule-enabled" checked={form.enabled} onCheckedChange={(enabled) => set({ enabled })} />
-            <Label htmlFor="wpal-rule-enabled">Enabled</Label>
+            <Label htmlFor="wpal-rule-enabled">{__( 'Enabled', 'wp-activity-ledger' )}</Label>
           </div>
 
           {save.isError && !Object.keys(errors).length && <p className="text-sm text-destructive">{save.error.message}</p>}
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
+              {__( 'Cancel', 'wp-activity-ledger' )}
             </Button>
             <Button type="submit" disabled={save.isPending}>
-              {rule ? 'Save' : 'Add rule'}
+              {rule ? __( 'Save', 'wp-activity-ledger' ) : __( 'Add rule', 'wp-activity-ledger' )}
             </Button>
           </DialogFooter>
         </form>
@@ -225,31 +230,31 @@ export default function RulesTab() {
   const toggle = (rule, enabled) =>
     save.mutate(
       { id: rule.id, enabled },
-      { onError: (error) => toast({ title: 'Could not change the rule', description: error.message, variant: 'destructive' }) }
+      { onError: (error) => toast({ title: __( 'Could not change the rule', 'wp-activity-ledger' ), description: error.message, variant: 'destructive' }) }
     );
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">Which events send an alert. Built-in templates start switched off.</p>
+        <p className="text-sm text-muted-foreground">{__( 'Which events send an alert. Built-in templates start switched off.', 'wp-activity-ledger' )}</p>
         <Button onClick={() => setEditing({})}>
           <Plus className="h-4 w-4" />
-          Add rule
+          {__( 'Add rule', 'wp-activity-ledger' )}
         </Button>
       </div>
 
       <div className="divide-y rounded-lg border bg-card">
         {rules.isLoading && <Skeleton className="m-4 h-10" />}
-        {rules.data?.length === 0 && <p className="p-6 text-center text-sm text-muted-foreground">No rules yet.</p>}
+        {rules.data?.length === 0 && <p className="p-6 text-center text-sm text-muted-foreground">{__( 'No rules yet.', 'wp-activity-ledger' )}</p>}
         {rules.data?.map((rule) => (
           <div key={rule.id} className="flex flex-wrap items-center justify-between gap-3 p-3">
             <div className="flex min-w-0 items-center gap-3">
-              <Switch checked={rule.enabled} onCheckedChange={(enabled) => toggle(rule, enabled)} aria-label={`Enable ${rule.name}`} />
+              <Switch checked={rule.enabled} onCheckedChange={(enabled) => toggle(rule, enabled)} aria-label={sprintf( __( 'Enable %s', 'wp-activity-ledger' ), rule.name )} />
               <div className="min-w-0 leading-tight">
                 <div className="flex flex-wrap items-center gap-2 font-medium">
                   {rule.name}
                   {rule.template && <Badge variant="secondary">template</Badge>}
-                  {rule.enabled && rule.channels.length === 0 && <Badge variant="warning">no channel</Badge>}
+                  {rule.enabled && rule.channels.length === 0 && <Badge variant="warning">{__( 'no channel', 'wp-activity-ledger' )}</Badge>}
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {summary(rule, meta)}
@@ -258,10 +263,10 @@ export default function RulesTab() {
               </div>
             </div>
             <div className="flex gap-1">
-              <Button variant="ghost" size="icon" aria-label="Edit" onClick={() => setEditing(rule)}>
+              <Button variant="ghost" size="icon" aria-label={__( 'Edit', 'wp-activity-ledger' )} onClick={() => setEditing(rule)}>
                 <Pencil className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" aria-label="Delete" onClick={() => setDeleting(rule)}>
+              <Button variant="ghost" size="icon" aria-label={__( 'Delete', 'wp-activity-ledger' )} onClick={() => setDeleting(rule)}>
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
@@ -274,15 +279,15 @@ export default function RulesTab() {
       <Dialog open={Boolean(deleting)} onOpenChange={(open) => !open && setDeleting(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete “{deleting?.name}”?</DialogTitle>
-            <DialogDescription>{deleting?.template ? 'Built-in templates are not added again later.' : 'This cannot be undone.'}</DialogDescription>
+            <DialogTitle>{__( 'Delete “', 'wp-activity-ledger' )}{deleting?.name}”?</DialogTitle>
+            <DialogDescription>{deleting?.template ? __( 'Built-in templates are not added again later.', 'wp-activity-ledger' ) : __( 'This cannot be undone.', 'wp-activity-ledger' )}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleting(null)}>
-              Cancel
+              {__( 'Cancel', 'wp-activity-ledger' )}
             </Button>
             <Button variant="destructive" disabled={remove.isPending} onClick={() => remove.mutate(deleting.id, { onSuccess: () => setDeleting(null) })}>
-              Delete
+              {__( 'Delete', 'wp-activity-ledger' )}
             </Button>
           </DialogFooter>
         </DialogContent>

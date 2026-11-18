@@ -27,16 +27,17 @@ import { api, toQuery } from '@/lib/api';
 import { config } from '@/lib/config';
 import { EMPTY, parseFilters, serializeFilters, toApiQuery } from '@/lib/filters';
 import { categoryLabel, formatDateTime, relativeTime, severity, typeLabel } from '@/lib/format';
+import { __, sprintf } from '@/lib/i18n';
 
 const COLUMNS = [
-  { key: 'time', label: 'Time' },
-  { key: 'user', label: 'User' },
-  { key: 'event', label: 'Event' },
-  { key: 'severity', label: 'Severity' },
-  { key: 'category', label: 'Category' },
-  { key: 'object', label: 'Object' },
-  { key: 'ip', label: 'IP' },
-  { key: 'source', label: 'Source' },
+  { key: 'time', label: __( 'Time', 'wp-activity-ledger' ) },
+  { key: 'user', label: __( 'User', 'wp-activity-ledger' ) },
+  { key: 'event', label: __( 'Event', 'wp-activity-ledger' ) },
+  { key: 'severity', label: __( 'Severity', 'wp-activity-ledger' ) },
+  { key: 'category', label: __( 'Category', 'wp-activity-ledger' ) },
+  { key: 'object', label: __( 'Object', 'wp-activity-ledger' ) },
+  { key: 'ip', label: __( 'IP', 'wp-activity-ledger' ) },
+  { key: 'source', label: __( 'Source', 'wp-activity-ledger' ) },
 ];
 
 /**
@@ -60,7 +61,7 @@ function Cell({ column, event, meta }) {
           </span>
         </span>
       ) : (
-        <span className="text-muted-foreground">System</span>
+        <span className="text-muted-foreground">{__( 'System', 'wp-activity-ledger' )}</span>
       );
     case 'event': {
       const level = severity(event.severity);
@@ -126,11 +127,11 @@ function ColumnMenu({ columns, onChange }) {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm">
           <Columns3 className="h-4 w-4" />
-          Columns
+          {__( 'Columns', 'wp-activity-ledger' )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Show columns</DropdownMenuLabel>
+        <DropdownMenuLabel>{__( 'Show columns', 'wp-activity-ledger' )}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {COLUMNS.map((column) => (
           <DropdownMenuCheckboxItem
@@ -163,14 +164,14 @@ function ExportMenu({ query }) {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm">
           <Download className="h-4 w-4" />
-          Export
+          {__( 'Export', 'wp-activity-ledger' )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Export these events</DropdownMenuLabel>
+        <DropdownMenuLabel>{__( 'Export these events', 'wp-activity-ledger' )}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={() => download('csv')}>CSV (spreadsheet)</DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => download('json')}>JSON</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => download('csv')}>{__( 'CSV (spreadsheet)', 'wp-activity-ledger' )}</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => download('json')}>{__( 'JSON', 'wp-activity-ledger' )}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -187,7 +188,7 @@ function useSavePrefs() {
     mutationFn: async (prefs) => (await api('/me/prefs', { method: 'PUT', body: prefs })).data,
     onMutate: (prefs) => client.setQueryData(['meta'], (meta) => (meta ? { ...meta, prefs: { ...meta.prefs, ...prefs } } : meta)),
     onSuccess: (prefs) => client.setQueryData(['meta'], (meta) => (meta ? { ...meta, prefs } : meta)),
-    onError: (error) => toast({ title: 'Could not save your view', description: error.message, variant: 'destructive' }),
+    onError: (error) => toast({ title: __( 'Could not save your view', 'wp-activity-ledger' ), description: error.message, variant: 'destructive' }),
   });
 }
 
@@ -240,14 +241,14 @@ export default function ActivityLog({ fixed = null }) {
 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm text-muted-foreground">
-          {events.isLoading ? 'Loading…' : `${total.toLocaleString()} ${total === 1 ? 'event' : 'events'}`}
+          {events.isLoading ? __( 'Loading…', 'wp-activity-ledger' ) : sprintf( total === 1 ? __( '%s event', 'wp-activity-ledger' ) : __( '%s events', 'wp-activity-ledger' ), total.toLocaleString() )}
           {events.isFetching && !events.isLoading && ' · updating…'}
         </p>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <Switch id="wpal-autorefresh" checked={autoRefresh} onCheckedChange={setAutoRefresh} />
             <Label htmlFor="wpal-autorefresh" className="text-sm font-normal">
-              Auto-refresh (30 s)
+              {__( 'Auto-refresh (30 s)', 'wp-activity-ledger' )}
             </Label>
           </div>
           <ColumnMenu columns={columns} onChange={(next) => savePrefs.mutate({ columns: next })} />
@@ -283,14 +284,14 @@ export default function ActivityLog({ fixed = null }) {
         {events.data && events.data.items.length === 0 && (
           <div className="flex flex-col items-center gap-2 p-10 text-center text-muted-foreground">
             <Inbox className="h-8 w-8" />
-            <p className="text-sm">No events match these filters.</p>
+            <p className="text-sm">{__( 'No events match these filters.', 'wp-activity-ledger' )}</p>
           </div>
         )}
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm">
-          <span className="text-muted-foreground">Rows per page</span>
+          <span className="text-muted-foreground">{__( 'Rows per page', 'wp-activity-ledger' )}</span>
           <Select
             value={String(perPage)}
             onValueChange={(value) => {
@@ -312,12 +313,12 @@ export default function ActivityLog({ fixed = null }) {
         </div>
         <div className="flex items-center gap-2 text-sm">
           <span className="text-muted-foreground">
-            Page {filters.page} of {totalPages}
+            {__( 'Page', 'wp-activity-ledger' )}{' '}{filters.page} of {totalPages}
           </span>
-          <Button variant="outline" size="icon" disabled={filters.page <= 1} onClick={() => update({ page: filters.page - 1 })} aria-label="Previous page">
+          <Button variant="outline" size="icon" disabled={filters.page <= 1} onClick={() => update({ page: filters.page - 1 })} aria-label={__( 'Previous page', 'wp-activity-ledger' )}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="icon" disabled={filters.page >= totalPages} onClick={() => update({ page: filters.page + 1 })} aria-label="Next page">
+          <Button variant="outline" size="icon" disabled={filters.page >= totalPages} onClick={() => update({ page: filters.page + 1 })} aria-label={__( 'Next page', 'wp-activity-ledger' )}>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>

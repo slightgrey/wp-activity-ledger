@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { __, sprintf } from '@/lib/i18n';
 
 /**
  * A searchable multiselect in a popover, with optional groups.
@@ -40,7 +41,7 @@ export default function MultiSelect({ label, options, value, onChange, className
   };
 
   const summary =
-    value.length === 0 ? label : value.length === 1 ? (options.find((o) => o.value === value[0])?.label ?? value[0]) : `${label}: ${value.length}`;
+    value.length === 0 ? label : value.length === 1 ? (options.find((o) => o.value === value[0])?.label ?? value[0]) : sprintf( __( '%1$s: %2$s', 'wp-activity-ledger' ), label, value.length );
 
   return (
     <Popover>
@@ -52,10 +53,10 @@ export default function MultiSelect({ label, options, value, onChange, className
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0">
         <div className="border-b p-2">
-          <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search…" autoFocus />
+          <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={__( 'Search…', 'wp-activity-ledger' )} autoFocus />
         </div>
         <div className="max-h-72 overflow-y-auto p-1">
-          {groups.length === 0 && <p className="p-2 text-sm text-muted-foreground">No matches.</p>}
+          {groups.length === 0 && <p className="p-2 text-sm text-muted-foreground">{__( 'No matches.', 'wp-activity-ledger' )}</p>}
           {groups.map(([group, items]) => (
             <div key={group}>
               {group && <div className="px-2 pb-1 pt-2 text-xs font-semibold uppercase text-muted-foreground">{group}</div>}
@@ -78,7 +79,7 @@ export default function MultiSelect({ label, options, value, onChange, className
         {value.length > 0 && (
           <div className="border-t p-1">
             <Button variant="ghost" size="sm" className="w-full" onClick={() => onChange([])}>
-              Clear selection
+              {__( 'Clear selection', 'wp-activity-ledger' )}
             </Button>
           </div>
         )}

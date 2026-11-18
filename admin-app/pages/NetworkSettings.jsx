@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/toast';
 import { Row } from '@/components/settings/fields';
 import { api } from '@/lib/api';
+import { __ } from '@/lib/i18n';
 
 /**
  * Network admin: the settings lock and the default settings for new sites.
@@ -19,9 +20,9 @@ export default function NetworkSettings() {
     mutationFn: async (fields) => (await api('/network-settings', { method: 'POST', body: fields })).data,
     onSuccess: (saved) => {
       client.setQueryData(['network-settings'], saved);
-      toast({ title: 'Network settings saved' });
+      toast({ title: __( 'Network settings saved', 'wp-activity-ledger' ) });
     },
-    onError: (error) => toast({ title: 'Not saved', description: error.message, variant: 'destructive' }),
+    onError: (error) => toast({ title: __( 'Not saved', 'wp-activity-ledger' ), description: error.message, variant: 'destructive' }),
   });
 
   const copyMain = async () => {
@@ -35,28 +36,28 @@ export default function NetworkSettings() {
     <Card>
       <CardContent className="py-2">
         <Row
-          label="Lock site settings"
-          help="Site administrators can still view their log and settings, but can't change settings or alerts, or purge logs."
+          label={__( 'Lock site settings', 'wp-activity-ledger' )}
+          help={__( 'Site administrators can still view their log and settings, but can\'t change settings or alerts, or purge logs.', 'wp-activity-ledger' )}
           htmlFor="wpal-net-lock"
         >
           <div className="flex items-center gap-2">
             <Switch id="wpal-net-lock" checked={settings.data.lock} disabled={save.isPending} onCheckedChange={(lock) => save.mutate({ lock })} />
             <label htmlFor="wpal-net-lock" className="text-sm">
-              {settings.data.lock ? 'Locked by the network' : 'Each site manages its own settings'}
+              {settings.data.lock ? __( 'Locked by the network', 'wp-activity-ledger' ) : __( 'Each site manages its own settings', 'wp-activity-ledger' )}
             </label>
           </div>
         </Row>
-        <Row label="Defaults for new sites" help="Sites created from now on start with these settings instead of the plugin defaults.">
+        <Row label={__( 'Defaults for new sites', 'wp-activity-ledger' )} help={__( 'Sites created from now on start with these settings instead of the plugin defaults.', 'wp-activity-ledger' )}>
           <p className="text-sm text-muted-foreground">
-            {settings.data.defaults ? 'New sites copy the saved defaults.' : 'New sites start with the plugin defaults.'}
+            {settings.data.defaults ? __( 'New sites copy the saved defaults.', 'wp-activity-ledger' ) : __( 'New sites start with the plugin defaults.', 'wp-activity-ledger' )}
           </p>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" disabled={save.isPending} onClick={copyMain}>
-              Use the main site&apos;s settings
+              {__( 'Use the main site\'s settings', 'wp-activity-ledger' )}
             </Button>
             {settings.data.defaults && (
               <Button variant="ghost" size="sm" disabled={save.isPending} onClick={() => save.mutate({ defaults: null })}>
-                Clear defaults
+                {__( 'Clear defaults', 'wp-activity-ledger' )}
               </Button>
             )}
           </div>

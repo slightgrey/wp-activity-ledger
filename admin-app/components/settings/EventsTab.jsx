@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { NumberRow, PatternRow } from '@/components/settings/fields';
+import { __, sprintf } from '@/lib/i18n';
 
 /**
  * One category's event types, each with an on/off switch.
@@ -17,10 +18,10 @@ function CategoryTypes({ category, types, disabled, onToggle, onToggleAll }) {
           {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
           {category.label}
           <span className="font-normal text-muted-foreground">
-            ({types.length - off} of {types.length} recorded)
+            ({types.length - off} of {types.length}{' '}{__( 'recorded)', 'wp-activity-ledger' )}
           </span>
         </button>
-        <Switch checked={off === 0} onCheckedChange={(checked) => onToggleAll(types, checked)} aria-label={`Record all ${category.label} events`} />
+        <Switch checked={off === 0} onCheckedChange={(checked) => onToggleAll(types, checked)} aria-label={sprintf( __( 'Record all %s events', 'wp-activity-ledger' ), category.label )} />
       </div>
       {open && (
         <ul className="mb-2 grid gap-1 pl-5 md:grid-cols-2">
@@ -60,8 +61,8 @@ export default function EventsTab({ draft, set, errors, meta }) {
   return (
     <div>
       <div className="border-b py-4">
-        <div className="mb-2 text-sm font-medium">Recorded events</div>
-        <p className="mb-2 text-xs text-muted-foreground">Switch off event types you never need. Activity Ledger&apos;s own events are always recorded.</p>
+        <div className="mb-2 text-sm font-medium">{__( 'Recorded events', 'wp-activity-ledger' )}</div>
+        <p className="mb-2 text-xs text-muted-foreground">{__( 'Switch off event types you never need. Activity Ledger\'s own events are always recorded.', 'wp-activity-ledger' )}</p>
         <div className="rounded-md border px-3">
           {groups.map((g) => (
             <CategoryTypes key={g.category.slug} category={g.category} types={g.types} disabled={disabled} onToggle={toggle} onToggleAll={toggleAll} />
@@ -70,25 +71,25 @@ export default function EventsTab({ draft, set, errors, meta }) {
       </div>
       <PatternRow
         name="ignored_option_patterns"
-        label="Ignored options"
-        help="Option names never recorded, one per line. * matches anything. WordPress's own busy options are always ignored."
+        label={__( 'Ignored options', 'wp-activity-ledger' )}
+        help={__( 'Option names never recorded, one per line. * matches anything. WordPress\'s own busy options are always ignored.', 'wp-activity-ledger' )}
         draft={draft}
         set={set}
         errors={errors}
       />
-      <PatternRow name="ignored_meta_keys" label="Ignored meta keys" help="Post and user meta keys never recorded, one per line." draft={draft} set={set} errors={errors} />
+      <PatternRow name="ignored_meta_keys" label={__( 'Ignored meta keys', 'wp-activity-ledger' )} help={__( 'Post and user meta keys never recorded, one per line.', 'wp-activity-ledger' )} draft={draft} set={set} errors={errors} />
       <PatternRow
         name="redact_patterns"
-        label="Redacted fields"
-        help="Fields whose values are stored as [redacted], one per line (passwords, keys, tokens)."
+        label={__( 'Redacted fields', 'wp-activity-ledger' )}
+        help={__( 'Fields whose values are stored as [redacted], one per line (passwords, keys, tokens).', 'wp-activity-ledger' )}
         draft={draft}
         set={set}
         errors={errors}
       />
       <NumberRow
         name="max_value_size"
-        label="Largest stored value"
-        help="Longer before/after values are cut and marked as truncated."
+        label={__( 'Largest stored value', 'wp-activity-ledger' )}
+        help={__( 'Longer before/after values are cut and marked as truncated.', 'wp-activity-ledger' )}
         suffix="bytes"
         min={1024}
         draft={draft}

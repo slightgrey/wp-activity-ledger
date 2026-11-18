@@ -10,11 +10,12 @@ import { api } from '@/lib/api';
 import { config } from '@/lib/config';
 import { formatDateTime, relativeTime, typeLabel } from '@/lib/format';
 import { cn } from '@/lib/utils';
+import { __, sprintf } from '@/lib/i18n';
 
 const RANGES = [
-  { key: '24h', label: '24 hours' },
-  { key: '7d', label: '7 days' },
-  { key: '30d', label: '30 days' },
+  { key: '24h', label: __( '24 hours', 'wp-activity-ledger' ) },
+  { key: '7d', label: __( '7 days', 'wp-activity-ledger' ) },
+  { key: '30d', label: __( '30 days', 'wp-activity-ledger' ) },
 ];
 
 const compact = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 });
@@ -85,10 +86,10 @@ export default function Dashboard() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm text-muted-foreground">
-          Activity in the last {RANGES.find((r) => r.key === range).label}
+          {sprintf( __( 'Activity in the last %s', 'wp-activity-ledger' ), RANGES.find((r) => r.key === range).label )}
           {stats.isFetching && !stats.isLoading && ' · updating…'}
         </p>
-        <div className="flex gap-1 rounded-lg bg-muted p-1" role="group" aria-label="Range">
+        <div className="flex gap-1 rounded-lg bg-muted p-1" role="group" aria-label={__( 'Range', 'wp-activity-ledger' )}>
           {RANGES.map((r) => (
             <button
               key={r.key}
@@ -106,43 +107,43 @@ export default function Dashboard() {
       {stats.isError && <p className="text-sm text-destructive">{stats.error.message}</p>}
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-        <StatTile label="Events" value={totals.events} to={log({})} loading={!data} />
-        <StatTile label="Failed logins" value={totals.failed_logins} to={log({ type: 'auth.login_failed' })} loading={!data} />
-        <StatTile label="Critical events" value={totals.critical} to={log({ severity: 'critical' })} loading={!data} />
-        <StatTile label="Active users" value={totals.users} loading={!data} />
-        <StatTile label="Active sessions" value={totals.active_sessions} to="/users" loading={!data} />
+        <StatTile label={__( 'Events', 'wp-activity-ledger' )} value={totals.events} to={log({})} loading={!data} />
+        <StatTile label={__( 'Failed logins', 'wp-activity-ledger' )} value={totals.failed_logins} to={log({ type: 'auth.login_failed' })} loading={!data} />
+        <StatTile label={__( 'Critical events', 'wp-activity-ledger' )} value={totals.critical} to={log({ severity: 'critical' })} loading={!data} />
+        <StatTile label={__( 'Active users', 'wp-activity-ledger' )} value={totals.users} loading={!data} />
+        <StatTile label={__( 'Active sessions', 'wp-activity-ledger' )} value={totals.active_sessions} to="/users" loading={!data} />
       </div>
 
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">Events over time</CardTitle>
+          <CardTitle className="text-base">{__( 'Events over time', 'wp-activity-ledger' )}</CardTitle>
         </CardHeader>
         <CardContent>{data ? <ActivityChart stats={data} /> : <Skeleton className="h-64 w-full" />}</CardContent>
       </Card>
 
       <div className="grid gap-3 md:grid-cols-3">
         <TopList
-          title="Most active users"
-          empty="No user activity."
+          title={__( 'Most active users', 'wp-activity-ledger' )}
+          empty={__( 'No user activity.', 'wp-activity-ledger' )}
           rows={(data?.top_users ?? []).map((u) => ({
             key: u.user_id,
-            label: u.user_id > 0 ? u.user_login : 'System',
+            label: u.user_id > 0 ? u.user_login : __( 'System', 'wp-activity-ledger' ),
             count: u.count,
             to: log({ user: String(u.user_id) }),
           }))}
         />
         <TopList
-          title="Top events"
-          empty="No events."
+          title={__( 'Top events', 'wp-activity-ledger' )}
+          empty={__( 'No events.', 'wp-activity-ledger' )}
           rows={(data?.top_types ?? []).map((t) => ({ key: t.event_type, label: typeLabel(t.event_type, meta.data), count: t.count, to: log({ type: t.event_type }) }))}
         />
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Recent critical events</CardTitle>
+            <CardTitle className="text-base">{__( 'Recent critical events', 'wp-activity-ledger' )}</CardTitle>
           </CardHeader>
           <CardContent>
             {(data?.recent_critical ?? []).length === 0 ? (
-              <p className="text-sm text-muted-foreground">No critical events in this period.</p>
+              <p className="text-sm text-muted-foreground">{__( 'No critical events in this period.', 'wp-activity-ledger' )}</p>
             ) : (
               <ul className="divide-y">
                 {data.recent_critical.map((e) => (

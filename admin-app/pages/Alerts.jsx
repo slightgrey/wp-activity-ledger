@@ -2,6 +2,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ChannelsTab from '@/components/alerts/ChannelsTab';
 import RulesTab from '@/components/alerts/RulesTab';
+import { __ } from '@/lib/i18n';
 
 /**
  * Alerts: rules (what triggers an alert) and channels (where it goes). The tab is kept in
@@ -14,8 +15,8 @@ export default function Alerts() {
   return (
     <Tabs value={tab} onValueChange={(value) => setParams(value === 'rules' ? {} : { tab: value })}>
       <TabsList>
-        <TabsTrigger value="rules">Rules</TabsTrigger>
-        <TabsTrigger value="channels">Channels</TabsTrigger>
+        <TabsTrigger value="rules">{__( 'Rules', 'wp-activity-ledger' )}</TabsTrigger>
+        <TabsTrigger value="channels">{__( 'Channels', 'wp-activity-ledger' )}</TabsTrigger>
       </TabsList>
       <TabsContent value="rules">
         <RulesTab />

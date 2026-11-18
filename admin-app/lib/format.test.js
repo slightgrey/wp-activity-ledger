@@ -75,3 +75,14 @@ describe('buildUrl', () => {
     expect(buildUrl('http://x.test/?rest_route=/wpal/v1/', '/meta', { a: 1 })).toBe('http://x.test/?rest_route=/wpal/v1/meta&a=1');
   });
 });
+
+describe('i18n', async () => {
+  const { __, sprintf } = await import('./i18n.js');
+
+  it('returns English without translations and fills placeholders', () => {
+    expect(__('Save', 'wp-activity-ledger')).toBe('Save');
+    expect(sprintf('%s events', 5)).toBe('5 events');
+    expect(sprintf('%1$s: %2$s', 'Users', 3)).toBe('Users: 3');
+    expect(sprintf('%2$s then %1$s', 'a', 'b')).toBe('b then a');
+  });
+});

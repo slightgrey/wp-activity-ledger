@@ -136,6 +136,7 @@ final class Assets {
 			'network'        => is_network_admin(),
 			'settingsLocked' => is_multisite() && Capabilities::network_locked(),
 			'siteId'         => get_current_blog_id(),
+			'i18n'           => (object) self::translations(),
 			'timezone'       => wp_timezone_string(),
 			'dateFormat'     => (string) get_option( 'date_format' ),
 			'timeFormat'     => (string) get_option( 'time_format' ),
@@ -152,6 +153,37 @@ final class Assets {
 				'manage_options'  => current_user_can( 'manage_options' ),
 			),
 		);
+	}
+
+	/**
+	 * Returns the admin app's translations for the user's locale: msgid => translation, read
+	 * from the JSON files `wp i18n make-json` writes (languages/wp-activity-ledger-{locale}-*.json,
+	 * or the same names in wp-content/languages/plugins/).
+	 *
+	 * @return array<string, string> Translations (empty for English or when none exist).
+	 */
+	public static function translations(): array {
+		$locale = determine_locale();
+
+		if ( 'en_US' === $locale ) {
+			return array();
+		}
+
+		$strings = array();
+		$pattern = 'wp-activity-ledger-' . $locale . '-*.json';
+
+		foreach ( array_merge( (array) glob( WPAL_DIR . 'languages/' . $pattern ), (array) glob( WP_LANG_DIR . '/plugins/' . $pattern ) ) as $file ) {
+			$data     = json_decode( (string) file_get_contents( (string) $file ), true ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local file.
+			$messages = is_array( $data ) ? ( $data['locale_data']['messages'] ?? $data['locale_data']['wp-activity-ledger'] ?? array() ) : array();
+
+			foreach ( (array) $messages as $msgid => $translation ) {
+				if ( '' !== $msgid && is_array( $translation ) && is_string( $translation[0] ?? null ) && '' !== $translation[0] ) {
+					$strings[ (string) $msgid ] = $translation[0];
+				}
+			}
+		}
+
+		return $strings;
 	}
 
 	/**

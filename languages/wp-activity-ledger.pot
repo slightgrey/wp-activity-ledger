@@ -1,0 +1,2489 @@
+# Copyright (C) 2026 Web of D
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: WP Activity Ledger 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-activity-ledger\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-11-18T05:36:10+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: wp-activity-ledger\n"
+
+#. Plugin Name of the plugin
+#: wp-activity-ledger.php
+msgid "WP Activity Ledger"
+msgstr ""
+
+#. Description of the plugin
+#: wp-activity-ledger.php
+msgid "Records every meaningful action on your site (who, what, when, from where) with field-level before/after diffs, alerts, export and a modern admin."
+msgstr ""
+
+#. Author of the plugin
+#: wp-activity-ledger.php
+msgid "Web of D"
+msgstr ""
+
+#. Author URI of the plugin
+#: wp-activity-ledger.php
+msgid "https://vincelayte.me/"
+msgstr ""
+
+#: src/Admin/Assets.php:121
+msgid "WP Activity Ledger: the admin app build is missing (dist/admin)."
+msgstr ""
+
+#: src/Admin/DashboardWidget.php:67
+#: src/Admin/Menu.php:73
+#: src/Admin/Menu.php:74
+#: src/Admin/Menu.php:100
+#: src/Admin/Menu.php:101
+#: src/Admin/Menu.php:140
+#: src/Domain/Category.php:56
+#: src/Privacy/PrivacyTools.php:66
+#: src/Privacy/PrivacyTools.php:83
+#: src/Privacy/PrivacyTools.php:194
+#: admin-app/App.jsx:69
+msgid "Activity Ledger"
+msgstr ""
+
+#. translators: %s: number of events.
+#: src/Admin/DashboardWidget.php:86
+#, php-format
+msgid "%s event in the last 24 hours"
+msgid_plural "%s events in the last 24 hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Admin/DashboardWidget.php:90
+msgid "No activity recorded yet."
+msgstr ""
+
+#: src/Admin/DashboardWidget.php:97
+msgid "View the activity log"
+msgstr ""
+
+#: src/Admin/DashboardWidget.php:109
+#: src/Alerts/Deliverer.php:148
+#: admin-app/pages/ActivityLog.jsx:64
+#: admin-app/pages/Dashboard.jsx:130
+msgid "System"
+msgstr ""
+
+#: src/Admin/ExportHandler.php:92
+msgid "Sorry, you are not allowed to export the activity log."
+msgstr ""
+
+#: src/Admin/Menu.php:127
+#: src/Admin/Menu.php:157
+#: admin-app/App.jsx:21
+#: admin-app/App.jsx:30
+msgid "Dashboard"
+msgstr ""
+
+#: src/Admin/Menu.php:128
+#: src/Admin/Menu.php:158
+#: admin-app/App.jsx:22
+#: admin-app/App.jsx:31
+msgid "Activity Log"
+msgstr ""
+
+#: src/Admin/Menu.php:129
+#: src/Admin/Menu.php:159
+#: admin-app/App.jsx:23
+#: admin-app/App.jsx:32
+msgid "Users & Sessions"
+msgstr ""
+
+#: src/Admin/Menu.php:130
+#: admin-app/App.jsx:33
+msgid "Network Settings"
+msgstr ""
+
+#: src/Admin/Menu.php:144
+msgid "The Activity Ledger admin app has not been built. Run \"npm run build\" in the plugin folder."
+msgstr ""
+
+#: src/Admin/Menu.php:160
+#: admin-app/App.jsx:24
+msgid "Alerts"
+msgstr ""
+
+#: src/Admin/Menu.php:161
+#: src/Domain/Category.php:51
+#: admin-app/App.jsx:26
+msgid "Settings"
+msgstr ""
+
+#: src/Alerts/AlertTemplates.php:32
+msgid "New administrator created"
+msgstr ""
+
+#: src/Alerts/AlertTemplates.php:39
+msgid "User promoted to administrator"
+msgstr ""
+
+#: src/Alerts/AlertTemplates.php:46
+msgid "Plugin installed, activated or deleted"
+msgstr ""
+
+#: src/Alerts/AlertTemplates.php:50
+#: src/Domain/CoreEventTypes.php:235
+msgid "Activity Ledger deactivated"
+msgstr ""
+
+#: src/Alerts/AlertTemplates.php:54
+msgid "Activity logs purged"
+msgstr ""
+
+#: src/Alerts/AlertTemplates.php:58
+msgid "Possible brute-force attack (5 failed logins in 10 minutes from one IP)"
+msgstr ""
+
+#: src/Alerts/AlertTemplates.php:67
+msgid "Plugin or theme file edited"
+msgstr ""
+
+#: src/Alerts/ChannelStore.php:104
+msgid "Choose a channel type."
+msgstr ""
+
+#: src/Alerts/ChannelStore.php:161
+msgid "Enter at least one valid email address."
+msgstr ""
+
+#: src/Alerts/ChannelStore.php:180
+msgid "Enter a valid http(s) URL."
+msgstr ""
+
+#: src/Alerts/Deliverer.php:144
+msgid "Test alert"
+msgstr ""
+
+#: src/Alerts/Deliverer.php:145
+msgid "This is a test alert from WP Activity Ledger. If you can read it, the channel works."
+msgstr ""
+
+#: src/Alerts/Deliverer.php:156
+msgid "Test"
+msgstr ""
+
+#: src/Alerts/ListStore.php:174
+msgid "Enter a name."
+msgstr ""
+
+#: src/Alerts/RuleStore.php:89
+msgid "Choose event types, categories or a minimum severity."
+msgstr ""
+
+#: src/Database/Installer.php:78
+#: wp-activity-ledger.php:51
+msgid "WP Activity Ledger:"
+msgstr ""
+
+#: src/Database/Installer.php:79
+msgid "The activity log tables could not be created, so nothing is being recorded. Database error:"
+msgstr ""
+
+#: src/Domain/Category.php:41
+msgid "Authentication"
+msgstr ""
+
+#: src/Domain/Category.php:42
+msgid "Users"
+msgstr ""
+
+#: src/Domain/Category.php:43
+msgid "Content"
+msgstr ""
+
+#: src/Domain/Category.php:44
+msgid "Media"
+msgstr ""
+
+#: src/Domain/Category.php:45
+msgid "Comments"
+msgstr ""
+
+#: src/Domain/Category.php:46
+msgid "Taxonomies"
+msgstr ""
+
+#: src/Domain/Category.php:47
+msgid "Menus"
+msgstr ""
+
+#: src/Domain/Category.php:48
+msgid "Plugins"
+msgstr ""
+
+#: src/Domain/Category.php:49
+msgid "Themes"
+msgstr ""
+
+#: src/Domain/Category.php:50
+msgid "WordPress core"
+msgstr ""
+
+#: src/Domain/Category.php:52
+msgid "Widgets & Customizer"
+msgstr ""
+
+#: src/Domain/Category.php:53
+msgid "Multisite"
+msgstr ""
+
+#: src/Domain/Category.php:54
+msgid "WooCommerce"
+msgstr ""
+
+#: src/Domain/Category.php:55
+msgid "Elementor"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:61
+msgid "Logged in"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:61
+msgid "{user} logged in"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:62
+msgid "Logged out"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:62
+msgid "{user} logged out"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:63
+msgid "Failed login"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:63
+msgid "Failed login for \"{object}\" ({count} attempts)"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:64
+msgid "Password reset requested"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:64
+msgid "Password reset requested for \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:65
+msgid "Password reset"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:65
+msgid "Password reset completed for \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:66
+msgid "Application password created"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:66
+msgid "Application password \"{app_name}\" created for \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:67
+msgid "Application password revoked"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:67
+msgid "Application password \"{app_name}\" revoked for \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:80
+msgid "User created"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:80
+msgid "Created user \"{object}\" with role {role}"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:81
+msgid "User updated"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:81
+msgid "Updated profile of \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:82
+msgid "User deleted"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:82
+msgid "Deleted user \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:83
+msgid "User role changed"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:83
+msgid "Changed role of \"{object}\" from {old_roles} to {new_roles}"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:84
+msgid "User role added"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:84
+msgid "Added role {role} to \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:85
+msgid "User role removed"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:85
+msgid "Removed role {role} from \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:86
+msgid "Super admin granted"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:86
+msgid "Granted super admin to \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:87
+msgid "Super admin revoked"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:87
+msgid "Revoked super admin from \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:88
+#: admin-app/pages/UserDetail.jsx:41
+msgid "Session ended"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:88
+msgid "Ended {count} session(s) of \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:101
+msgid "Content created"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:101
+msgid "Created {type_label} \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:102
+msgid "Content updated"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:102
+msgid "Updated {type_label} \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:103
+msgid "Content published"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:103
+msgid "Published {type_label} \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:104
+msgid "Content scheduled"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:104
+msgid "Scheduled {type_label} \"{object}\" for {date}"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:105
+msgid "Content unpublished"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:105
+msgid "Unpublished {type_label} \"{object}\" (now {status})"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:106
+msgid "Content trashed"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:106
+msgid "Moved {type_label} \"{object}\" to the trash"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:107
+msgid "Content restored"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:107
+msgid "Restored {type_label} \"{object}\" from the trash"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:108
+msgid "Content deleted"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:108
+msgid "Permanently deleted {type_label} \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:122
+msgid "Media uploaded"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:122
+msgid "Uploaded \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:123
+msgid "Media updated"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:123
+msgid "Updated media \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:124
+msgid "Image edited"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:124
+msgid "Edited image \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:125
+msgid "Media deleted"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:125
+msgid "Deleted media \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:126
+msgid "Comment approved"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:126
+msgid "Approved comment by {author} on \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:127
+msgid "Comment unapproved"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:127
+msgid "Unapproved comment by {author} on \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:128
+msgid "Comment marked as spam"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:128
+msgid "Marked comment by {author} on \"{object}\" as spam"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:129
+msgid "Comment trashed"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:129
+msgid "Trashed comment by {author} on \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:130
+msgid "Comment deleted"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:130
+msgid "Deleted comment by {author} on \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:131
+msgid "Comment edited"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:131
+msgid "Edited comment by {author} on \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:146
+msgid "Term created"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:146
+msgid "Created {taxonomy} \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:147
+msgid "Term updated"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:147
+msgid "Updated {taxonomy} \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:148
+msgid "Term deleted"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:148
+msgid "Deleted {taxonomy} \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:149
+msgid "Menu created"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:149
+msgid "Created menu \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:150
+msgid "Menu updated"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:150
+msgid "Updated menu \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:151
+msgid "Menu deleted"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:151
+msgid "Deleted menu \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:152
+msgid "Menu locations changed"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:152
+msgid "Changed menu locations"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:153
+msgid "Widgets updated"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:153
+msgid "Updated widgets"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:154
+msgid "Customizer saved"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:154
+msgid "Saved {count} Customizer setting(s)"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:169
+msgid "Plugin installed"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:169
+msgid "Installed plugin \"{object}\" {version}"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:170
+msgid "Plugin activated"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:170
+msgid "Activated plugin \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:171
+msgid "Plugin deactivated"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:171
+msgid "Deactivated plugin \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:172
+msgid "Plugin updated"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:172
+msgid "Updated plugin \"{object}\" from {old_version} to {new_version}"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:173
+msgid "Plugin deleted"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:173
+msgid "Deleted plugin \"{object}\" {version}"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:174
+msgid "Plugin file edited"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:174
+msgid "Edited plugin file {file}"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:175
+msgid "Plugin auto-updates changed"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:175
+msgid "Turned auto-updates {state} for plugin \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:176
+msgid "Theme installed"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:176
+msgid "Installed theme \"{object}\" {version}"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:177
+msgid "Theme switched"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:177
+msgid "Switched theme from \"{old_theme}\" to \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:178
+msgid "Theme updated"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:178
+msgid "Updated theme \"{object}\" from {old_version} to {new_version}"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:179
+msgid "Theme deleted"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:179
+msgid "Deleted theme \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:180
+msgid "Theme file edited"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:180
+msgid "Edited theme file {file}"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:181
+msgid "Theme auto-updates changed"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:181
+msgid "Turned auto-updates {state} for theme \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:182
+msgid "WordPress updated"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:182
+msgid "Updated WordPress from {old_version} to {new_version}"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:183
+msgid "Core auto-updates changed"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:183
+msgid "Changed WordPress core auto-update settings"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:196
+msgid "Settings changed"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:196
+msgid "Changed {count} setting(s) on {object}"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:197
+msgid "Content exported"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:197
+msgid "Exported site content ({content})"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:198
+msgid "Content imported"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:198
+msgid "Imported content"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:199
+msgid "Personal data exported"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:199
+msgid "Exported personal data for {object}"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:200
+msgid "Personal data erased"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:200
+msgid "Erased personal data for {object}"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:213
+msgid "Site created"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:213
+msgid "Created site \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:214
+msgid "Site deleted"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:214
+msgid "Deleted site \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:215
+msgid "Site archived"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:215
+msgid "Archived site \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:216
+msgid "Site unarchived"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:216
+msgid "Unarchived site \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:217
+msgid "Site marked as spam"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:217
+msgid "Marked site \"{object}\" as spam"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:218
+msgid "Site unmarked as spam"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:218
+msgid "Unmarked site \"{object}\" as spam"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:219
+msgid "Site deactivated"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:219
+msgid "Deactivated site \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:220
+msgid "Site activated"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:220
+msgid "Activated site \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:221
+msgid "Network settings changed"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:221
+msgid "Changed {count} network setting(s)"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:234
+msgid "Activity Ledger activated"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:234
+msgid "Activity Ledger was activated"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:235
+msgid "Activity Ledger was deactivated"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:236
+msgid "Ledger settings changed"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:236
+msgid "Changed Activity Ledger settings"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:237
+msgid "Alert rules changed"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:237
+msgid "Changed alert rule \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:238
+msgid "Alert channels changed"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:238
+msgid "Changed alert channel \"{object}\""
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:239
+msgid "Alert delivery failed"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:239
+msgid "Alert to channel \"{object}\" failed: {error}"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:240
+msgid "Logs exported"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:240
+msgid "Exported {count} log entries as {format}"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:241
+msgid "Logs purged"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:241
+msgid "Purged {count} log entries"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:242
+msgid "Old logs pruned"
+msgstr ""
+
+#: src/Domain/CoreEventTypes.php:242
+msgid "Retention removed {count} old log entries"
+msgstr ""
+
+#: src/Domain/Severity.php:29
+msgid "Info"
+msgstr ""
+
+#: src/Domain/Severity.php:30
+msgid "Notice"
+msgstr ""
+
+#: src/Domain/Severity.php:31
+msgid "Warning"
+msgstr ""
+
+#: src/Domain/Severity.php:32
+msgid "Critical"
+msgstr ""
+
+#: src/Integrations/Elementor.php:143
+msgid "Edited with Elementor"
+msgstr ""
+
+#: src/Integrations/Elementor.php:143
+msgid "Edited {type_label} \"{object}\" with Elementor"
+msgstr ""
+
+#: src/Integrations/Elementor.php:144
+msgid "Template created"
+msgstr ""
+
+#: src/Integrations/Elementor.php:144
+msgid "Created Elementor template \"{object}\""
+msgstr ""
+
+#: src/Integrations/Elementor.php:145
+msgid "Template updated"
+msgstr ""
+
+#: src/Integrations/Elementor.php:145
+msgid "Edited Elementor template \"{object}\""
+msgstr ""
+
+#: src/Integrations/Elementor.php:146
+msgid "Template trashed"
+msgstr ""
+
+#: src/Integrations/Elementor.php:146
+msgid "Moved Elementor template \"{object}\" to the trash"
+msgstr ""
+
+#: src/Integrations/Elementor.php:147
+msgid "Template restored"
+msgstr ""
+
+#: src/Integrations/Elementor.php:147
+msgid "Restored Elementor template \"{object}\" from the trash"
+msgstr ""
+
+#: src/Integrations/Elementor.php:148
+msgid "Template deleted"
+msgstr ""
+
+#: src/Integrations/Elementor.php:148
+msgid "Deleted Elementor template \"{object}\""
+msgstr ""
+
+#: src/Integrations/Elementor.php:149
+msgid "Site Settings changed"
+msgstr ""
+
+#: src/Integrations/Elementor.php:149
+msgid "Changed {count} Elementor Site Setting(s)"
+msgstr ""
+
+#: src/Integrations/Elementor.php:150
+msgid "Elementor settings changed"
+msgstr ""
+
+#: src/Integrations/Elementor.php:150
+msgid "Changed {count} Elementor setting(s)"
+msgstr ""
+
+#: src/Integrations/Elementor.php:151
+msgid "Display conditions changed"
+msgstr ""
+
+#: src/Integrations/Elementor.php:151
+msgid "Changed Elementor theme-builder display conditions"
+msgstr ""
+
+#: src/Integrations/WooCatalogWatcher.php:320
+msgid "variation"
+msgstr ""
+
+#: src/Integrations/WooCatalogWatcher.php:321
+msgid "coupon"
+msgstr ""
+
+#: src/Integrations/WooCatalogWatcher.php:322
+msgid "product"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:164
+msgid "Order status changed"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:164
+msgid "Order {object} changed from {from} to {to}"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:165
+msgid "Order refunded"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:165
+msgid "Refunded {amount} on order {object}"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:166
+msgid "Order note added"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:166
+msgid "Added a note to order {object}"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:167
+msgid "Order edited"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:167
+msgid "Edited order {object}"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:168
+msgid "Product created"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:168
+msgid "Created product \"{object}\""
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:169
+msgid "Product updated"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:169
+msgid "Updated product \"{object}\""
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:170
+msgid "Product trashed"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:170
+msgid "Moved product \"{object}\" to the trash"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:171
+msgid "Product restored"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:171
+msgid "Restored product \"{object}\" from the trash"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:172
+msgid "Product deleted"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:172
+msgid "Deleted product \"{object}\""
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:173
+msgid "Stock changed"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:173
+msgid "Stock of \"{object}\" changed to {stock}"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:174
+msgid "Coupon created"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:174
+msgid "Created coupon \"{object}\""
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:175
+msgid "Coupon updated"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:175
+msgid "Updated coupon \"{object}\""
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:176
+msgid "Coupon trashed"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:176
+msgid "Moved coupon \"{object}\" to the trash"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:177
+msgid "Coupon restored"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:177
+msgid "Restored coupon \"{object}\" from the trash"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:178
+msgid "Coupon deleted"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:178
+msgid "Deleted coupon \"{object}\""
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:179
+msgid "WooCommerce settings changed"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:179
+msgid "Changed {count} WooCommerce setting(s)"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:180
+msgid "Payment method switched"
+msgstr ""
+
+#: src/Integrations/WooCommerce.php:180
+msgid "Turned payment method \"{object}\" {state}"
+msgstr ""
+
+#: src/Integrations/WooSettingsWatcher.php:135
+msgid "on"
+msgstr ""
+
+#: src/Integrations/WooSettingsWatcher.php:135
+msgid "off"
+msgstr ""
+
+#. translators: 1: required PHP version, 2: required WordPress version.
+#: src/Lifecycle/Activator.php:93
+#, php-format
+msgid "WP Activity Ledger needs PHP %1$s and WordPress %2$s or newer."
+msgstr ""
+
+#: src/Lifecycle/Activator.php:98
+msgid "Plugin activation failed"
+msgstr ""
+
+#. translators: %d: number of log entries.
+#: src/Privacy/PrivacyTools.php:153
+#, php-format
+msgid "Activity Ledger keeps %d log entry for security auditing. The login, IP address and browser details in it were anonymised."
+msgid_plural "Activity Ledger keeps %d log entries for security auditing. The login, IP address and browser details in them were anonymised."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Privacy/PrivacyTools.php:176
+msgid "Suggested text for sites that use WP Activity Ledger:"
+msgstr ""
+
+#: src/Privacy/PrivacyTools.php:177
+msgid "Suggested text:"
+msgstr ""
+
+#: src/Privacy/PrivacyTools.php:178
+msgid "For security and accountability, this site keeps an activity log of actions taken by logged-in users and of failed login attempts: what was done, when, by which account, from which IP address and with which browser. The log is only visible to administrators, is kept for a limited time and is deleted automatically afterwards. If you ask us to erase your personal data, your entries in the log are anonymised but kept as part of the security record."
+msgstr ""
+
+#: src/Privacy/PrivacyTools.php:198
+msgid "Time (UTC)"
+msgstr ""
+
+#: src/Privacy/PrivacyTools.php:202
+#: admin-app/components/EventDrawer.jsx:43
+#: admin-app/components/FilterBar.jsx:109
+#: admin-app/pages/ActivityLog.jsx:35
+msgid "Event"
+msgstr ""
+
+#: src/Privacy/PrivacyTools.php:206
+#: admin-app/components/EventDrawer.jsx:78
+#: admin-app/pages/ActivityLog.jsx:38
+msgid "Object"
+msgstr ""
+
+#: src/Privacy/PrivacyTools.php:210
+#: admin-app/components/alerts/RulesTab.jsx:179
+#: admin-app/components/FilterBar.jsx:137
+msgid "IP address"
+msgstr ""
+
+#: src/Privacy/PrivacyTools.php:214
+msgid "Browser"
+msgstr ""
+
+#: src/Rest/AlertsController.php:249
+msgid "Not found."
+msgstr ""
+
+#: src/Rest/AlertsController.php:260
+msgid "Some fields are not valid."
+msgstr ""
+
+#: src/Rest/BaseController.php:44
+msgid "You must be logged in."
+msgstr ""
+
+#: src/Rest/BaseController.php:48
+msgid "Sorry, you are not allowed to do that."
+msgstr ""
+
+#: src/Rest/BaseController.php:76
+msgid "Site to read (multisite, super admins only)."
+msgstr ""
+
+#: src/Rest/BaseController.php:98
+msgid "Only network administrators can read other sites."
+msgstr ""
+
+#: src/Rest/BaseController.php:102
+msgid "Site not found."
+msgstr ""
+
+#: src/Rest/EventsController.php:100
+msgid "Event not found."
+msgstr ""
+
+#: src/Rest/EventsController.php:183
+msgid "Start, UTC."
+msgstr ""
+
+#: src/Rest/EventsController.php:184
+msgid "End, UTC."
+msgstr ""
+
+#: src/Rest/NetworkSettingsController.php:75
+#: src/Rest/SettingsController.php:89
+msgid "Some settings are not valid."
+msgstr ""
+
+#: src/Rest/PurgeController.php:89
+msgid "Type PURGE to confirm."
+msgstr ""
+
+#: src/Rest/PurgeController.php:114
+msgid "Choose a date."
+msgstr ""
+
+#: src/Rest/PurgeController.php:123
+msgid "Set at least one filter, or choose \"all\"."
+msgstr ""
+
+#: src/Rest/SessionsController.php:93
+msgid "Sorry, you are not allowed to manage this user’s sessions."
+msgstr ""
+
+#: src/Rest/SessionsController.php:110
+#: src/Rest/SessionsController.php:164
+msgid "User not found."
+msgstr ""
+
+#: src/Rest/SessionsController.php:145
+msgid "Session not found."
+msgstr ""
+
+#: src/Rest/StatsController.php:81
+msgid "First day, site timezone (Y-m-d)."
+msgstr ""
+
+#: src/Rest/StatsController.php:82
+msgid "Last day, site timezone (Y-m-d)."
+msgstr ""
+
+#: src/Rest/StatsController.php:99
+msgid "The start date is after the end date."
+msgstr ""
+
+#: src/Rest/UsersController.php:76
+msgid "Range start, UTC (default: 30 days ago)."
+msgstr ""
+
+#: src/Rest/UsersController.php:77
+msgid "Range end, UTC (default: now)."
+msgstr ""
+
+#: src/Sensors/CommentSensor.php:197
+msgid "anonymous"
+msgstr ""
+
+#: src/Sensors/MetaWatcher.php:236
+#: src/Sensors/PostSensor.php:448
+msgid "(no title)"
+msgstr ""
+
+#: src/Sensors/OptionSensor.php:206
+msgid "site settings"
+msgstr ""
+
+#: src/Settings/SettingsValidator.php:111
+msgid "Must be a number."
+msgstr ""
+
+#: src/Settings/SettingsValidator.php:127
+msgid "Must be on or off."
+msgstr ""
+
+#: src/Settings/SettingsValidator.php:144
+msgid "Must be a list."
+msgstr ""
+
+#: src/Settings/SettingsValidator.php:189
+msgid "Unknown proxy header."
+msgstr ""
+
+#: src/Update/Updater.php:131
+msgid "See the release page on GitHub."
+msgstr ""
+
+#: wp-activity-ledger.php:53
+msgid "Run <code>composer install</code> in the plugin directory, or install the release zip, before use."
+msgstr ""
+
+#: admin-app/App.jsx:69
+msgid " · Network"
+msgstr ""
+
+#: admin-app/components/ActivityChart.jsx:35
+#: admin-app/components/ActivityChart.jsx:83
+msgid "Total"
+msgstr ""
+
+#: admin-app/components/ActivityChart.jsx:59
+msgid "Legend"
+msgstr ""
+
+#: admin-app/components/ActivityChart.jsx:68
+msgid "Show chart"
+msgstr ""
+
+#: admin-app/components/ActivityChart.jsx:68
+msgid "Show table"
+msgstr ""
+
+#: admin-app/components/ActivityChart.jsx:77
+msgid "Hour"
+msgstr ""
+
+#: admin-app/components/ActivityChart.jsx:77
+msgid "Day"
+msgstr ""
+
+#: admin-app/components/ActivityChart.jsx:102
+#, js-format
+msgid "Events per %s, stacked by category"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:16
+msgid "Email"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:16
+msgid "Sends an HTML email to each recipient."
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:17
+msgid "Webhook"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:17
+msgid "POSTs signed JSON (X-WPAL-Signature) to your endpoint."
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:18
+msgid "Slack"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:18
+msgid "Paste a Slack incoming-webhook URL."
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:19
+msgid "Discord"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:19
+msgid "Paste a Discord channel webhook URL."
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:20
+msgid "Microsoft Teams"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:20
+msgid "Paste a Teams Workflows (or incoming) webhook URL."
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:65
+msgid "Channel saved"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:65
+msgid "Channel added"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:77
+msgid "Edit channel"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:77
+msgid "Add a channel"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:82
+#: admin-app/components/settings/PurgePanel.jsx:68
+msgid "Type"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:98
+#: admin-app/components/alerts/RulesTab.jsx:121
+msgid "Name"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:99
+msgid "e.g. Admins"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:105
+msgid "Recipients"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:106
+msgid "admin@example.com, ops@example.com"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:111
+msgid "Webhook URL"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:112
+msgid "https://…"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:113
+msgid "Stored URLs are hidden. Leave it as is to keep the current one."
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:120
+msgid "Signing secret"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:122
+msgid "Generated when empty"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:125
+msgid "Generate"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:128
+msgid "Copy a new secret now; it is hidden after saving."
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:136
+#: admin-app/components/alerts/ChannelsTab.jsx:218
+#: admin-app/components/alerts/RulesTab.jsx:205
+#: admin-app/components/alerts/RulesTab.jsx:287
+#: admin-app/pages/UserDetail.jsx:104
+msgid "Cancel"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:139
+#: admin-app/components/alerts/RulesTab.jsx:208
+#: admin-app/lib/format.test.js:83
+msgid "Save"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:139
+#: admin-app/components/alerts/ChannelsTab.jsx:174
+msgid "Add channel"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:163
+msgid "Test alert sent"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:163
+#, js-format
+msgid "Check %s."
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:164
+#: admin-app/components/alerts/ChannelsTab.jsx:165
+msgid "Test alert failed"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:171
+msgid "Where alerts are sent. Rules pick one or more channels."
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:180
+msgid "No channels yet. Add one to start sending alerts."
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:195
+msgid "Send test"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:197
+#: admin-app/components/alerts/RulesTab.jsx:266
+msgid "Edit"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:200
+#: admin-app/components/alerts/ChannelsTab.jsx:225
+#: admin-app/components/alerts/RulesTab.jsx:269
+#: admin-app/components/alerts/RulesTab.jsx:290
+msgid "Delete"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:213
+#: admin-app/components/alerts/RulesTab.jsx:282
+msgid "Delete “"
+msgstr ""
+
+#: admin-app/components/alerts/ChannelsTab.jsx:214
+msgid "Rules that use this channel stop sending to it."
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:20
+#: admin-app/components/FilterBar.jsx:24
+msgid "Any severity"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:21
+#: admin-app/components/FilterBar.jsx:25
+msgid "Notice and up"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:22
+#: admin-app/components/FilterBar.jsx:26
+msgid "Warning and up"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:23
+#: admin-app/components/FilterBar.jsx:27
+msgid "Critical only"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:33
+#, js-format
+msgid "%s event types"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:36
+#, js-format
+msgid "by %s"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:39
+#, js-format
+msgid "%1$s× in %2$s min per %3$s"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:39
+msgid "user"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:39
+#: admin-app/components/EventDrawer.jsx:88
+#: admin-app/pages/ActivityLog.jsx:39
+msgid "IP"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:105
+msgid "Rule saved"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:105
+msgid "Rule added"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:117
+msgid "Edit rule"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:117
+msgid "Add a rule"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:118
+msgid "An alert is sent when an event meets every condition you set."
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:122
+msgid "e.g. Plugin changes"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:127
+msgid "Event types"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:128
+msgid "Any event type"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:130
+msgid "Categories"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:132
+msgid "Any category"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:138
+msgid "Minimum severity"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:152
+msgid "Done by roles"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:154
+#: admin-app/components/FilterBar.jsx:100
+#: admin-app/pages/Users.jsx:100
+msgid "Any role"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:166
+msgid "Only alert after repeated events"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:170
+msgid "Count"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:171
+msgid "events within"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:172
+msgid "Minutes"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:173
+msgid "minutes from the same"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:188
+msgid "Cooldown (minutes)"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:188
+msgid "Quiet time after an alert. 0: none (threshold rules wait one window)."
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:191
+msgid "Send to"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:191
+msgid "Add a channel on the Channels tab first."
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:192
+msgid "No channel"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:198
+msgid "Enabled"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:208
+#: admin-app/components/alerts/RulesTab.jsx:242
+msgid "Add rule"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:233
+msgid "Could not change the rule"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:239
+msgid "Which events send an alert. Built-in templates start switched off."
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:248
+msgid "No rules yet."
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:252
+#, js-format
+msgid "Enable %s"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:257
+msgid "no channel"
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:283
+msgid "Built-in templates are not added again later."
+msgstr ""
+
+#: admin-app/components/alerts/RulesTab.jsx:283
+msgid "This cannot be undone."
+msgstr ""
+
+#: admin-app/components/DiffView.jsx:29
+msgid "(empty)"
+msgstr ""
+
+#: admin-app/components/DiffView.jsx:48
+#, js-format
+msgid "Array (%s)"
+msgstr ""
+
+#: admin-app/components/DiffView.jsx:48
+#, js-format
+msgid "Object (%s)"
+msgstr ""
+
+#: admin-app/components/DiffView.jsx:100
+msgid "Before"
+msgstr ""
+
+#: admin-app/components/DiffView.jsx:104
+msgid "After"
+msgstr ""
+
+#: admin-app/components/DiffView.jsx:129
+msgid "truncated: values were longer than the stored limit"
+msgstr ""
+
+#: admin-app/components/DiffView.jsx:143
+msgid "No field changes were recorded for this event."
+msgstr ""
+
+#: admin-app/components/EventDrawer.jsx:62
+msgid "When"
+msgstr ""
+
+#: admin-app/components/EventDrawer.jsx:63
+msgid ", UTC"
+msgstr ""
+
+#: admin-app/components/EventDrawer.jsx:65
+#: admin-app/components/UserPicker.jsx:38
+#: admin-app/pages/ActivityLog.jsx:34
+#: admin-app/pages/Users.jsx:118
+msgid "User"
+msgstr ""
+
+#: admin-app/components/EventDrawer.jsx:73
+msgid "System / anonymous"
+msgstr ""
+
+#: admin-app/components/EventDrawer.jsx:76
+#: admin-app/pages/Users.jsx:119
+msgid "Roles"
+msgstr ""
+
+#: admin-app/components/EventDrawer.jsx:77
+#: admin-app/components/FilterBar.jsx:108
+#: admin-app/pages/ActivityLog.jsx:37
+msgid "Category"
+msgstr ""
+
+#: admin-app/components/EventDrawer.jsx:89
+#: admin-app/pages/ActivityLog.jsx:40
+msgid "Source"
+msgstr ""
+
+#: admin-app/components/EventDrawer.jsx:94
+msgid "User agent"
+msgstr ""
+
+#: admin-app/components/EventDrawer.jsx:99
+msgid "Context"
+msgstr ""
+
+#: admin-app/components/EventDrawer.jsx:109
+msgid "Other events in this session"
+msgstr ""
+
+#: admin-app/components/EventDrawer.jsx:114
+msgid "More by this user"
+msgstr ""
+
+#: admin-app/components/EventDrawer.jsx:119
+msgid "History of this object"
+msgstr ""
+
+#: admin-app/components/EventDrawer.jsx:125
+msgid "Changes"
+msgstr ""
+
+#: admin-app/components/FilterBar.jsx:16
+msgid "All time"
+msgstr ""
+
+#: admin-app/components/FilterBar.jsx:17
+msgid "Last 24 hours"
+msgstr ""
+
+#: admin-app/components/FilterBar.jsx:18
+msgid "Last 7 days"
+msgstr ""
+
+#: admin-app/components/FilterBar.jsx:19
+msgid "Last 30 days"
+msgstr ""
+
+#: admin-app/components/FilterBar.jsx:20
+msgid "Custom range"
+msgstr ""
+
+#: admin-app/components/FilterBar.jsx:74
+msgid "Search messages and objects…"
+msgstr ""
+
+#: admin-app/components/FilterBar.jsx:90
+msgid "From"
+msgstr ""
+
+#: admin-app/components/FilterBar.jsx:91
+msgid "To"
+msgstr ""
+
+#: admin-app/components/FilterBar.jsx:124
+msgid "More"
+msgstr ""
+
+#: admin-app/components/FilterBar.jsx:129
+msgid "Clear"
+msgstr ""
+
+#: admin-app/components/FilterBar.jsx:135
+msgid "Object type"
+msgstr ""
+
+#: admin-app/components/FilterBar.jsx:136
+msgid "Object ID"
+msgstr ""
+
+#: admin-app/components/FilterBar.jsx:138
+msgid "Session"
+msgstr ""
+
+#: admin-app/components/MultiSelect.jsx:44
+#, js-format
+msgid "%1$s: %2$s"
+msgstr ""
+
+#: admin-app/components/MultiSelect.jsx:56
+msgid "Search…"
+msgstr ""
+
+#: admin-app/components/MultiSelect.jsx:59
+msgid "No matches."
+msgstr ""
+
+#: admin-app/components/MultiSelect.jsx:82
+#: admin-app/components/UserPicker.jsx:77
+msgid "Clear selection"
+msgstr ""
+
+#: admin-app/components/Placeholder.jsx:12
+msgid "This screen is coming soon."
+msgstr ""
+
+#: admin-app/components/settings/EventsTab.jsx:21
+msgid "recorded)"
+msgstr ""
+
+#: admin-app/components/settings/EventsTab.jsx:24
+#, js-format
+msgid "Record all %s events"
+msgstr ""
+
+#: admin-app/components/settings/EventsTab.jsx:64
+msgid "Recorded events"
+msgstr ""
+
+#: admin-app/components/settings/EventsTab.jsx:65
+msgid "Switch off event types you never need. Activity Ledger's own events are always recorded."
+msgstr ""
+
+#: admin-app/components/settings/EventsTab.jsx:74
+msgid "Ignored options"
+msgstr ""
+
+#: admin-app/components/settings/EventsTab.jsx:75
+msgid "Option names never recorded, one per line. * matches anything. WordPress's own busy options are always ignored."
+msgstr ""
+
+#: admin-app/components/settings/EventsTab.jsx:80
+msgid "Ignored meta keys"
+msgstr ""
+
+#: admin-app/components/settings/EventsTab.jsx:80
+msgid "Post and user meta keys never recorded, one per line."
+msgstr ""
+
+#: admin-app/components/settings/EventsTab.jsx:83
+msgid "Redacted fields"
+msgstr ""
+
+#: admin-app/components/settings/EventsTab.jsx:84
+msgid "Fields whose values are stored as [redacted], one per line (passwords, keys, tokens)."
+msgstr ""
+
+#: admin-app/components/settings/EventsTab.jsx:91
+msgid "Largest stored value"
+msgstr ""
+
+#: admin-app/components/settings/EventsTab.jsx:92
+msgid "Longer before/after values are cut and marked as truncated."
+msgstr ""
+
+#: admin-app/components/settings/PurgePanel.jsx:15
+msgid "Events older than a date"
+msgstr ""
+
+#: admin-app/components/settings/PurgePanel.jsx:16
+msgid "All events"
+msgstr ""
+
+#: admin-app/components/settings/PurgePanel.jsx:32
+#, js-format
+msgid "%s events deleted"
+msgstr ""
+
+#: admin-app/components/settings/PurgePanel.jsx:42
+msgid "Purge logs"
+msgstr ""
+
+#: admin-app/components/settings/PurgePanel.jsx:44
+msgid "Deleted events can't be restored. The purge itself is recorded and stays in the log."
+msgstr ""
+
+#: admin-app/components/settings/PurgePanel.jsx:47
+msgid "What to delete"
+msgstr ""
+
+#: admin-app/components/settings/PurgePanel.jsx:59
+msgid "Delete events before"
+msgstr ""
+
+#: admin-app/components/settings/PurgePanel.jsx:62
+msgid "(site time, start of that day)"
+msgstr ""
+
+#: admin-app/components/settings/PurgePanel.jsx:68
+msgid "to confirm"
+msgstr ""
+
+#: admin-app/components/settings/PurgePanel.jsx:72
+msgid "Purge"
+msgstr ""
+
+#: admin-app/components/SiteSwitcher.jsx:36
+msgid "Site"
+msgstr ""
+
+#: admin-app/components/SiteSwitcher.jsx:37
+msgid "Choose a site"
+msgstr ""
+
+#: admin-app/components/SiteSwitcher.jsx:42
+msgid "(main site, network events)"
+msgstr ""
+
+#: admin-app/components/UserPicker.jsx:40
+#, js-format
+msgid "User #%s"
+msgstr ""
+
+#: admin-app/components/UserPicker.jsx:41
+#, js-format
+msgid "Users: %s"
+msgstr ""
+
+#: admin-app/components/UserPicker.jsx:53
+msgid "Search users…"
+msgstr ""
+
+#: admin-app/components/UserPicker.jsx:56
+msgid "Type a name, login or email."
+msgstr ""
+
+#: admin-app/components/UserPicker.jsx:57
+msgid "Searching…"
+msgstr ""
+
+#: admin-app/components/UserPicker.jsx:58
+msgid "No users found."
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:33
+msgid "Time"
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:36
+msgid "Severity"
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:130
+msgid "Columns"
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:134
+msgid "Show columns"
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:167
+msgid "Export"
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:171
+msgid "Export these events"
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:173
+msgid "CSV (spreadsheet)"
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:174
+msgid "JSON"
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:191
+msgid "Could not save your view"
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:244
+#: admin-app/pages/Users.jsx:111
+msgid "Loading…"
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:244
+#, js-format
+msgid "%s event"
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:244
+#, js-format
+msgid "%s events"
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:251
+msgid "Auto-refresh (30 s)"
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:287
+msgid "No events match these filters."
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:294
+msgid "Rows per page"
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:316
+#: admin-app/pages/Users.jsx:170
+msgid "Page"
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:318
+#: admin-app/pages/Users.jsx:172
+msgid "Previous page"
+msgstr ""
+
+#: admin-app/pages/ActivityLog.jsx:321
+#: admin-app/pages/Users.jsx:175
+msgid "Next page"
+msgstr ""
+
+#: admin-app/pages/Alerts.jsx:18
+msgid "Rules"
+msgstr ""
+
+#: admin-app/pages/Alerts.jsx:19
+msgid "Channels"
+msgstr ""
+
+#: admin-app/pages/Dashboard.jsx:16
+msgid "24 hours"
+msgstr ""
+
+#: admin-app/pages/Dashboard.jsx:17
+msgid "7 days"
+msgstr ""
+
+#: admin-app/pages/Dashboard.jsx:18
+msgid "30 days"
+msgstr ""
+
+#: admin-app/pages/Dashboard.jsx:89
+#, js-format
+msgid "Activity in the last %s"
+msgstr ""
+
+#: admin-app/pages/Dashboard.jsx:92
+msgid "Range"
+msgstr ""
+
+#: admin-app/pages/Dashboard.jsx:110
+#: admin-app/pages/Settings.jsx:170
+#: admin-app/pages/UserDetail.jsx:80
+#: admin-app/pages/Users.jsx:122
+msgid "Events"
+msgstr ""
+
+#: admin-app/pages/Dashboard.jsx:111
+#: admin-app/pages/Users.jsx:123
+msgid "Failed logins"
+msgstr ""
+
+#: admin-app/pages/Dashboard.jsx:112
+msgid "Critical events"
+msgstr ""
+
+#: admin-app/pages/Dashboard.jsx:113
+msgid "Active users"
+msgstr ""
+
+#: admin-app/pages/Dashboard.jsx:114
+#: admin-app/pages/UserDetail.jsx:52
+msgid "Active sessions"
+msgstr ""
+
+#: admin-app/pages/Dashboard.jsx:119
+msgid "Events over time"
+msgstr ""
+
+#: admin-app/pages/Dashboard.jsx:126
+msgid "Most active users"
+msgstr ""
+
+#: admin-app/pages/Dashboard.jsx:127
+msgid "No user activity."
+msgstr ""
+
+#: admin-app/pages/Dashboard.jsx:136
+msgid "Top events"
+msgstr ""
+
+#: admin-app/pages/Dashboard.jsx:137
+msgid "No events."
+msgstr ""
+
+#: admin-app/pages/Dashboard.jsx:142
+msgid "Recent critical events"
+msgstr ""
+
+#: admin-app/pages/Dashboard.jsx:146
+msgid "No critical events in this period."
+msgstr ""
+
+#: admin-app/pages/NetworkSettings.jsx:23
+msgid "Network settings saved"
+msgstr ""
+
+#: admin-app/pages/NetworkSettings.jsx:25
+msgid "Not saved"
+msgstr ""
+
+#: admin-app/pages/NetworkSettings.jsx:39
+msgid "Lock site settings"
+msgstr ""
+
+#: admin-app/pages/NetworkSettings.jsx:40
+msgid "Site administrators can still view their log and settings, but can't change settings or alerts, or purge logs."
+msgstr ""
+
+#: admin-app/pages/NetworkSettings.jsx:46
+msgid "Locked by the network"
+msgstr ""
+
+#: admin-app/pages/NetworkSettings.jsx:46
+msgid "Each site manages its own settings"
+msgstr ""
+
+#: admin-app/pages/NetworkSettings.jsx:50
+msgid "Defaults for new sites"
+msgstr ""
+
+#: admin-app/pages/NetworkSettings.jsx:50
+msgid "Sites created from now on start with these settings instead of the plugin defaults."
+msgstr ""
+
+#: admin-app/pages/NetworkSettings.jsx:52
+msgid "New sites copy the saved defaults."
+msgstr ""
+
+#: admin-app/pages/NetworkSettings.jsx:52
+msgid "New sites start with the plugin defaults."
+msgstr ""
+
+#: admin-app/pages/NetworkSettings.jsx:56
+msgid "Use the main site's settings"
+msgstr ""
+
+#: admin-app/pages/NetworkSettings.jsx:60
+msgid "Clear defaults"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:31
+msgid "Record activity of"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:31
+msgid "Whose actions are logged. Anonymous and system actions are controlled below."
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:35
+msgid "Every role"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:38
+msgid "Choose roles"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:40
+msgid "Never record these users"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:40
+msgid "For service accounts or your own test users."
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:43
+msgid "Record anonymous actions"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:43
+msgid "Failed logins and password reset requests by visitors."
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:44
+msgid "Who can view the log"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:44
+msgid "Administrators always can. Viewers also see the dashboard and users."
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:45
+#: admin-app/pages/Settings.jsx:48
+msgid "Administrators only"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:47
+msgid "Who can export"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:47
+msgid "Export also needs permission to view."
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:52
+msgid "Group repeated failed logins"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:53
+msgid "Failed logins for the same username and IP within this time are counted on one entry. 0 records each one."
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:59
+msgid "Dashboard widget"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:59
+msgid "Show recent activity on Dashboard → Home."
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:67
+msgid "Anonymise IP addresses"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:67
+msgid "Stores 203.0.113.0 instead of 203.0.113.42 (IPv6: the first 48 bits)."
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:68
+msgid "Store browser details"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:68
+msgid "The user agent of each request."
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:70
+msgid "Client IP source"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:71
+msgid "Only use a proxy header when your site is behind a proxy or CDN that sets it; otherwise visitors can fake their IP."
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:79
+msgid "Connection address (REMOTE_ADDR)"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:96
+msgid "Keep events for"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:96
+msgid "Older events are deleted every day. 0 keeps them forever."
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:97
+msgid "Keep at most"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:97
+msgid "The oldest events beyond this number are deleted every day. 0 means no limit."
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:107
+msgid "Delete data when uninstalled"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:107
+msgid "When the plugin is deleted from Plugins: remove the log tables, settings, alerts and capabilities."
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:111
+msgid "Delete everything on uninstall"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:111
+msgid "Keep the audit trail"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:116
+msgid "The whole activity log is lost when the plugin is deleted."
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:121
+msgid "Network lock"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:121
+msgid "Stop site administrators from changing these settings or purging logs. Managed in the network admin."
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:122
+msgid "Set this under Network Admin → Activity Ledger."
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:153
+msgid "Settings saved"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:155
+msgid "Settings not saved"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:169
+msgid "General"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:171
+msgid "Privacy"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:172
+msgid "Retention"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:173
+msgid "Advanced"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:176
+msgid "Unsaved changes"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:178
+msgid "Discard"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:181
+msgid "Save settings"
+msgstr ""
+
+#: admin-app/pages/Settings.jsx:187
+msgid "These settings are managed by the network administrator. You can view them but not change them."
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:41
+#, js-format
+msgid "%s sessions ended"
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:44
+msgid "Could not end the session"
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:56
+#: admin-app/pages/UserDetail.jsx:107
+msgid "Log out everywhere"
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:63
+msgid "No active sessions."
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:71
+msgid "this session"
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:74
+msgid "· signed in"
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:74
+msgid "· expires"
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:84
+msgid "Log out"
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:96
+msgid "Log out everywhere?"
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:98
+msgid "This ends"
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:98
+msgid "1 session"
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:98
+#, js-format
+msgid "%s sessions"
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:98
+msgid ". The user has to sign in again on those devices."
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:130
+msgid "All users"
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:136
+msgid "This user no longer exists. Their recorded activity is below."
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:150
+#: admin-app/pages/Users.jsx:120
+msgid "Last activity"
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:154
+#: admin-app/pages/Users.jsx:121
+msgid "Last login"
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:158
+msgid "Events (30 days)"
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:162
+msgid "Failed logins (30 days)"
+msgstr ""
+
+#: admin-app/pages/UserDetail.jsx:174
+msgid "Activity"
+msgstr ""
+
+#: admin-app/pages/Users.jsx:86
+msgid "Search by name, login or email…"
+msgstr ""
+
+#: admin-app/pages/Users.jsx:111
+#, js-format
+msgid "%s users"
+msgstr ""
+
+#: admin-app/pages/Users.jsx:111
+msgid "· event counts cover the last 30 days"
+msgstr ""
+
+#: admin-app/pages/Users.jsx:163
+msgid "No users match."
+msgstr ""

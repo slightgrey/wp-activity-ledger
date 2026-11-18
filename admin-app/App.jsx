@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import SiteSwitcher from '@/components/SiteSwitcher';
+import { __ } from '@/lib/i18n';
 
 // Screens load on first visit (the dashboard's chart library is the largest part).
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
@@ -17,19 +18,19 @@ const Gallery = lazy(() => import('@/pages/Gallery'));
 const NetworkSettings = lazy(() => import('@/pages/NetworkSettings'));
 
 const SITE_SCREENS = [
-  { path: '/', label: 'Dashboard', cap: 'view', element: <Dashboard /> },
-  { path: '/log', label: 'Activity Log', cap: 'view', element: <ActivityLog /> },
-  { path: '/users', label: 'Users & Sessions', cap: 'view', element: <Users /> },
-  { path: '/alerts', label: 'Alerts', cap: 'manage_settings', element: <Alerts /> },
+  { path: '/', label: __( 'Dashboard', 'wp-activity-ledger' ), cap: 'view', element: <Dashboard /> },
+  { path: '/log', label: __( 'Activity Log', 'wp-activity-ledger' ), cap: 'view', element: <ActivityLog /> },
+  { path: '/users', label: __( 'Users & Sessions', 'wp-activity-ledger' ), cap: 'view', element: <Users /> },
+  { path: '/alerts', label: __( 'Alerts', 'wp-activity-ledger' ), cap: 'manage_settings', element: <Alerts /> },
   // Shown read-only to site admins while the network lock is on.
-  { path: '/settings', label: 'Settings', cap: config.settingsLocked ? 'manage_options' : 'manage_settings', element: <Settings /> },
+  { path: '/settings', label: __( 'Settings', 'wp-activity-ledger' ), cap: config.settingsLocked ? 'manage_options' : 'manage_settings', element: <Settings /> },
 ];
 
 const NETWORK_SCREENS = [
-  { path: '/', label: 'Dashboard', cap: 'view', element: <Dashboard /> },
-  { path: '/log', label: 'Activity Log', cap: 'view', element: <ActivityLog /> },
-  { path: '/users', label: 'Users & Sessions', cap: 'view', element: <Users /> },
-  { path: '/network', label: 'Network Settings', cap: 'view', element: <NetworkSettings /> },
+  { path: '/', label: __( 'Dashboard', 'wp-activity-ledger' ), cap: 'view', element: <Dashboard /> },
+  { path: '/log', label: __( 'Activity Log', 'wp-activity-ledger' ), cap: 'view', element: <ActivityLog /> },
+  { path: '/users', label: __( 'Users & Sessions', 'wp-activity-ledger' ), cap: 'view', element: <Users /> },
+  { path: '/network', label: __( 'Network Settings', 'wp-activity-ledger' ), cap: 'view', element: <NetworkSettings /> },
 ];
 
 const SCREENS = config.network ? NETWORK_SCREENS : SITE_SCREENS;
@@ -65,7 +66,7 @@ function Layout() {
     <div className="space-y-4 pr-4">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <h2 className="text-xl font-semibold">Activity Ledger{config.network ? ' · Network' : ''}</h2>
+          <h2 className="text-xl font-semibold">{__( 'Activity Ledger', 'wp-activity-ledger' )}{config.network ? __( ' · Network', 'wp-activity-ledger' ) : ''}</h2>
           {config.network && location.pathname !== '/network' && <SiteSwitcher />}
         </div>
         <nav className="flex flex-wrap gap-1 rounded-lg bg-muted p-1">

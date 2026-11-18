@@ -16,6 +16,7 @@ const defaults = {
   network: false,
   settingsLocked: false,
   siteId: 1,
+  i18n: {},
   caps: { view: false, export: false, manage_settings: false, delete: false, manage_sessions: false, manage_options: false },
 };
 
