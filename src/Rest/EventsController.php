@@ -23,7 +23,7 @@ final class EventsController extends BaseController {
 	/**
 	 * Filter arguments passed on to the query builder.
 	 */
-	private const FILTERS = array( 'page', 'per_page', 'from', 'to', 'user', 'role', 'category', 'type', 'severity', 'object_type', 'object_id', 'ip', 'session', 'search', 'orderby', 'order' );
+	private const FILTERS = array( 'page', 'per_page', 'from', 'to', 'user', 'role', 'category', 'type', 'severity', 'object_type', 'object_id', 'ip', 'session', 'search', 'hide_system', 'orderby', 'order' );
 
 	/**
 	 * Creates the controller.
@@ -218,6 +218,10 @@ final class EventsController extends BaseController {
 			'search'      => array(
 				'type'      => 'string',
 				'maxLength' => 100,
+			),
+			'hide_system' => array(
+				'type'        => 'boolean',
+				'description' => __( 'Hide System events (no logged-in user) below warning severity.', 'wp-activity-ledger' ),
 			),
 			'orderby'     => array(
 				'type'    => 'string',

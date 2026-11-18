@@ -102,9 +102,11 @@ export default function Dashboard() {
   const [eventId, setEventId] = useState(null);
   const navigate = useNavigate();
   const meta = useMeta();
+  // Same per-user choice as the Activity Log's "Show system events" switch (hidden by default).
+  const hideSystem = !meta.data?.prefs?.show_system;
   const stats = useQuery({
-    queryKey: ['stats', range],
-    queryFn: async () => (await api('/stats', { query: { range } })).data,
+    queryKey: ['stats', range, hideSystem],
+    queryFn: async () => (await api('/stats', { query: { range, ...(hideSystem ? { hide_system: 1 } : {}) } })).data,
     placeholderData: keepPreviousData,
   });
 
@@ -118,6 +120,12 @@ export default function Dashboard() {
         <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
           <Clock className="h-4 w-4" aria-hidden="true" />
           {sprintf( __( 'Activity in the last %s', 'wp-activity-ledger' ), RANGES.find((r) => r.key === range).label )}
+          {hideSystem && (
+            <span title={__( 'Routine events with no logged-in user are left out. Warnings and critical events are always counted. Change this with "Show system events" in the Activity Log.', 'wp-activity-ledger' )}>
+              {' · '}
+              {__( 'system events hidden', 'wp-activity-ledger' )}
+            </span>
+          )}
           {stats.isFetching && !stats.isLoading && ' · updating…'}
         </p>
         <div className={segmentGroupClass} role="group" aria-label={__( 'Range', 'wp-activity-ledger' )}>

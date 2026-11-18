@@ -74,6 +74,12 @@ final class MetaStatsControllerTest extends RestTestCase {
 		$this->assertSame( 'miss', $first->get_headers()['X-WPAL-Cache'] );
 		$this->assertSame( 'hit', $second->get_headers()['X-WPAL-Cache'] );
 
+		// Hiding System events is cached separately.
+		delete_transient( StatsController::cache_key( '2026-01-01|2026-01-07', true ) );
+		$this->assertNotSame( StatsController::cache_key( '2026-01-01|2026-01-07' ), StatsController::cache_key( '2026-01-01|2026-01-07', true ) );
+		$this->assertSame( 'miss', self::request( 'GET', '/stats', $args + array( 'hide_system' => true ) )->get_headers()['X-WPAL-Cache'] );
+		$this->assertSame( 'hit', self::request( 'GET', '/stats', $args + array( 'hide_system' => true ) )->get_headers()['X-WPAL-Cache'] );
+
 		foreach ( array( 'range', 'totals', 'by_day', 'top_users', 'top_types', 'recent_critical' ) as $key ) {
 			$this->assertArrayHasKey( $key, $first->get_data() );
 		}
@@ -117,9 +123,9 @@ final class MetaStatsControllerTest extends RestTestCase {
 			'PUT',
 			'/me/prefs',
 			array(
-				'columns'  => array( 'time', 'ip', 'bogus' ),
-				'per_page' => 50,
-				'filters'  => array(
+				'columns'     => array( 'time', 'ip', 'bogus' ),
+				'per_page'    => 50,
+				'filters'     => array(
 					array(
 						'name'    => 'Admins',
 						'filters' => array(
@@ -130,14 +136,15 @@ final class MetaStatsControllerTest extends RestTestCase {
 					),
 					array( 'name' => '' ),
 				),
-				'unknown'  => 'x',
+				'unknown'     => 'x',
+				'show_system' => 'true',
 			)
 		)->get_data();
 
 		$expected = array(
-			'columns'  => array( 'time', 'ip' ),
-			'per_page' => 50,
-			'filters'  => array(
+			'columns'     => array( 'time', 'ip' ),
+			'per_page'    => 50,
+			'filters'     => array(
 				array(
 					'name'    => 'Admins',
 					'filters' => array(
@@ -146,6 +153,7 @@ final class MetaStatsControllerTest extends RestTestCase {
 					),
 				),
 			),
+			'show_system' => true,
 		);
 
 		$this->assertSame( $expected, $saved );

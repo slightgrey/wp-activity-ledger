@@ -11,7 +11,8 @@ namespace WPActivityLedger\Rest;
 
 /**
  * Validates and stores the admin app preferences of a user (user meta "wpal_ui_prefs"):
- * visible log columns, rows per page and saved filters. Unknown keys are dropped.
+ * visible log columns, rows per page, saved filters and whether routine System events
+ * are shown (off by default). Unknown keys are dropped.
  */
 final class UiPrefs {
 
@@ -43,13 +44,14 @@ final class UiPrefs {
 	/**
 	 * Returns the default preferences.
 	 *
-	 * @return array{columns: array<int, string>, per_page: int, filters: array<int, array{name: string, filters: array<string, mixed>}>} Defaults.
+	 * @return array{columns: array<int, string>, per_page: int, filters: array<int, array{name: string, filters: array<string, mixed>}>, show_system: bool} Defaults.
 	 */
 	public static function defaults(): array {
 		return array(
-			'columns'  => array( 'time', 'user', 'event', 'object', 'ip' ),
-			'per_page' => 25,
-			'filters'  => array(),
+			'columns'     => array( 'time', 'user', 'event', 'object', 'ip' ),
+			'per_page'    => 25,
+			'filters'     => array(),
+			'show_system' => false,
 		);
 	}
 
@@ -101,6 +103,10 @@ final class UiPrefs {
 
 		if ( isset( $input['filters'] ) && is_array( $input['filters'] ) ) {
 			$prefs['filters'] = self::saved_filters( $input['filters'] );
+		}
+
+		if ( isset( $input['show_system'] ) && is_scalar( $input['show_system'] ) ) {
+			$prefs['show_system'] = rest_sanitize_boolean( $input['show_system'] );
 		}
 
 		return $prefs;

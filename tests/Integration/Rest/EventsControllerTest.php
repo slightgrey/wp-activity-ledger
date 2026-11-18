@@ -9,6 +9,10 @@ declare( strict_types=1 );
 
 namespace WPActivityLedger\Tests\Integration\Rest;
 
+use WPActivityLedger\Admin\ExportHandler;
+use WPActivityLedger\Database\EventRepository;
+use WPActivityLedger\Domain\Event;
+
 /**
  * @covers \WPActivityLedger\Rest\BaseController
  * @covers \WPActivityLedger\Rest\EventsController
@@ -132,6 +136,35 @@ final class EventsControllerTest extends RestTestCase {
 		$this->assertSame( 404, self::request( 'GET', '/events/999999999' )->get_status() );
 		$this->assertSame( 400, self::request( 'GET', '/events', array( 'per_page' => 500 ) )->get_status() );
 		$this->assertSame( 400, self::request( 'GET', '/events', array( 'orderby' => 'message; DROP' ) )->get_status() );
+	}
+
+	/**
+	 * hide_system leaves out routine System events (list and export) but keeps System warnings,
+	 * and an explicit System user filter still shows them all.
+	 *
+	 * @return void
+	 */
+	public function test_hide_system(): void {
+		$this->as_user( 'administrator' );
+		$marker = 'hidesys' . wp_generate_password( 6, false );
+		$now    = gmdate( 'Y-m-d H:i:s' );
+
+		( new EventRepository() )->insert_many(
+			array(
+				new Event( 'media.uploaded', category: 'media', severity: 0, object_type: 'test', object_id: $marker, created_at: $now ),
+				new Event( 'option.updated', category: 'settings', severity: 1, object_type: 'test', object_id: $marker, created_at: $now ),
+				new Event( 'auth.login_failed', category: 'auth', severity: 2, object_type: 'test', object_id: $marker, created_at: $now ),
+				new Event( 'post.updated', category: 'content', severity: 0, object_type: 'test', object_id: $marker, user_id: 1, user_login: 'admin', created_at: $now ),
+			)
+		);
+
+		$types = static fn( array $params ): array => array_column( self::request( 'GET', '/events', array( 'object_id' => $marker ) + $params )->get_data(), 'event_type' );
+
+		$this->assertCount( 4, $types( array() ) );
+		$this->assertEqualsCanonicalizing( array( 'auth.login_failed', 'post.updated' ), $types( array( 'hide_system' => true ) ) );
+		$this->assertCount( 4, $types( array( 'hide_system' => false ) ) );
+		$this->assertCount( 3, $types( array( 'hide_system' => true, 'user' => array( 0 ) ) ) );
+		$this->assertSame( array( 'hide_system' => true ), ExportHandler::filters( array( 'hide_system' => '1' ) ) );
 	}
 
 	/**

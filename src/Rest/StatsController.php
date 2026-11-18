@@ -73,13 +73,18 @@ final class StatsController extends BaseController {
 				'callback'            => fn( \WP_REST_Request $request ) => self::in_site( $request, fn() => $this->get_stats( $request ) ),
 				'permission_callback' => self::permission( Capabilities::VIEW ),
 				'args'                => array(
-					'site_id' => self::site_arg(),
-					'range'   => array(
+					'site_id'     => self::site_arg(),
+					'range'       => array(
 						'type' => 'string',
 						'enum' => array_keys( self::RANGES ),
 					),
-					'from'    => $day + array( 'description' => __( 'First day, site timezone (Y-m-d).', 'wp-activity-ledger' ) ),
-					'to'      => $day + array( 'description' => __( 'Last day, site timezone (Y-m-d).', 'wp-activity-ledger' ) ),
+					'from'        => $day + array( 'description' => __( 'First day, site timezone (Y-m-d).', 'wp-activity-ledger' ) ),
+					'to'          => $day + array( 'description' => __( 'Last day, site timezone (Y-m-d).', 'wp-activity-ledger' ) ),
+					'hide_system' => array(
+						'type'        => 'boolean',
+						'default'     => false,
+						'description' => __( 'Leave out System events (no logged-in user) below warning severity.', 'wp-activity-ledger' ),
+					),
 				),
 			)
 		);
@@ -99,12 +104,13 @@ final class StatsController extends BaseController {
 			return self::error( 'wpal_invalid_range', __( 'The start date is after the end date.', 'wp-activity-ledger' ), 400 );
 		}
 
-		$key    = self::cache_key( $range['key'] );
+		$hide   = (bool) $request['hide_system'];
+		$key    = self::cache_key( $range['key'], $hide );
 		$cached = get_transient( $key );
 		$hit    = is_array( $cached );
 
 		if ( ! $hit ) {
-			$cached = $this->compute( $range );
+			$cached = $this->compute( $range, $hide );
 			set_transient( $key, $cached, self::CACHE_TTL );
 		}
 
@@ -117,24 +123,26 @@ final class StatsController extends BaseController {
 	/**
 	 * Returns the cache key of a range.
 	 *
-	 * @param string $range_key Preset key, or "from|to" days.
+	 * @param string $range_key   Preset key, or "from|to" days.
+	 * @param bool   $hide_system Whether routine System events are left out.
 	 *
 	 * @return string Transient key.
 	 */
-	public static function cache_key( string $range_key ): string {
-		return self::CACHE_PREFIX . md5( $range_key . '|' . wp_timezone_string() . '|' . get_current_blog_id() );
+	public static function cache_key( string $range_key, bool $hide_system = false ): string {
+		return self::CACHE_PREFIX . md5( $range_key . '|' . wp_timezone_string() . '|' . get_current_blog_id() . ( $hide_system ? '|nosys' : '' ) );
 	}
 
 	/**
 	 * Runs the aggregate queries.
 	 *
-	 * @param array{key: string, from: string, to: string, bucket: string} $range Range (UTC).
+	 * @param array{key: string, from: string, to: string, bucket: string} $range       Range (UTC).
+	 * @param bool                                                         $hide_system Leave out routine System events.
 	 *
 	 * @return array<string, mixed> Aggregates with the range.
 	 */
-	private function compute( array $range ): array {
+	private function compute( array $range, bool $hide_system ): array {
 		$offset  = wp_timezone()->getOffset( new \DateTimeImmutable( $range['to'], new \DateTimeZone( 'UTC' ) ) );
-		$summary = $this->stats->summary( $range['from'], $range['to'], $offset, $range['bucket'] );
+		$summary = $this->stats->summary( $range['from'], $range['to'], $offset, $range['bucket'], $hide_system );
 
 		$summary['totals']['active_sessions'] = ActiveSessions::count();
 

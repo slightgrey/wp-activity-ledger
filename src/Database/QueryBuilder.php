@@ -20,9 +20,15 @@ use WPActivityLedger\Domain\Severity;
  *
  * Filters: from, to (UTC "Y-m-d" or "Y-m-d H:i:s"), user (ID or IDs), role, category
  * (slug or slugs), type (key or keys), severity (minimum, int or slug), object_type,
- * object_id, ip, session (hash), search, orderby, order, page, per_page (max 100).
+ * object_id, ip, session (hash), search, hide_system, orderby, order, page, per_page (max 100).
  */
 final class QueryBuilder {
+
+	/**
+	 * System events (no logged-in user) at or above this severity stay visible when
+	 * "hide_system" is on, so failed logins and critical events are never hidden.
+	 */
+	public const SYSTEM_KEEP_SEVERITY = Severity::Warning;
 
 	/**
 	 * Columns the result may be sorted by.
@@ -49,6 +55,13 @@ final class QueryBuilder {
 	private array $args = array();
 
 	/**
+	 * User IDs of the user filter.
+	 *
+	 * @var array<int, int>
+	 */
+	private array $user_ids = array();
+
+	/**
 	 * Creates the builder and parses the filters.
 	 *
 	 * @param array<string, mixed> $filters Filters.
@@ -65,6 +78,16 @@ final class QueryBuilder {
 		$this->add_equals( 'ip', $filters['ip'] ?? null, 45 );
 		$this->add_equals( 'session_hash', $filters['session'] ?? null, 16 );
 		$this->add_search();
+		$this->add_hide_system();
+	}
+
+	/**
+	 * Returns the condition that drops routine System events (user 0 below warning).
+	 *
+	 * @return string SQL without placeholders.
+	 */
+	public static function system_condition(): string {
+		return sprintf( '(user_id <> 0 OR severity >= %d)', self::SYSTEM_KEEP_SEVERITY->value );
 	}
 
 	/**
@@ -169,8 +192,23 @@ final class QueryBuilder {
 			return;
 		}
 
+		$this->user_ids     = $ids;
 		$this->conditions[] = 'user_id IN (' . implode( ',', array_fill( 0, count( $ids ), '%d' ) ) . ')';
 		array_push( $this->args, ...array_values( $ids ) );
+	}
+
+	/**
+	 * Hides routine System events, unless the user filter asks for System (user 0).
+	 *
+	 * @return void
+	 */
+	private function add_hide_system(): void {
+		$raw = $this->filters['hide_system'] ?? false;
+		$on  = true === $raw || 1 === $raw || ( is_string( $raw ) && in_array( strtolower( $raw ), array( '1', 'true' ), true ) );
+
+		if ( $on && ! isset( $this->user_ids[0] ) ) {
+			$this->conditions[] = self::system_condition();
+		}
 	}
 
 	/**

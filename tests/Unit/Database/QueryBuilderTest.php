@@ -112,6 +112,34 @@ final class QueryBuilderTest extends TestCase {
 	}
 
 	/**
+	 * hide_system drops System events below warning, unless the user filter asks for System.
+	 *
+	 * @return void
+	 */
+	public function test_hide_system(): void {
+		$condition = '(user_id <> 0 OR severity >= 2)';
+
+		$this->assertSame( $condition, QueryBuilder::system_condition() );
+
+		foreach ( array( true, 1, '1', 'true' ) as $on ) {
+			$this->assertSame( array( 'WHERE ' . $condition, array() ), ( new QueryBuilder( array( 'hide_system' => $on ) ) )->where() );
+		}
+
+		foreach ( array( false, 0, '0', 'false', '', 'yes please' ) as $off ) {
+			$this->assertSame( array( '', array() ), ( new QueryBuilder( array( 'hide_system' => $off ) ) )->where() );
+		}
+
+		$this->assertSame(
+			array( 'WHERE user_id IN (%d) AND ' . $condition, array( 5 ) ),
+			( new QueryBuilder( array( 'hide_system' => true, 'user' => array( 5 ) ) ) )->where()
+		);
+		$this->assertSame(
+			array( 'WHERE user_id IN (%d,%d)', array( 0, 5 ) ),
+			( new QueryBuilder( array( 'hide_system' => true, 'user' => array( 0, 5 ) ) ) )->where()
+		);
+	}
+
+	/**
 	 * Unknown sort columns fall back to created_at; direction and paging are clamped.
 	 *
 	 * @return void

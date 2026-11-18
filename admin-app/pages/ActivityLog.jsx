@@ -210,12 +210,14 @@ export default function ActivityLog({ fixed = null }) {
   const prefs = meta.data?.prefs;
   const columns = prefs?.columns?.length ? prefs.columns : ['time', 'user', 'event', 'object', 'ip'];
   const perPage = filters.per_page || prefs?.per_page || 25;
+  // Routine System events (no logged-in user, below warning) are hidden unless the user opts in.
+  const showSystem = Boolean(prefs?.show_system);
 
   // Relative ranges ("last 24 hours") are anchored when the filters change, not on every render.
   const query = useMemo(
-    () => toApiQuery(filters, { timeZone: config.timezone, perPage, now: new Date() }),
+    () => ({ ...toApiQuery(filters, { timeZone: config.timezone, perPage, now: new Date() }), ...(showSystem ? {} : { hide_system: 1 }) }),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `filters` derives from `params` and `fixed`.
-    [params, fixed, perPage]
+    [params, fixed, perPage, showSystem]
   );
 
   const events = useEvents(query, { refetchInterval: autoRefresh ? 30000 : false });
@@ -244,13 +246,21 @@ export default function ActivityLog({ fixed = null }) {
           {events.isLoading ? __( 'Loading…', 'wp-activity-ledger' ) : sprintf( total === 1 ? __( '%s event', 'wp-activity-ledger' ) : __( '%s events', 'wp-activity-ledger' ), total.toLocaleString() )}
           {events.isFetching && !events.isLoading && ' · updating…'}
         </p>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
             <Switch id="wpal-autorefresh" checked={autoRefresh} onCheckedChange={setAutoRefresh} />
             <Label htmlFor="wpal-autorefresh" className="text-sm font-normal">
               {__( 'Auto-refresh (30 s)', 'wp-activity-ledger' )}
             </Label>
           </div>
+          {!fixed?.user && (
+            <div className="flex items-center gap-2" title={__( 'System events have no logged-in user: cron, WP-CLI, remote managers and site connectors. Warnings and critical events are always shown.', 'wp-activity-ledger' )}>
+              <Switch id="wpal-show-system" checked={showSystem} onCheckedChange={(checked) => savePrefs.mutate({ show_system: checked })} />
+              <Label htmlFor="wpal-show-system" className="text-sm font-normal">
+                {__( 'Show system events', 'wp-activity-ledger' )}
+              </Label>
+            </div>
+          )}
           <ColumnMenu columns={columns} onChange={(next) => savePrefs.mutate({ columns: next })} />
           {config.caps.export && <ExportMenu query={query} />}
         </div>
