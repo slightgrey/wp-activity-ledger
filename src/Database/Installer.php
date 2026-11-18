@@ -9,6 +9,8 @@ declare( strict_types=1 );
 
 namespace WPActivityLedger\Database;
 
+use WPActivityLedger\Alerts\RuleStore;
+
 /**
  * Runs dbDelta() for the current site and records the schema version.
  */
@@ -31,9 +33,23 @@ final class Installer {
 
 		$changes = dbDelta( Schema::sql( $wpdb->prefix, $wpdb->get_charset_collate() ) );
 
+		self::upgrade_data();
 		update_option( Schema::VERSION_OPTION, Schema::VERSION, true );
 
 		return $changes;
+	}
+
+	/**
+	 * Brings stored options up to the current schema version. Every step is safe to repeat.
+	 *
+	 * @return void
+	 */
+	public static function upgrade_data(): void {
+		// Version 2: alert rules are autoloaded. update_option() only applies a new autoload
+		// value when the value itself changes, so set it on existing installs here.
+		if ( false !== get_option( RuleStore::OPTION, false ) ) {
+			wp_set_option_autoload( RuleStore::OPTION, true );
+		}
 	}
 
 	/**

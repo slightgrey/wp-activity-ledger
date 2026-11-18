@@ -45,6 +45,17 @@ final class RuleStore extends ListStore {
 	}
 
 	/**
+	 * Rules are autoloaded: the Dispatcher reads them whenever events are saved, so this
+	 * saves a database query on those requests. They hold no secrets (channels do, and
+	 * stay non-autoloaded).
+	 *
+	 * @return bool True.
+	 */
+	public function autoload(): bool {
+		return true;
+	}
+
+	/**
 	 * Returns the enabled rules that have at least one channel.
 	 *
 	 * @return array<int, array<string, mixed>> Rules.

@@ -10,8 +10,8 @@ declare( strict_types=1 );
 namespace WPActivityLedger\Alerts;
 
 /**
- * Stores a list of items with UUID IDs in one non-autoloaded option. Subclasses validate
- * submitted fields; nothing is saved while any field is invalid.
+ * Stores a list of items with UUID IDs in one option (not autoloaded unless a subclass says
+ * so). Subclasses validate submitted fields; nothing is saved while any field is invalid.
  */
 abstract class ListStore {
 
@@ -21,6 +21,15 @@ abstract class ListStore {
 	 * @return string Option.
 	 */
 	abstract protected function option(): string;
+
+	/**
+	 * Tells whether the option is autoloaded (loaded with every request's options).
+	 *
+	 * @return bool True to autoload.
+	 */
+	public function autoload(): bool {
+		return false;
+	}
 
 	/**
 	 * Validates submitted fields, merged over an existing item when updating.
@@ -138,7 +147,7 @@ abstract class ListStore {
 	 * @return void
 	 */
 	protected function save( array $items ): void {
-		update_option( $this->option(), array_values( $items ), false );
+		update_option( $this->option(), array_values( $items ), $this->autoload() );
 	}
 
 	/**

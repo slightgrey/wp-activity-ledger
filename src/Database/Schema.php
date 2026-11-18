@@ -15,9 +15,12 @@ namespace WPActivityLedger\Database;
 final class Schema {
 
 	/**
-	 * Schema version stored in the wpal_db_version option. Bump it when the SQL changes.
+	 * Schema version stored in the wpal_db_version option. Bump it when the SQL changes or
+	 * stored data needs an upgrade step (see Installer::upgrade_data()).
+	 *
+	 * 2: the alert rules option is autoloaded.
 	 */
-	public const VERSION = '1';
+	public const VERSION = '2';
 
 	/**
 	 * Option holding the installed schema version.

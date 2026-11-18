@@ -9,8 +9,11 @@ declare( strict_types=1 );
 
 namespace WPActivityLedger\Tests\Integration\Database;
 
+use WPActivityLedger\Alerts\ChannelStore;
+use WPActivityLedger\Alerts\RuleStore;
 use WPActivityLedger\Database\Installer;
 use WPActivityLedger\Database\Schema;
+use WPActivityLedger\Plugin;
 use WPActivityLedger\Tests\Integration\IntegrationTestCase;
 
 /**
@@ -66,6 +69,92 @@ final class InstallerTest extends IntegrationTestCase {
 
 		$this->assertSame( Schema::VERSION, get_option( Schema::VERSION_OPTION ) );
 		$this->assertFalse( get_option( Installer::ERROR_OPTION ) );
+	}
+
+	/**
+	 * Upgrading autoloads an existing, non-autoloaded alert rules option (version 2); saving
+	 * rules keeps them autoloaded while channels (webhook secrets) stay non-autoloaded.
+	 *
+	 * @return void
+	 */
+	public function test_alert_rules_are_autoloaded(): void {
+		// Upgrading may run DDL, which commits the test transaction: restore the options after.
+		$saved = array(
+			RuleStore::OPTION    => get_option( RuleStore::OPTION ),
+			ChannelStore::OPTION => get_option( ChannelStore::OPTION ),
+		);
+
+		try {
+			$this->check_alert_rules_autoload();
+		} finally {
+			foreach ( $saved as $option => $value ) {
+				delete_option( $option );
+
+				if ( false !== $value ) {
+					add_option( $option, $value, '', RuleStore::OPTION === $option );
+				}
+			}
+
+			update_option( Schema::VERSION_OPTION, Schema::VERSION );
+		}
+	}
+
+	/**
+	 * Body of test_alert_rules_are_autoloaded().
+	 *
+	 * @return void
+	 */
+	private function check_alert_rules_autoload(): void {
+		delete_option( RuleStore::OPTION );
+		add_option( RuleStore::OPTION, array(), '', false );
+		$this->assertFalse( self::autoloaded( RuleStore::OPTION ) );
+
+		update_option( Schema::VERSION_OPTION, '1' );
+		Installer::maybe_upgrade();
+
+		$this->assertTrue( self::autoloaded( RuleStore::OPTION ) );
+		$this->assertArrayHasKey( RuleStore::OPTION, wp_load_alloptions() );
+		$this->assertSame( Schema::VERSION, get_option( Schema::VERSION_OPTION ) );
+
+		// Repeating the step is harmless, and a missing option is not created.
+		delete_option( RuleStore::OPTION );
+		Installer::upgrade_data();
+		$this->assertFalse( get_option( RuleStore::OPTION ) );
+
+		$plugin = Plugin::instance();
+		$plugin->alert_channels()->create(
+			array(
+				'type'   => 'webhook',
+				'name'   => 'Autoload check',
+				'config' => array( 'url' => 'https://example.test/hook' ),
+			)
+		);
+		$plugin->alert_rules()->create(
+			array(
+				'name'  => 'Autoload check',
+				'match' => array( 'min_severity' => 3 ),
+			)
+		);
+
+		$this->assertTrue( self::autoloaded( RuleStore::OPTION ) );
+		$this->assertFalse( self::autoloaded( ChannelStore::OPTION ) );
+	}
+
+	/**
+	 * Tells whether an option row is marked for autoloading.
+	 *
+	 * @param string $option Option name.
+	 *
+	 * @return bool True when autoloaded.
+	 */
+	private static function autoloaded( string $option ): bool {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB -- Test reads the autoload flag directly.
+		$value = $wpdb->get_var( $wpdb->prepare( "SELECT autoload FROM {$wpdb->options} WHERE option_name = %s", $option ) );
+		$yes   = function_exists( 'wp_autoload_values_to_autoload' ) ? wp_autoload_values_to_autoload() : array( 'yes' );
+
+		return in_array( $value, $yes, true );
 	}
 
 	/**
