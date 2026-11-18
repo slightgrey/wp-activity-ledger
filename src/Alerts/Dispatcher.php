@@ -78,6 +78,9 @@ final class Dispatcher {
 	 * @return void
 	 */
 	public function on_flushed( mixed $events = array() ): void {
+		// Other code may fire the hook with do_action(), which passes a single event unwrapped.
+		$events = $events instanceof Event ? array( $events ) : $events;
+
 		foreach ( is_array( $events ) ? $events : array() as $event ) {
 			if ( $event instanceof Event ) {
 				$this->check( $event );

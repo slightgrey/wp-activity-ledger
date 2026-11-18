@@ -134,7 +134,8 @@ final class Recorder {
 		 *
 		 * @param array<int, Event> $events Stored events.
 		 */
-		do_action( 'wpal_events_flushed', $events );
+		// do_action() would unwrap a one-item array into the bare Event; pass the list as is.
+		do_action_ref_array( 'wpal_events_flushed', array( $events ) );
 
 		return $stored;
 	}

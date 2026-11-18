@@ -105,6 +105,48 @@ final class AlertDeliveryTest extends AlertsTestCase {
 	}
 
 	/**
+	 * A flush holding a single event still alerts (do_action unwraps one-item arrays).
+	 *
+	 * @return void
+	 */
+	public function test_single_event_flush_alerts(): void {
+		$channel = self::channel(
+			array(
+				'type'   => 'email',
+				'name'   => 'Me',
+				'config' => array( 'recipients' => 'me@example.test' ),
+			)
+		);
+		self::rule(
+			array(
+				'name'     => 'New admin',
+				'match'    => array(
+					'event_types'  => array( 'user.created' ),
+					'min_severity' => 3,
+				),
+				'channels' => array( $channel['id'] ),
+			)
+		);
+		self::flush();
+
+		$login = 'wpal_single_' . wp_generate_password( 6, false );
+
+		wp_insert_user(
+			array(
+				'user_login' => $login,
+				'user_pass'  => wp_generate_password(),
+				'user_email' => 'wpal-single-' . wp_generate_password( 6, false ) . '@example.test',
+				'role'       => 'administrator',
+			)
+		);
+		$this->assertCount( 1, Plugin::instance()->recorder()->pending() );
+		self::flush();
+
+		$labels = array_map( static fn( array $job ): string => $job['message']['object_label'], self::queued_jobs() );
+		$this->assertContains( $login, $labels );
+	}
+
+	/**
 	 * A failing endpoint is retried twice, then the failure is recorded.
 	 *
 	 * @return void

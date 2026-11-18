@@ -26,6 +26,10 @@ abstract class AlertsTestCase extends RestTestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
+		if ( function_exists( 'as_unschedule_all_actions' ) ) {
+			as_unschedule_all_actions( '', array(), Queue::GROUP ); // Rolled back with the test.
+		}
+
 		delete_option( 'wpal_alert_channels' );
 		delete_option( 'wpal_alert_rules' );
 		Plugin::instance()->dispatcher()->forget_rules();
