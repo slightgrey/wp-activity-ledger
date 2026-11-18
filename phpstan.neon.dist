@@ -11,3 +11,4 @@ parameters:
 		- tests/phpstan-bootstrap.php
 	scanFiles:
 		- vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+		- tests/phpstan-wp-cli-stubs.php

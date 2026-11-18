@@ -31,6 +31,7 @@ use WPActivityLedger\Admin\Assets;
 use WPActivityLedger\Admin\DashboardWidget;
 use WPActivityLedger\Admin\ExportHandler;
 use WPActivityLedger\Admin\Menu;
+use WPActivityLedger\Cli\Command;
 use WPActivityLedger\Lifecycle\Network;
 use WPActivityLedger\Maintenance\Pruner;
 use WPActivityLedger\Privacy\PrivacyTools;
@@ -398,6 +399,7 @@ final class Plugin {
 		( new Pruner( $this->repository(), $this->settings(), $this->recorder() ) )->register( $this->loader );
 		( new PrivacyTools( $this->repository() ) )->register( $this->loader );
 		$this->register_admin();
+		Command::register();
 
 		if ( is_multisite() ) {
 			$this->loader->add_action( 'switch_blog', array( $this, 'on_switch_blog' ), 10, 2 );

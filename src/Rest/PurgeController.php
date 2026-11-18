@@ -11,7 +11,7 @@ namespace WPActivityLedger\Rest;
 
 use WPActivityLedger\Admin\ExportHandler;
 use WPActivityLedger\Database\EventRepository;
-use WPActivityLedger\Domain\Event;
+use WPActivityLedger\Maintenance\Purger;
 use WPActivityLedger\Recording\Recorder;
 use WPActivityLedger\Security\Capabilities;
 
@@ -95,8 +95,7 @@ final class PurgeController extends BaseController {
 			return self::error( 'wpal_purge_invalid', $filters->get_error_message(), 400 );
 		}
 
-		$deleted = $this->repository->delete_where( $filters );
-		$this->record( (string) $request['mode'], $filters, $deleted );
+		$deleted = ( new Purger( $this->repository, $this->recorder ) )->purge( $filters, (string) $request['mode'] );
 
 		return rest_ensure_response( array( 'deleted' => $deleted ) );
 	}
@@ -115,9 +114,7 @@ final class PurgeController extends BaseController {
 					return new \WP_Error( 'wpal_purge_date', __( 'Choose a date.', 'wp-activity-ledger' ) );
 				}
 
-				$midnight = new \DateTimeImmutable( $request['before'] . ' 00:00:00', wp_timezone() );
-
-				return array( 'to' => $midnight->setTimezone( new \DateTimeZone( 'UTC' ) )->modify( '-1 second' )->format( 'Y-m-d H:i:s' ) );
+				return Purger::before( $request['before'] );
 
 			case 'filter':
 				$filters = ExportHandler::filters( (array) $request['filters'] );
@@ -131,29 +128,5 @@ final class PurgeController extends BaseController {
 			default:
 				return array();
 		}
-	}
-
-	/**
-	 * Records the purge (stored right away, after the deletion).
-	 *
-	 * @param string               $mode    Mode.
-	 * @param array<string, mixed> $filters Filters used.
-	 * @param int                  $deleted Events deleted.
-	 *
-	 * @return void
-	 */
-	private function record( string $mode, array $filters, int $deleted ): void {
-		$this->recorder->record_now(
-			new Event(
-				'system.logs_purged',
-				object_type: 'logs',
-				object_label: 'Activity log',
-				context: array(
-					'count'   => $deleted,
-					'mode'    => $mode,
-					'filters' => $filters,
-				)
-			)
-		);
 	}
 }
