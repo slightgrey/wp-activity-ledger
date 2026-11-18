@@ -2,6 +2,8 @@
 
 An audit log for WordPress. It records who did what, when and from where, with field-level before/after values, and gives administrators a fast admin app to review, filter, export and get alerts on activity.
 
+Read the story behind it, with a tour of each screen and how it's built: [I Built WP Activity Ledger, a Free Audit Log for WordPress](https://blog.vincelayte.me/wp-activity-ledger-wordpress-audit-log-plugin/).
+
 ![Activity log](screenshots/activity-log.png)
 
 ## Features
