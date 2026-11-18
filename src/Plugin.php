@@ -20,6 +20,7 @@ use WPActivityLedger\Integrations\IntegrationManager;
 use WPActivityLedger\Integrations\Elementor;
 use WPActivityLedger\Integrations\WooCommerce;
 use WPActivityLedger\Recording\Recorder;
+use WPActivityLedger\Rest\Routes;
 use WPActivityLedger\Security\Capabilities;
 use WPActivityLedger\Sensors\AuthSensor;
 use WPActivityLedger\Sensors\AutoUpdateSensor;
@@ -303,6 +304,7 @@ final class Plugin {
 		$this->loader->add_action( 'wpal_log', 'wpal_log', 10, 2 );
 		( new SensorRegistry( $this->core_sensors() ) )->register( $this->loader );
 		$this->integrations()->load( $this->loader, $this->types() );
+		( new Routes( $this ) )->register( $this->loader );
 
 		/**
 		 * Fires after the core modules queued their hooks and before they are registered.
