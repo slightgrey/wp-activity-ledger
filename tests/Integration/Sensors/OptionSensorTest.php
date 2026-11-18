@@ -129,4 +129,26 @@ final class OptionSensorTest extends IntegrationTestCase {
 
 		$this->assertSame( array(), self::settle( $start ) );
 	}
+
+	/**
+	 * Option writes during WP-Cron are background state and skipped unless turned on.
+	 *
+	 * @return void
+	 */
+	public function test_cron_writes_are_skipped(): void {
+		$start = self::max_event_id();
+		add_filter( 'wp_doing_cron', '__return_true' );
+
+		update_option( 'acme_last_result', array( 'time' => wp_rand() ) );
+		$this->assertSame( array(), self::settle( $start ) );
+
+		add_filter( 'wpal_record_cron_option_changes', '__return_true' );
+		update_option( 'acme_last_result', array( 'time' => wp_rand() ) );
+		$events = self::settle( $start );
+
+		remove_filter( 'wpal_record_cron_option_changes', '__return_true' );
+		remove_filter( 'wp_doing_cron', '__return_true' );
+
+		$this->assertCount( 1, $events );
+	}
 }

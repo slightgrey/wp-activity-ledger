@@ -49,11 +49,41 @@ abstract class IntegrationTestCase extends TestCase {
 	protected function tearDown(): void {
 		global $wpdb;
 
+		// Record and store what the test left pending (end-of-request work) inside the
+		// transaction, so it is rolled back instead of being written at the real shutdown.
+		self::settle_all();
 		$wpdb->query( 'ROLLBACK' );
 		wp_cache_flush();
 		wp_set_current_user( $this->previous_user_id );
 
 		parent::tearDown();
+	}
+
+	/**
+	 * Runs every sensor's and integration's end-of-request recording, then flushes.
+	 *
+	 * @return void
+	 */
+	protected static function settle_all(): void {
+		$plugin = \WPActivityLedger\Plugin::instance();
+
+		foreach ( $plugin->core_sensors() as $sensor ) {
+			foreach ( array( 'record_pending', 'record_role_deltas' ) as $method ) {
+				if ( method_exists( $sensor, $method ) ) {
+					$sensor->$method();
+				}
+			}
+		}
+
+		foreach ( array_keys( $plugin->integrations()->active() ) as $slug ) {
+			$integration = $plugin->integrations()->get( $slug );
+
+			if ( null !== $integration && method_exists( $integration, 'record_pending' ) ) {
+				$integration->record_pending();
+			}
+		}
+
+		$plugin->recorder()->flush();
 	}
 
 	/**

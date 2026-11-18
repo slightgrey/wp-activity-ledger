@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { categoryLabel, formatDateTime, relativeTime, severity, siteDate, typeLabel } from './format.js';
+import { categoryLabel, formatDateTime, localToUtc, relativeTime, severity, siteDate, typeLabel } from './format.js';
 import { buildUrl } from './api.js';
 
 describe('formatDateTime', () => {
@@ -24,6 +24,16 @@ describe('siteDate', () => {
     const now = new Date('2026-01-01T23:30:00Z');
     expect(siteDate('Asia/Manila', 0, now)).toBe('2026-01-02');
     expect(siteDate('UTC', -6, now)).toBe('2025-12-26');
+  });
+});
+
+describe('localToUtc', () => {
+  it('converts site-local times to UTC', () => {
+    expect(localToUtc('2026-01-02 07:30:00', 'Asia/Manila')).toBe('2026-01-01 23:30:00');
+    expect(localToUtc('2026-07-01 13:00:00', 'Europe/London')).toBe('2026-07-01 12:00:00');
+    expect(localToUtc('2026-01-02 01:30:00', '+02:00')).toBe('2026-01-01 23:30:00');
+    expect(localToUtc('2026-01-01 00:00:00', 'UTC')).toBe('2026-01-01 00:00:00');
+    expect(localToUtc('bad', 'UTC')).toBe('');
   });
 });
 

@@ -42,6 +42,13 @@ final class PostSensor implements SensorInterface {
 	private array $activities = array();
 
 	/**
+	 * Posts whose activity is dropped (auto-drafts sent to the trash), by ID.
+	 *
+	 * @var array<int, true>
+	 */
+	private array $discarded = array();
+
+	/**
 	 * Creates the sensor.
 	 *
 	 * @param Recorder    $recorder Recorder.
@@ -180,6 +187,13 @@ final class PostSensor implements SensorInterface {
 			return;
 		}
 
+		if ( 'auto-draft' === $old_status && 'trash' === $new_status ) {
+			// An auto-draft nobody wrote (e.g. removed with its author) is not content.
+			$this->discarded[ $post->ID ] = true;
+
+			return;
+		}
+
 		$kind = self::transition_kind( (string) $new_status, (string) $old_status );
 
 		if ( null === $kind ) {
@@ -298,6 +312,8 @@ final class PostSensor implements SensorInterface {
 		foreach ( $activities as $activity ) {
 			$this->record( $activity );
 		}
+
+		$this->discarded = array();
 	}
 
 	/**
@@ -308,6 +324,10 @@ final class PostSensor implements SensorInterface {
 	 * @return void
 	 */
 	private function record( PostActivity $activity ): void {
+		if ( isset( $this->discarded[ $activity->post()->ID ] ) ) {
+			return;
+		}
+
 		$changes = array();
 
 		foreach ( $activity->fields() as $field => [ $old, $new ] ) {

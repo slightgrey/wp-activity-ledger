@@ -91,6 +91,42 @@ export function siteDate(timeZone, days = 0, now = new Date()) {
 }
 
 /**
+ * Converts a site-local datetime ("YYYY-MM-DD HH:mm:ss") to a UTC datetime string.
+ *
+ * The site's offset at that moment is found by formatting a first guess in the site's
+ * timezone and correcting by the difference (twice, to settle around DST changes).
+ *
+ * @param {string} local    Local datetime.
+ * @param {string} timeZone Site timezone.
+ * @returns {string} UTC datetime ("YYYY-MM-DD HH:mm:ss"), or '' when invalid.
+ */
+export function localToUtc(local, timeZone) {
+  const target = new Date(`${String(local).replace(' ', 'T')}Z`).getTime();
+
+  if (Number.isNaN(target)) return '';
+
+  let guess = target;
+
+  for (let i = 0; i < 2; i++) {
+    const p = siteParts(new Date(guess), timeZone);
+    const shown = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second);
+    guess += target - shown;
+  }
+
+  return new Date(guess).toISOString().slice(0, 19).replace('T', ' ');
+}
+
+/**
+ * Formats a Date as a UTC datetime string ("YYYY-MM-DD HH:mm:ss").
+ *
+ * @param {Date} date Date.
+ * @returns {string} UTC datetime.
+ */
+export function toUtcString(date) {
+  return date.toISOString().slice(0, 19).replace('T', ' ');
+}
+
+/**
  * Describes how long ago a stored UTC datetime was ("5 minutes ago").
  *
  * @param {string} value UTC datetime.

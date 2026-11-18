@@ -50,6 +50,7 @@ final class ElementorSettingsWatcher {
 		'elementor_controls_usage',
 		'elementor_events_*',
 		'elementor_tracker_*',
+		'elementor_*tracker_notice',
 		'elementor_landing_pages_activation',
 		'elementor_custom_icon_sets_config',
 		'elementor_fonts_manager_*',

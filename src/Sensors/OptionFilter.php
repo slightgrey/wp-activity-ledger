@@ -16,7 +16,9 @@ use WPActivityLedger\Support\PatternMatcher;
 /**
  * Matches options that are never recorded as changes: Activity Ledger's own, values that
  * WordPress or common plugins rewrite on their own (transients, cron, caches), and the
- * patterns from the settings and the wpal_ignored_option_patterns filter.
+ * patterns from the settings and the wpal_ignored_option_patterns filter. Option writes
+ * made by WP-Cron are background state (no person behind them) and are skipped too, unless
+ * the wpal_record_cron_option_changes filter returns true.
  *
  * The built-in list is in code, not settings, so updates of it reach existing sites.
  */
@@ -71,7 +73,21 @@ final class OptionFilter {
 	 * @return bool True when the option is never recorded.
 	 */
 	public function is_noise( string $option ): bool {
-		return '' === $option || $this->matcher()->matches( $option );
+		return '' === $option || self::skips_cron() || $this->matcher()->matches( $option );
+	}
+
+	/**
+	 * Tells whether option writes are skipped because this is a WP-Cron request.
+	 *
+	 * @return bool True in cron requests unless recording them is turned on.
+	 */
+	private static function skips_cron(): bool {
+		/**
+		 * Filters whether option changes made during WP-Cron runs are recorded.
+		 *
+		 * @param bool $record Whether to record them (default false: cron writes are background state).
+		 */
+		return wp_doing_cron() && ! apply_filters( 'wpal_record_cron_option_changes', false );
 	}
 
 	/**

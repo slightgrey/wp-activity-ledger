@@ -98,4 +98,24 @@ final class PostStatusTest extends PostSensorTestCase {
 		$this->assertSame( 'Scheduled post "Original title" for 2099-01-01 10:00:00', $events[1]['message'] );
 		$this->assertSame( 'Unpublished post "Original title" (now draft)', $events[3]['message'] );
 	}
+
+	/**
+	 * An auto-draft sent to the trash (e.g. with its deleted author) records nothing.
+	 *
+	 * @return void
+	 */
+	public function test_trashed_auto_draft_is_ignored(): void {
+		$this->as_user( 'administrator' );
+		$id = wp_insert_post(
+			array(
+				'post_title'  => 'Auto Draft',
+				'post_status' => 'auto-draft',
+			)
+		);
+		self::settle();
+
+		wp_trash_post( $id );
+
+		$this->assertSame( array(), self::events_for( $id ) );
+	}
 }
