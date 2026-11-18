@@ -18,17 +18,36 @@ export function useAlertItems(kind) {
  * Saves (creates or updates) and deletes alert channels or rules, refreshing both lists
  * (deleting a channel changes rules too).
  *
+ * Updates show in the list at once (optimistic) and roll back if the request fails, so a
+ * switch flips when clicked instead of after the save and the reload.
+ *
  * @param {'channels'|'rules'} kind Kind.
  * @returns {{ save: object, remove: object }} Mutations.
  */
 export function useAlertMutations(kind) {
   const client = useQueryClient();
+  const key = ['alerts', kind];
   const refresh = () => client.invalidateQueries({ queryKey: ['alerts'] });
 
   const save = useMutation({
     mutationFn: async ({ id, ...fields }) =>
       (await api(id ? `/alerts/${kind}/${id}` : `/alerts/${kind}`, { method: id ? 'PUT' : 'POST', body: fields })).data,
-    onSuccess: refresh,
+    onMutate: async ({ id, ...fields }) => {
+      if (!id) return undefined;
+
+      await client.cancelQueries({ queryKey: key });
+      const previous = client.getQueryData(key);
+      client.setQueryData(key, (items) => items?.map((item) => (item.id === id ? { ...item, ...fields } : item)));
+
+      return { previous };
+    },
+    onError: (_error, _vars, context) => {
+      if (context?.previous) client.setQueryData(key, context.previous);
+    },
+    onSuccess: (saved, { id }) => {
+      if (id && saved?.id) client.setQueryData(key, (items) => items?.map((item) => (item.id === saved.id ? saved : item)));
+    },
+    onSettled: refresh,
   });
 
   const remove = useMutation({
