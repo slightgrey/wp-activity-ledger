@@ -76,6 +76,7 @@ final class MetaController extends BaseController {
 					static fn( Category $c ): array => array(
 						'slug'  => $c->value,
 						'label' => $c->label(),
+						'group' => $c->group(),
 					),
 					Category::cases()
 				),
@@ -89,6 +90,7 @@ final class MetaController extends BaseController {
 				),
 				'roles'         => self::roles(),
 				'integrations'  => $this->integrations(),
+				'supported'     => array_values( $this->integrations->supported() ),
 				'caps'          => self::caps(),
 				'prefs'         => UiPrefs::get( get_current_user_id() ),
 				'proxy_headers' => IpResolver::ALLOWED_HEADERS,

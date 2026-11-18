@@ -116,6 +116,13 @@ final class IntegrationManagerTest extends TestCase {
 		$this->assertNotNull( $types->get( 'shop.thing_done' ) );
 		$this->assertNull( $types->get( 'builder.thing_done' ) );
 		$this->assertSame( array( 'shop' => 'Shop' ), $manager->active() );
+		$this->assertSame(
+			array(
+				'shop'    => 'Shop',
+				'builder' => 'Builder',
+			),
+			$manager->supported()
+		);
 	}
 
 	/**

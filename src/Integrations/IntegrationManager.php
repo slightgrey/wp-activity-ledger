@@ -68,6 +68,21 @@ final class IntegrationManager {
 	}
 
 	/**
+	 * Returns the names of every known integration, active or not, keyed by slug.
+	 *
+	 * @return array<string, string> Slug => name.
+	 */
+	public function supported(): array {
+		$names = array();
+
+		foreach ( $this->candidates() as $integration ) {
+			$names[ $integration->slug() ] = $integration->name();
+		}
+
+		return $names;
+	}
+
+	/**
 	 * Returns an active integration by slug.
 	 *
 	 * @param string $slug Slug.

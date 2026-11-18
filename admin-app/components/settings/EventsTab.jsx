@@ -51,6 +51,12 @@ export default function EventsTab({ draft, set, errors, meta }) {
         .filter((g) => g.types.length > 0),
     [meta]
   );
+  // WordPress itself first, then plugin integrations (only active plugins have event types).
+  const sections = [
+    { key: 'site', label: __( 'WordPress', 'wp-activity-ledger' ), items: groups.filter((g) => g.category.group !== 'integration') },
+    { key: 'integration', label: __( 'Plugin integrations', 'wp-activity-ledger' ), items: groups.filter((g) => g.category.group === 'integration') },
+  ];
+  const supported = (meta?.supported ?? []).join(', ');
 
   const toggle = (key, on) => set({ disabled_event_types: on ? disabled.filter((k) => k !== key) : [...new Set([...disabled, key])] });
   const toggleAll = (types, on) => {
@@ -63,9 +69,26 @@ export default function EventsTab({ draft, set, errors, meta }) {
       <div className="border-b py-4">
         <div className="mb-2 text-sm font-medium">{__( 'Recorded events', 'wp-activity-ledger' )}</div>
         <p className="mb-2 text-xs text-muted-foreground">{__( 'Switch off event types you never need. Activity Ledger\'s own events are always recorded.', 'wp-activity-ledger' )}</p>
-        <div className="rounded-md border px-3">
-          {groups.map((g) => (
-            <CategoryTypes key={g.category.slug} category={g.category} types={g.types} disabled={disabled} onToggle={toggle} onToggleAll={toggleAll} />
+        <div className="mt-3 space-y-4">
+          {sections.map((section) => (
+            <section key={section.key} aria-labelledby={`wpal-events-${section.key}`}>
+              <h3 id={`wpal-events-${section.key}`} className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {section.label}
+              </h3>
+              {section.items.length > 0 ? (
+                <div className="rounded-md border px-3">
+                  {section.items.map((g) => (
+                    <CategoryTypes key={g.category.slug} category={g.category} types={g.types} disabled={disabled} onToggle={toggle} onToggleAll={toggleAll} />
+                  ))}
+                </div>
+              ) : (
+                <p className="rounded-md border border-dashed px-3 py-2.5 text-sm text-muted-foreground">
+                  {supported
+                    ? sprintf( __( 'Events from supported plugins (%s) appear here when the plugin is active.', 'wp-activity-ledger' ), supported )
+                    : __( 'Events from supported plugins appear here when the plugin is active.', 'wp-activity-ledger' )}
+                </p>
+              )}
+            </section>
           ))}
         </div>
       </div>

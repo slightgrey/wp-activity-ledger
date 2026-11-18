@@ -47,5 +47,11 @@ final class EnumsTest extends TestCase {
 			$this->assertLessThanOrEqual( 32, strlen( $category->value ) );
 			$this->assertNotSame( '', $category->label() );
 		}
+
+		$integrations = array_values( array_filter( Category::cases(), static fn( Category $c ): bool => $c->is_integration() ) );
+		$this->assertSame( array( Category::WooCommerce, Category::Elementor ), $integrations );
+		$this->assertSame( 'integration', Category::Elementor->group() );
+		$this->assertSame( 'site', Category::Content->group() );
+		$this->assertSame( 'site', Category::System->group() );
 	}
 }

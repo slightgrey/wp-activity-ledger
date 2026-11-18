@@ -49,6 +49,12 @@ final class MetaStatsControllerTest extends RestTestCase {
 		}
 
 		$this->assertContains( 'content', array_column( $data['categories'], 'slug' ) );
+		$groups = array_column( $data['categories'], 'group', 'slug' );
+		$this->assertSame( 'site', $groups['content'] );
+		$this->assertSame( 'integration', $groups['woocommerce'] );
+		$this->assertSame( 'integration', $groups['elementor'] );
+		$this->assertContains( 'WooCommerce', $data['supported'] );
+		$this->assertContains( 'Elementor', $data['supported'] );
 		$this->assertSame( array( 'info', 'notice', 'warning', 'critical' ), array_column( $data['severities'], 'slug' ) );
 		$this->assertContains( 'administrator', array_column( $data['roles'], 'slug' ) );
 		$this->assertTrue( $data['caps']['manage_settings'] );

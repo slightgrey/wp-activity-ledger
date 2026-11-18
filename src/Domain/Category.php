@@ -56,4 +56,27 @@ enum Category: string {
 			self::System      => __( 'Activity Ledger', 'wp-activity-ledger' ),
 		};
 	}
+
+	/**
+	 * Tells whether the category belongs to a plugin integration rather than WordPress
+	 * itself. Mark the category of every new integration here; the admin app groups
+	 * them under "Plugin integrations".
+	 *
+	 * @return bool True for integration categories.
+	 */
+	public function is_integration(): bool {
+		return match ( $this ) {
+			self::WooCommerce, self::Elementor => true,
+			default => false,
+		};
+	}
+
+	/**
+	 * Returns the settings group of the category.
+	 *
+	 * @return string "integration" or "site".
+	 */
+	public function group(): string {
+		return $this->is_integration() ? 'integration' : 'site';
+	}
 }
