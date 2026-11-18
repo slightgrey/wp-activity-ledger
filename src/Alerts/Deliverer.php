@@ -23,6 +23,11 @@ use WPActivityLedger\Recording\Recorder;
  * with wp_mail, the others as a JSON POST with a 5-second timeout). A failed delivery is
  * retried twice (after 1 and 5 minutes); the third failure is recorded as
  * "system.alert_failed".
+ *
+ * POSTs go through wp_safe_remote_post(), which refuses private, loopback and link-local
+ * addresses and unusual ports (other than for the site's own host), so a channel URL can't
+ * be used to reach the server's internal network. Allow an internal receiver with the core
+ * filters `http_request_host_is_external` (host) and `http_allowed_safe_ports` (port).
  */
 final class Deliverer {
 
@@ -172,7 +177,8 @@ final class Deliverer {
 	 * @return string|null Error, or null for a 2xx response.
 	 */
 	private static function post( string $url, string $body, array $headers ): ?string {
-		$response = wp_remote_post(
+		// Safe variant: no internal addresses (SSRF), see the class comment.
+		$response = wp_safe_remote_post(
 			$url,
 			array(
 				'timeout'     => self::TIMEOUT,

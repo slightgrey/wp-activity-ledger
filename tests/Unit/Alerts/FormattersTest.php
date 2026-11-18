@@ -107,6 +107,64 @@ final class FormattersTest extends TestCase {
 	}
 
 	/**
+	 * Slack's notification fallback text is escaped like the blocks, so it can't mention anyone.
+	 *
+	 * @return void
+	 */
+	public function test_slack_fallback_text_is_escaped(): void {
+		$alert = self::alert_with( '<!channel> <@U123> Failed login for "<!here>"' );
+		$slack = ( new SlackFormatter() )->format( $alert );
+
+		$this->assertStringContainsString( '&lt;!channel&gt; &lt;@U123&gt;', $slack['text'] );
+		$this->assertStringNotContainsString( '<!', $slack['text'] );
+		$this->assertStringNotContainsString( '<!', (string) wp_json_encode( $slack['blocks'] ) );
+	}
+
+	/**
+	 * Teams text escapes Markdown, so untrusted values can't become disguised links.
+	 *
+	 * @return void
+	 */
+	public function test_teams_escapes_markdown(): void {
+		$teams = ( new TeamsFormatter() )->format( self::alert_with( 'Failed login for [Click here](https://evil.test) *now*' ) );
+		$card  = $teams['attachments'][0]['content'];
+
+		$this->assertSame( 'Failed login for \[Click here\](https://evil.test) \*now\*', $card['body'][1]['text'] );
+
+		foreach ( $card['body'][2]['facts'] as $fact ) {
+			$this->assertDoesNotMatchRegularExpression( '/(?<!\\\\)\[/', $fact['value'] );
+		}
+	}
+
+	/**
+	 * The fixture alert with another message and user.
+	 *
+	 * @param string $message Message (also used as the user).
+	 *
+	 * @return AlertMessage Alert.
+	 */
+	private static function alert_with( string $message ): AlertMessage {
+		$alert = self::alert();
+
+		return new AlertMessage(
+			title: $alert->title,
+			message: $message,
+			event_type: $alert->event_type,
+			severity: $alert->severity,
+			category: $alert->category,
+			user: $message,
+			ip: $alert->ip,
+			object_label: $alert->object_label,
+			created_at: $alert->created_at,
+			site_name: $alert->site_name,
+			site_url: $alert->site_url,
+			log_url: $alert->log_url,
+			rule: $alert->rule,
+			event_id: $alert->event_id
+		);
+	}
+
+	/**
 	 * The signature matches an independently computed HMAC-SHA256 (openssl dgst).
 	 *
 	 * @return void

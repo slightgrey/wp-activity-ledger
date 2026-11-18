@@ -99,6 +99,23 @@ wp activity-ledger list --url=example.com/site2/
 
 Dates are UTC (`Y-m-d` or `Y-m-d H:i:s`), except `purge --before`, which takes a day in the site's timezone.
 
+## Alerts: internal webhook receivers
+
+Webhook, Slack, Discord and Teams channels are sent with `wp_safe_remote_post()`. It refuses private, loopback and link-local addresses (like `10.x`, `192.168.x`, `127.0.0.1` or a cloud metadata service), and ports other than 80, 443 and 8080, unless the URL is on the site's own host. This stops a channel URL from being used to reach the server's internal network. To send to a receiver on your own network or on another port, allow it with WordPress's filters:
+
+```php
+// Allow a webhook receiver on the internal network.
+add_filter(
+	'http_request_host_is_external',
+	static fn( bool $external, string $host ): bool => $external || 'n8n.internal.example' === $host,
+	10,
+	2
+);
+
+// Allow an extra port.
+add_filter( 'http_allowed_safe_ports', static fn( array $ports ): array => array_merge( $ports, array( 5678 ) ) );
+```
+
 ## Alerts: verifying webhook signatures
 
 Generic webhook channels send a JSON `POST` with two headers:

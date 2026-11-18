@@ -225,4 +225,73 @@ final class AlertDeliveryTest extends AlertsTestCase {
 		do_action( 'wp_login_failed', $user, new \WP_Error() );
 		$this->assertCount( 1, self::queued_jobs() );
 	}
+
+	/**
+	 * Webhook channels can't reach internal addresses (SSRF): those are refused before any
+	 * request is made, while public URLs are still sent, with WordPress's safety check on.
+	 *
+	 * @return void
+	 */
+	public function test_webhooks_refuse_internal_addresses(): void {
+		$deliverer = Plugin::instance()->deliverer();
+		$sample    = $deliverer->sample_message();
+		$sent      = array();
+		$catch     = static function ( $pre, array $args, string $url ) use ( &$sent ) {
+			$sent[] = array(
+				'url'  => $url,
+				'safe' => ! empty( $args['reject_unsafe_urls'] ),
+			);
+
+			return $pre;
+		};
+
+		add_filter( 'pre_http_request', $catch, 10, 3 );
+
+		try {
+			foreach ( array( 'http://127.0.0.2/hook', 'http://169.254.169.254/latest/meta-data/', 'http://10.0.0.5:8080/hook', 'http://[::1]/hook' ) as $url ) {
+				$error = $deliverer->send(
+					array(
+						'type'   => 'webhook',
+						'config' => array(
+							'url'    => $url,
+							'secret' => 'secret',
+						),
+					),
+					$sample
+				);
+
+				// WP_Http's own message when reject_unsafe_urls refuses a URL (no connection attempted).
+				$this->assertSame( 'A valid URL was not provided.', $error, "$url must be refused by the safety check" );
+			}
+
+			// A public URL is attempted with the safety check on (answered here without network).
+			$fake = static fn() => array(
+				'headers'  => array(),
+				'body'     => '',
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'cookies'  => array(),
+			);
+			add_filter( 'pre_http_request', $fake, 20 );
+
+			$this->assertNull(
+				$deliverer->send(
+					array(
+						'type'   => 'slack',
+						'config' => array( 'url' => 'https://hooks.slack.com/services/T000/B000/XXXX' ),
+					),
+					$sample
+				)
+			);
+		} finally {
+			remove_filter( 'pre_http_request', $catch, 10 );
+			remove_filter( 'pre_http_request', $fake ?? '__return_false', 20 );
+		}
+
+		$public = array_values( array_filter( $sent, static fn( array $call ): bool => str_starts_with( $call['url'], 'https://hooks.slack.com/' ) ) );
+		$this->assertCount( 1, $public );
+		$this->assertTrue( $public[0]['safe'] );
+	}
 }

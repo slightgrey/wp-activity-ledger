@@ -34,7 +34,8 @@ final class SlackFormatter extends Formatter {
 		}
 
 		return array(
-			'text'   => self::subject( $alert ) . ': ' . $alert->message,
+			// Fallback text for notifications: escaped like the blocks, so "<!channel>" can't ping anyone.
+			'text'   => self::escape( self::subject( $alert ) . ': ' . $alert->message ),
 			'blocks' => array(
 				array(
 					'type' => 'header',

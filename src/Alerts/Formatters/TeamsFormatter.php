@@ -40,7 +40,7 @@ final class TeamsFormatter extends Formatter {
 		foreach ( self::facts( $alert ) as $label => $value ) {
 			$facts[] = array(
 				'title' => $label,
-				'value' => $value,
+				'value' => self::escape( $value ),
 			);
 		}
 
@@ -60,12 +60,12 @@ final class TeamsFormatter extends Formatter {
 								'size'   => 'Medium',
 								'weight' => 'Bolder',
 								'color'  => self::TEXT_COLORS[ $alert->severity ] ?? 'Default',
-								'text'   => self::subject( $alert ),
+								'text'   => self::escape( self::subject( $alert ) ),
 								'wrap'   => true,
 							),
 							array(
 								'type' => 'TextBlock',
-								'text' => $alert->message,
+								'text' => self::escape( $alert->message ),
 								'wrap' => true,
 							),
 							array(
@@ -84,5 +84,18 @@ final class TeamsFormatter extends Formatter {
 				),
 			),
 		);
+	}
+
+	/**
+	 * Escapes the Markdown that Adaptive Card text renders (links, emphasis, code, HTML-like
+	 * tags), so values from users and site content, like a failed-login username, can't
+	 * show up as a disguised link.
+	 *
+	 * @param string $text Text.
+	 *
+	 * @return string Escaped text.
+	 */
+	private static function escape( string $text ): string {
+		return (string) preg_replace( '/([\\\\`*_\[\]<>])/', '\\\\$1', $text );
 	}
 }

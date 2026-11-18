@@ -14,12 +14,12 @@
                         "size": "Medium",
                         "weight": "Bolder",
                         "color": "Attention",
-                        "text": "[Example] Plugin activated",
+                        "text": "\\[Example\\] Plugin activated",
                         "wrap": true
                     },
                     {
                         "type": "TextBlock",
-                        "text": "Activated plugin \"Hello <Dolly> & Co\"",
+                        "text": "Activated plugin \"Hello \\<Dolly\\> & Co\"",
                         "wrap": true
                     },
                     {

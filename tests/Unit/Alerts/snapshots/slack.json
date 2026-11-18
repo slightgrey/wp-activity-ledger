@@ -1,5 +1,5 @@
 {
-    "text": "[Example] Plugin activated: Activated plugin \"Hello <Dolly> & Co\"",
+    "text": "[Example] Plugin activated: Activated plugin \"Hello &lt;Dolly&gt; &amp; Co\"",
     "blocks": [
         {
             "type": "header",
