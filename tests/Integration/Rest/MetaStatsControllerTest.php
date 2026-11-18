@@ -9,6 +9,9 @@ declare( strict_types=1 );
 
 namespace WPActivityLedger\Tests\Integration\Rest;
 
+use WPActivityLedger\Domain\Event;
+use WPActivityLedger\Plugin;
+use WPActivityLedger\Rest\StatsController;
 use WPActivityLedger\Rest\UiPrefs;
 
 /**
@@ -62,7 +65,7 @@ final class MetaStatsControllerTest extends RestTestCase {
 			'from' => '2026-01-01',
 			'to'   => '2026-01-07',
 		);
-		delete_transient( \WPActivityLedger\Rest\StatsController::CACHE_PREFIX . md5( '2026-01-01|2026-01-07|' . wp_timezone_string() ) );
+		delete_transient( StatsController::cache_key( '2026-01-01|2026-01-07' ) );
 
 		$first  = self::request( 'GET', '/stats', $args );
 		$second = self::request( 'GET', '/stats', $args );
@@ -75,8 +78,33 @@ final class MetaStatsControllerTest extends RestTestCase {
 			$this->assertArrayHasKey( $key, $first->get_data() );
 		}
 
-		$this->assertSame( array( 'events', 'failed_logins', 'critical', 'users' ), array_keys( $first->get_data()['totals'] ) );
+		$this->assertSame( array( 'events', 'failed_logins', 'critical', 'users', 'active_sessions' ), array_keys( $first->get_data()['totals'] ) );
 		$this->assertSame( 400, self::request( 'GET', '/stats', array( 'from' => '2026-02-01', 'to' => '2026-01-01' ) )->get_status() );
+	}
+
+	/**
+	 * A preset range counts seeded events (failed logins with their folded count) by hour.
+	 *
+	 * @return void
+	 */
+	public function test_stats_range_counts(): void {
+		global $wpdb;
+
+		delete_transient( StatsController::cache_key( '24h' ) );
+		$recorder = Plugin::instance()->recorder();
+		$recorder->record( new Event( 'auth.login_failed', object_type: 'user', object_id: '1', context: array( 'count' => 4 ) ) );
+		$recorder->record( new Event( 'system.deactivated', severity: 3 ) );
+		self::flush();
+
+		$data  = self::request( 'GET', '/stats', array( 'range' => '24h' ) )->get_data();
+		$count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}wpal_events WHERE created_at BETWEEN %s AND %s", $data['range']['from'], $data['range']['to'] ) );
+
+		$this->assertSame( 'hour', $data['range']['bucket'] );
+		$this->assertSame( $count, $data['totals']['events'] );
+		$this->assertGreaterThanOrEqual( 4, $data['totals']['failed_logins'] );
+		$this->assertGreaterThanOrEqual( 1, $data['totals']['critical'] );
+		$this->assertMatchesRegularExpression( '/^\d{4}-\d{2}-\d{2} \d{2}:00$/', $data['by_day'][0]['day'] );
+		$this->assertSame( 400, self::request( 'GET', '/stats', array( 'range' => '1y' ) )->get_status() );
 	}
 
 	/**

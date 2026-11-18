@@ -13,10 +13,12 @@ export default defineConfig({
     outDir: resolve(dir, 'dist/admin'),
     emptyOutDir: true,
     manifest: true,
+    cssCodeSplit: false, // One stylesheet (wpal-admin.css) for the whole app.
     rollupOptions: {
       input: resolve(dir, 'admin-app/main.jsx'),
       output: {
-        entryFileNames: 'wpal-admin.js',
+        // Hashed and enqueued without ?ver, so lazy chunks import the very same module URL.
+        entryFileNames: 'wpal-admin-[hash].js',
         chunkFileNames: 'wpal-admin-[name]-[hash].js',
         assetFileNames: (info) => {
           if (info.name?.endsWith('.css')) return 'wpal-admin.css';

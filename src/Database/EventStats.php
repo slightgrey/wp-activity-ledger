@@ -41,13 +41,14 @@ final class EventStats {
 	 * @param string $from           Start, UTC "Y-m-d H:i:s" (inclusive).
 	 * @param string $to             End, UTC "Y-m-d H:i:s" (inclusive).
 	 * @param int    $offset_seconds Site timezone offset from UTC, used to group days locally.
+	 * @param string $bucket         "day" or "hour" for the activity series.
 	 *
 	 * @return array<string, mixed> Aggregates.
 	 */
-	public function summary( string $from, string $to, int $offset_seconds = 0 ): array {
+	public function summary( string $from, string $to, int $offset_seconds = 0, string $bucket = 'day' ): array {
 		return array(
 			'totals'          => $this->totals( $from, $to ),
-			'by_day'          => $this->by_day( $from, $to, $offset_seconds ),
+			'by_day'          => $this->by_day( $from, $to, $offset_seconds, $bucket ),
 			'top_users'       => $this->top( 'user_id, user_login', $from, $to ),
 			'top_types'       => $this->top( 'event_type', $from, $to ),
 			'recent_critical' => $this->recent_critical( $from, $to ),
@@ -67,7 +68,7 @@ final class EventStats {
 		$row   = $this->db->get_row(
 			$this->db->prepare(
 				"SELECT COUNT(*) AS events,
-					SUM(event_type = 'auth.login_failed') AS failed_logins,
+					SUM(CASE WHEN event_type = 'auth.login_failed' THEN COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(context, '$.count')) AS UNSIGNED), 1) ELSE 0 END) AS failed_logins,
 					SUM(severity >= 3) AS critical,
 					COUNT(DISTINCT NULLIF(user_id, 0)) AS users
 				FROM $table WHERE created_at BETWEEN %s AND %s",
@@ -91,17 +92,20 @@ final class EventStats {
 	 * @param string $from           Start (UTC).
 	 * @param string $to             End (UTC).
 	 * @param int    $offset_seconds Site timezone offset.
+	 * @param string $bucket         "day" ("Y-m-d") or "hour" ("Y-m-d H:00").
 	 *
 	 * @return array<int, array{day: string, category: string, count: int}> Rows, oldest day first.
 	 */
-	public function by_day( string $from, string $to, int $offset_seconds ): array {
-		$table = Schema::events_table();
-		$rows  = $this->db->get_results(
+	public function by_day( string $from, string $to, int $offset_seconds, string $bucket = 'day' ): array {
+		$table  = Schema::events_table();
+		$format = 'hour' === $bucket ? '%Y-%m-%d %H:00' : '%Y-%m-%d';
+		$rows   = $this->db->get_results(
 			$this->db->prepare(
-				"SELECT DATE(DATE_ADD(created_at, INTERVAL %d SECOND)) AS day, category, COUNT(*) AS count
+				"SELECT DATE_FORMAT(DATE_ADD(created_at, INTERVAL %d SECOND), %s) AS day, category, COUNT(*) AS count
 				FROM $table WHERE created_at BETWEEN %s AND %s
 				GROUP BY day, category ORDER BY day, category",
 				$offset_seconds,
+				$format,
 				$from,
 				$to
 			),

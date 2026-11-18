@@ -22,6 +22,7 @@ use WPActivityLedger\Integrations\WooCommerce;
 use WPActivityLedger\Recording\Recorder;
 use WPActivityLedger\Rest\Routes;
 use WPActivityLedger\Admin\Assets;
+use WPActivityLedger\Admin\DashboardWidget;
 use WPActivityLedger\Admin\Menu;
 use WPActivityLedger\Security\Capabilities;
 use WPActivityLedger\Sensors\AuthSensor;
@@ -328,5 +329,6 @@ final class Plugin {
 		$menu = new Menu();
 		$menu->register( $this->loader );
 		( new Assets( $menu ) )->register( $this->loader );
+		( new DashboardWidget( $this->repository(), $this->settings() ) )->register( $this->loader );
 	}
 }

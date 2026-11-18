@@ -80,7 +80,9 @@ final class Assets {
 
 		$version = WPAL_VERSION . '-' . (string) filemtime( WPAL_DIR . self::BUILD_DIR . $entry['file'] );
 
-		wp_enqueue_script( self::HANDLE, WPAL_URL . self::BUILD_DIR . $entry['file'], array(), $version, true );
+		// No ?ver on the script: its file name is content-hashed, and the lazy-loaded chunks
+		// import it by its bare URL; a different URL would load a second copy of the app.
+		wp_enqueue_script( self::HANDLE, WPAL_URL . self::BUILD_DIR . $entry['file'], array(), null, true ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- Hashed file name.
 		wp_add_inline_script( self::HANDLE, 'window.wpalConfig = ' . wp_json_encode( self::config() ) . ';', 'before' );
 
 		foreach ( $entry['css'] as $index => $css ) {
@@ -165,9 +167,16 @@ final class Assets {
 			return null;
 		}
 
+		$css = (array) ( $entry['css'] ?? array() );
+
+		// With CSS code splitting off, Vite lists the one stylesheet under "style.css".
+		if ( is_string( $manifest['style.css']['file'] ?? null ) ) {
+			$css[] = $manifest['style.css']['file'];
+		}
+
 		return array(
 			'file' => $entry['file'],
-			'css'  => array_values( array_filter( (array) ( $entry['css'] ?? array() ), 'is_string' ) ),
+			'css'  => array_values( array_unique( array_filter( $css, 'is_string' ) ) ),
 		);
 	}
 }

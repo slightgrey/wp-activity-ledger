@@ -1,14 +1,17 @@
-import { useEffect } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { HashRouter, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { config } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toast';
-import Dashboard from '@/pages/Dashboard';
-import ActivityLog from '@/pages/ActivityLog';
-import Users from '@/pages/Users';
-import Alerts from '@/pages/Alerts';
-import Settings from '@/pages/Settings';
-import Gallery from '@/pages/Gallery';
+import { Skeleton } from '@/components/ui/skeleton';
+
+// Screens load on first visit (the dashboard's chart library is the largest part).
+const Dashboard = lazy(() => import('@/pages/Dashboard'));
+const ActivityLog = lazy(() => import('@/pages/ActivityLog'));
+const Users = lazy(() => import('@/pages/Users'));
+const Alerts = lazy(() => import('@/pages/Alerts'));
+const Settings = lazy(() => import('@/pages/Settings'));
+const Gallery = lazy(() => import('@/pages/Gallery'));
 
 const SCREENS = [
   { path: '/', label: 'Dashboard', cap: 'view', element: <Dashboard /> },
@@ -67,13 +70,15 @@ function Layout() {
         </nav>
       </header>
       <main>
-        <Routes>
-          {screens.map((screen) => (
-            <Route key={screen.path} path={screen.path} element={screen.element} />
-          ))}
-          {DEV && <Route path="/dev" element={<Gallery />} />}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+          <Routes>
+            {screens.map((screen) => (
+              <Route key={screen.path} path={screen.path} element={screen.element} />
+            ))}
+            {DEV && <Route path="/dev" element={<Gallery />} />}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
       </main>
     </div>
   );
