@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { ArrowDown, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,21 +19,21 @@ import { __, sprintf } from '@/lib/i18n';
 const PER_PAGE = 100;
 const ALL = 'all';
 
-const SORTS = {
-  login: (a, b) => a.login.localeCompare(b.login),
-  last_activity: (a, b) => (b.last_activity ?? '').localeCompare(a.last_activity ?? ''),
-  events: (a, b) => b.events - a.events,
-};
+// First direction when a column is picked (sorting happens on the server, across pages).
+const FIRST_ORDER = { login: 'asc', last_activity: 'desc', events: 'desc' };
 
 /**
- * A sortable column header.
+ * A sortable column header; clicking the active column flips the direction.
  */
 function SortHead({ label, sortKey, sort, onSort, className }) {
+  const active = sort.orderby === sortKey;
+  const Arrow = sort.order === 'asc' ? ArrowUp : ArrowDown;
+
   return (
-    <TableHead className={className}>
-      <button type="button" onClick={() => onSort(sortKey)} className={cn('inline-flex items-center gap-1 uppercase', sort === sortKey && 'text-foreground')}>
+    <TableHead className={className} aria-sort={active ? (sort.order === 'asc' ? 'ascending' : 'descending') : 'none'}>
+      <button type="button" onClick={() => onSort(sortKey)} className={cn('inline-flex items-center gap-1 uppercase', active && 'text-foreground')}>
         {label}
-        {sort === sortKey && <ArrowDown className="h-3 w-3" />}
+        {active && <Arrow className="h-3 w-3" aria-hidden="true" />}
       </button>
     </TableHead>
   );
@@ -54,21 +54,27 @@ export default function Users() {
   const [search, setSearch] = useState('');
   const [role, setRole] = useState('');
   const [page, setPage] = useState(1);
-  const [sort, setSort] = useState('last_activity');
+  const [sort, setSort] = useState({ orderby: 'last_activity', order: 'desc' });
   const term = useDebounced(search.trim(), 300);
 
   const users = useQuery({
-    queryKey: ['users', term, role, page],
+    queryKey: ['users', term, role, page, sort.orderby, sort.order],
     queryFn: async () => {
-      const result = await api('/users', { query: { search: term, role, page, per_page: PER_PAGE } });
+      const result = await api('/users', { query: { search: term, role, page, per_page: PER_PAGE, orderby: sort.orderby, order: sort.order } });
 
       return { items: result.data, total: result.total ?? 0, totalPages: result.totalPages ?? 1 };
     },
     placeholderData: keepPreviousData,
   });
 
-  // Sorting applies to the loaded page (up to 100 users).
-  const rows = useMemo(() => [...(users.data?.items ?? [])].sort(SORTS[sort]), [users.data, sort]);
+  const onSort = (orderby) => {
+    setSort((current) =>
+      current.orderby === orderby ? { orderby, order: current.order === 'asc' ? 'desc' : 'asc' } : { orderby, order: FIRST_ORDER[orderby] }
+    );
+    setPage(1);
+  };
+
+  const rows = users.data?.items ?? [];
   const totalPages = Math.max(1, users.data?.totalPages ?? 1);
 
   return (
@@ -115,11 +121,11 @@ export default function Users() {
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
-              <SortHead label={__( 'User', 'wp-activity-ledger' )} sortKey="login" sort={sort} onSort={setSort} />
+              <SortHead label={__( 'User', 'wp-activity-ledger' )} sortKey="login" sort={sort} onSort={onSort} />
               <TableHead>{__( 'Roles', 'wp-activity-ledger' )}</TableHead>
-              <SortHead label={__( 'Last activity', 'wp-activity-ledger' )} sortKey="last_activity" sort={sort} onSort={setSort} />
+              <SortHead label={__( 'Last activity', 'wp-activity-ledger' )} sortKey="last_activity" sort={sort} onSort={onSort} />
               <TableHead>{__( 'Last login', 'wp-activity-ledger' )}</TableHead>
-              <SortHead label={__( 'Events', 'wp-activity-ledger' )} sortKey="events" sort={sort} onSort={setSort} className="text-right" />
+              <SortHead label={__( 'Events', 'wp-activity-ledger' )} sortKey="events" sort={sort} onSort={onSort} className="text-right" />
               <TableHead className="text-right">{__( 'Failed logins', 'wp-activity-ledger' )}</TableHead>
             </TableRow>
           </TableHeader>

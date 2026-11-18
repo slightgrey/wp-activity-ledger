@@ -15,6 +15,9 @@ use WPActivityLedger\Security\Capabilities;
 /**
  * GET /users: a paged user list with activity in a range (last activity, last login, event
  * count, failed logins, roles). Also used for the user filter's autocomplete ("search").
+ *
+ * Sorted on the server by login, last activity or event count (`orderby`, `order`), so the
+ * order holds across pages.
  */
 final class UsersController extends BaseController {
 
@@ -22,6 +25,11 @@ final class UsersController extends BaseController {
 	 * Default range length in days.
 	 */
 	private const DEFAULT_DAYS = 30;
+
+	/**
+	 * Sort columns.
+	 */
+	public const ORDERBY = array( 'login', 'last_activity', 'events' );
 
 	/**
 	 * Creates the controller.
@@ -75,6 +83,17 @@ final class UsersController extends BaseController {
 					),
 					'from'     => self::date_arg( __( 'Range start, UTC (default: 30 days ago).', 'wp-activity-ledger' ) ),
 					'to'       => self::date_arg( __( 'Range end, UTC (default: now).', 'wp-activity-ledger' ) ),
+					'orderby'  => array(
+						'type'        => 'string',
+						'enum'        => self::ORDERBY,
+						'default'     => 'login',
+						'description' => __( 'Sort by login, last activity (all time) or events in the range. Users without activity come last.', 'wp-activity-ledger' ),
+					),
+					'order'    => array(
+						'type'        => 'string',
+						'enum'        => array( 'asc', 'desc' ),
+						'description' => __( 'Direction (default: asc for login, desc otherwise).', 'wp-activity-ledger' ),
+					),
 				),
 			)
 		);
@@ -88,12 +107,14 @@ final class UsersController extends BaseController {
 	 * @return \WP_REST_Response Response with total headers.
 	 */
 	public function get_items( $request ): \WP_REST_Response {
-		$query = new \WP_User_Query( self::user_query_args( $request ) );
-		$users = array_filter( (array) $query->get_results(), static fn( $user ): bool => $user instanceof \WP_User );
-
 		[ $from, $to ] = self::range( $request );
-		$activity      = $this->activity->for_users( array_map( static fn( \WP_User $user ): int => $user->ID, $users ), $from, $to );
-		$items         = array_map( static fn( \WP_User $user ): array => self::item( $user, $activity[ $user->ID ] ?? array() ), array_values( $users ) );
+		$orderby       = in_array( $request['orderby'], self::ORDERBY, true ) ? (string) $request['orderby'] : 'login';
+		$order         = is_string( $request['order'] ) ? $request['order'] : ( 'login' === $orderby ? 'asc' : 'desc' );
+		$query         = $this->user_query( self::user_query_args( $request, $order ), $orderby, $order, $from, $to );
+		$users         = array_filter( (array) $query->get_results(), static fn( $user ): bool => $user instanceof \WP_User );
+
+		$activity = $this->activity->for_users( array_map( static fn( \WP_User $user ): int => $user->ID, $users ), $from, $to );
+		$items    = array_map( static fn( \WP_User $user ): array => self::item( $user, $activity[ $user->ID ] ?? array() ), array_values( $users ) );
 
 		$response = rest_ensure_response( $items );
 		$response->header( 'X-WP-Total', (string) $query->get_total() );
@@ -103,18 +124,53 @@ final class UsersController extends BaseController {
 	}
 
 	/**
+	 * Runs the user query, joined to the activity aggregates when sorting by activity.
+	 *
+	 * @param array<string, mixed> $args    WP_User_Query arguments.
+	 * @param string               $orderby Sort column.
+	 * @param string               $order   "asc" or "desc".
+	 * @param string               $from    Range start (UTC).
+	 * @param string               $to      Range end (UTC).
+	 *
+	 * @return \WP_User_Query Executed query.
+	 */
+	private function user_query( array $args, string $orderby, string $order, string $from, string $to ): \WP_User_Query {
+		if ( 'login' === $orderby ) {
+			return new \WP_User_Query( $args );
+		}
+
+		global $wpdb;
+
+		$clauses = $this->activity->order_clauses( $wpdb->users, $orderby, $order, $from, $to );
+		$sort    = static function ( \WP_User_Query $query ) use ( $clauses ): void {
+			$query->query_from   .= $clauses['join'];
+			$query->query_orderby = $clauses['orderby'];
+		};
+
+		// The query runs in its constructor, so the hook only ever sees this one query.
+		add_action( 'pre_user_query', $sort );
+
+		try {
+			return new \WP_User_Query( $args );
+		} finally {
+			remove_action( 'pre_user_query', $sort );
+		}
+	}
+
+	/**
 	 * Builds the user query arguments.
 	 *
 	 * @param \WP_REST_Request $request Request.
+	 * @param string           $order   "asc" or "desc" (used for login sorting).
 	 *
 	 * @return array<string, mixed> WP_User_Query arguments.
 	 */
-	private static function user_query_args( \WP_REST_Request $request ): array {
+	private static function user_query_args( \WP_REST_Request $request, string $order ): array {
 		$args = array(
 			'number'      => (int) $request['per_page'],
 			'paged'       => (int) $request['page'],
 			'orderby'     => 'login',
-			'order'       => 'ASC',
+			'order'       => strtoupper( $order ),
 			'count_total' => true,
 		);
 

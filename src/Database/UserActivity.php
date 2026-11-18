@@ -79,6 +79,38 @@ final class UserActivity {
 	}
 
 	/**
+	 * Returns the JOIN and ORDER BY clauses that sort a WP_User_Query by activity.
+	 *
+	 * The join is a LEFT JOIN on one aggregate row per user, so it never adds rows and the
+	 * user query keeps its own filters (role, search, site membership) and paging. Users
+	 * without any recorded activity are listed last in both directions; ties sort by login.
+	 *
+	 * @param string $users_table Users table (from the user query).
+	 * @param string $orderby     "last_activity" (all time) or "events" (in the range).
+	 * @param string $order       "asc" or "desc".
+	 * @param string $from        Range start, UTC "Y-m-d H:i:s".
+	 * @param string $to          Range end, UTC "Y-m-d H:i:s".
+	 *
+	 * @return array{join: string, orderby: string} Clauses ("ORDER BY …" included).
+	 */
+	public function order_clauses( string $users_table, string $orderby, string $order, string $from, string $to ): array {
+		$table     = Schema::events_table();
+		$direction = 'asc' === $order ? 'ASC' : 'DESC';
+		$column    = 'events' === $orderby ? 'wpal_activity.events' : 'wpal_activity.last_activity';
+		$join      = $this->db->prepare(
+			" LEFT JOIN (SELECT user_id, MAX(created_at) AS last_activity, SUM(created_at BETWEEN %s AND %s) AS events
+				FROM $table WHERE user_id > 0 GROUP BY user_id) AS wpal_activity ON wpal_activity.user_id = $users_table.ID",
+			$from,
+			$to
+		);
+
+		return array(
+			'join'    => (string) $join,
+			'orderby' => "ORDER BY wpal_activity.user_id IS NULL ASC, $column $direction, $users_table.user_login ASC",
+		);
+	}
+
+	/**
 	 * Aggregates the events done by the users.
 	 *
 	 * @param array<int, int> $user_ids User IDs.
