@@ -12,6 +12,7 @@ namespace WPActivityLedger\Admin;
 use WPActivityLedger\Loader;
 use WPActivityLedger\Rest\BaseController;
 use WPActivityLedger\Security\Capabilities;
+use WPActivityLedger\Support\Author;
 
 /**
  * Enqueues the Vite build of the admin app (read from its manifest) on the plugin page only,
@@ -144,6 +145,15 @@ final class Assets {
 			'exportUrl'      => admin_url( 'admin-post.php' ),
 			'exportNonce'    => wp_create_nonce( ExportHandler::ACTION ),
 			'userId'         => get_current_user_id(),
+			'user'           => array(
+				'name'  => wp_get_current_user()->display_name,
+				'email' => wp_get_current_user()->user_email,
+			),
+			'author'         => array(
+				'requestEmail' => Author::REQUEST_EMAIL,
+				'paypalMe'     => Author::PAYPAL_ME,
+				'minDonation'  => Author::MIN_DONATION,
+			),
 			'caps'           => array(
 				'view'            => current_user_can( Capabilities::VIEW ), // phpcs:ignore WordPress.WP.Capabilities.Undetermined -- Plugin capabilities.
 				'export'          => current_user_can( Capabilities::EXPORT ), // phpcs:ignore WordPress.WP.Capabilities.Undetermined

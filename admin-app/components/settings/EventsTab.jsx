@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, Lightbulb } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import IntegrationRequest from '@/components/settings/IntegrationRequest';
 import { NumberRow, PatternRow } from '@/components/settings/fields';
+import { cn } from '@/lib/utils';
 import { __, sprintf } from '@/lib/i18n';
 
 /**
@@ -56,7 +58,8 @@ export default function EventsTab({ draft, set, errors, meta }) {
     { key: 'site', label: __( 'WordPress', 'wp-activity-ledger' ), items: groups.filter((g) => g.category.group !== 'integration') },
     { key: 'integration', label: __( 'Plugin integrations', 'wp-activity-ledger' ), items: groups.filter((g) => g.category.group === 'integration') },
   ];
-  const supported = (meta?.supported ?? []).join(', ');
+  // "WooCommerce and Elementor" (every built-in integration, active or not).
+  const supported = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' }).format(meta?.supported ?? []);
 
   const toggle = (key, on) => set({ disabled_event_types: on ? disabled.filter((k) => k !== key) : [...new Set([...disabled, key])] });
   const toggleAll = (types, on) => {
@@ -64,32 +67,50 @@ export default function EventsTab({ draft, set, errors, meta }) {
     set({ disabled_event_types: on ? disabled.filter((k) => !keys.includes(k)) : [...new Set([...disabled, ...keys])] });
   };
 
+  const activeIntegrations = sections[1].items.length > 0;
+
   return (
     <div>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-md border border-blue-200 bg-blue-50 px-3 py-2.5">
+        <div className="flex min-w-0 items-start gap-2 text-sm text-blue-900">
+          <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" aria-hidden="true" />
+          <p>
+            {activeIntegrations
+              ? sprintf( __( 'Audit logging for plugins currently supports %s.', 'wp-activity-ledger' ), supported )
+              : sprintf( __( 'Audit logging for plugins currently supports %s. Their events appear below when the plugin is active.', 'wp-activity-ledger' ), supported )}{' '}
+            {__( 'Want another plugin covered? Tell me which one.', 'wp-activity-ledger' )}
+          </p>
+        </div>
+        <IntegrationRequest />
+      </div>
       <div className="border-b py-4">
         <div className="mb-2 text-sm font-medium">{__( 'Recorded events', 'wp-activity-ledger' )}</div>
         <p className="mb-2 text-xs text-muted-foreground">{__( 'Switch off event types you never need. Activity Ledger\'s own events are always recorded.', 'wp-activity-ledger' )}</p>
         <div className="mt-3 space-y-4">
-          {sections.map((section) => (
-            <section key={section.key} aria-labelledby={`wpal-events-${section.key}`}>
-              <h3 id={`wpal-events-${section.key}`} className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {section.label}
-              </h3>
-              {section.items.length > 0 ? (
-                <div className="rounded-md border px-3">
-                  {section.items.map((g) => (
-                    <CategoryTypes key={g.category.slug} category={g.category} types={g.types} disabled={disabled} onToggle={toggle} onToggleAll={toggleAll} />
-                  ))}
-                </div>
-              ) : (
-                <p className="rounded-md border border-dashed px-3 py-2.5 text-sm text-muted-foreground">
-                  {supported
-                    ? sprintf( __( 'Events from supported plugins (%s) appear here when the plugin is active.', 'wp-activity-ledger' ), supported )
-                    : __( 'Events from supported plugins appear here when the plugin is active.', 'wp-activity-ledger' )}
-                </p>
-              )}
-            </section>
-          ))}
+          {sections.map((section) => {
+            // Plugin integrations share the info look of the request box above.
+            const info = section.key === 'integration';
+
+            return (
+              <section key={section.key} aria-labelledby={`wpal-events-${section.key}`} className={cn(info && 'rounded-md border border-blue-200 bg-blue-50 p-3')}>
+                <h3 id={`wpal-events-${section.key}`} className={cn('mb-1.5 text-xs font-semibold uppercase tracking-wide', info ? 'text-blue-800' : 'text-muted-foreground')}>
+                  {section.label}
+                </h3>
+                {section.items.length > 0 && (
+                  <div className={cn('rounded-md border px-3', info && 'border-blue-200 [&>div]:border-blue-200')}>
+                    {section.items.map((g) => (
+                      <CategoryTypes key={g.category.slug} category={g.category} types={g.types} disabled={disabled} onToggle={toggle} onToggleAll={toggleAll} />
+                    ))}
+                  </div>
+                )}
+                {section.items.length === 0 && (
+                  <p className={cn('rounded-md border border-dashed px-3 py-2.5 text-sm', info ? 'border-blue-200 text-blue-900' : 'text-muted-foreground')}>
+                    {sprintf( __( 'None of the supported plugins (%s) is active on this site.', 'wp-activity-ledger' ), supported )}
+                  </p>
+                )}
+              </section>
+            );
+          })}
         </div>
       </div>
       <PatternRow

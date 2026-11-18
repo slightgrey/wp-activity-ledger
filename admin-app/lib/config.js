@@ -13,6 +13,8 @@ const defaults = {
   timeFormat: 'g:i a',
   version: '',
   userId: 0,
+  user: { name: '', email: '' },
+  author: { requestEmail: '', paypalMe: '', minDonation: 1 },
   network: false,
   settingsLocked: false,
   siteId: 1,

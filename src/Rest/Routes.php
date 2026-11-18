@@ -65,6 +65,7 @@ final class Routes {
 			new NetworkSettingsController(),
 			new PurgeController( $this->plugin->repository(), $this->plugin->recorder() ),
 			new AlertsController( $this->plugin->alert_channels(), $this->plugin->alert_rules(), $this->plugin->deliverer() ),
+			new IntegrationRequestController(),
 		);
 	}
 }
