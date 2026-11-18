@@ -6,6 +6,7 @@ parameters:
 	phpVersion: 80100
 	paths:
 		- wp-activity-ledger.php
+		- uninstall.php
 		- src
 	bootstrapFiles:
 		- tests/phpstan-bootstrap.php
