@@ -18,7 +18,7 @@ An audit log for WordPress. It records who did what, when and from where, with f
 - **Activity log:** filters (date range, user, role, category, event type, severity, object, IP, session, text) kept in the URL so views can be shared. A detail drawer, per-user column choice, and a 30-second auto-refresh.
 - **System events:** routine events with no logged-in user (cron, WP-CLI, remote site managers) are hidden by default in the log, the dashboard and exports. System warnings and critical events (failed logins, purges) always show. Each user can turn on "Show system events", or pick "System" in the user filter to see them all.
 - **Dashboard:** headline numbers, events over time by category (with a table view), top users and events, recent critical events that open in the detail drawer, and a widget on Dashboard → Home.
-- **Users & sessions:** activity per user, active sessions with "Log out" and "Log out everywhere".
+- **Users & sessions:** activity per user, sortable by last activity, events or login across all pages, and active sessions with "Log out" and "Log out everywhere".
 - **Alerts:** rules (event types, categories, severity, roles, "N times in M minutes per IP or user", cooldown) sent to email, signed webhooks, Slack, Discord or Microsoft Teams, in the background with retries. Seven built-in templates (new administrator, brute force, plugin changes…) ship switched off.
 - **Export:** CSV or JSON of the current filters, streamed, any size.
 - **Retention:** keep events for N days and/or at most N events. Old events are deleted daily in batches.
@@ -56,10 +56,14 @@ Updates appear on **Dashboard → Updates** like any other plugin: the plugin ch
 **Activity Ledger → Settings** has five tabs:
 
 - **General:** whose actions are recorded (every role or selected roles), excluded users, anonymous actions (failed logins), which roles may view or export the log, failed-login grouping, the dashboard widget.
-- **Events:** switch off event types you don't need, and edit the ignored options, ignored meta keys and redacted fields (one pattern per line, `*` matches anything), plus the largest stored value.
+- **Events:** switch off event types you don't need, grouped under WordPress and Plugin integrations, and edit the ignored options, ignored meta keys and redacted fields (one pattern per line, `*` matches anything), plus the largest stored value. **Request an integration** emails a request for another plugin to the author (see below).
 - **Privacy:** anonymise IPs (IPv4 /24, IPv6 /48), store browser details, and the client IP source. Only choose a proxy header if your site is behind a proxy or CDN that sets it.
 - **Retention:** days and maximum number of events, and **Purge logs** (type `PURGE` to confirm).
 - **Advanced:** delete all data when the plugin is deleted. It's off by default, so the audit trail survives an uninstall.
+
+### Integration requests
+
+The plugin never contacts the author on its own. Only when an administrator sends the **Request an integration** form does the site email the request with `wp_mail()`. The email contains the form fields, the sender's name and email (as Reply-To), the site address, and the Activity Ledger and WordPress versions. Each user can send three requests per hour. The optional **Buy me a coffee** button only opens PayPal.Me in a new tab; the plugin handles no payment data.
 
 ### Capabilities
 
