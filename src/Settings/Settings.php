@@ -85,6 +85,16 @@ final class Settings {
 	}
 
 	/**
+	 * Reloads the stored settings (after the option changed outside this object).
+	 *
+	 * @return void
+	 */
+	public function reload(): void {
+		$stored       = get_option( self::OPTION, array() );
+		$this->values = array_merge( self::defaults(), is_array( $stored ) ? $stored : array() );
+	}
+
+	/**
 	 * Validates and saves submitted fields; nothing is saved when any field is invalid.
 	 *
 	 * @param array<string, mixed> $input Submitted fields.

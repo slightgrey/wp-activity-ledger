@@ -62,6 +62,7 @@ final class Routes {
 			new SettingsController( $this->plugin->settings() ),
 			new UsersController( new UserActivity() ),
 			new SessionsController( $this->plugin->recorder() ),
+			new PurgeController( $this->plugin->repository(), $this->plugin->recorder() ),
 			new AlertsController( $this->plugin->alert_channels(), $this->plugin->alert_rules(), $this->plugin->deliverer() ),
 		);
 	}

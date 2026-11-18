@@ -14,6 +14,7 @@ use WPActivityLedger\Domain\EventTypeRegistry;
 use WPActivityLedger\Domain\Severity;
 use WPActivityLedger\Integrations\IntegrationManager;
 use WPActivityLedger\Security\Capabilities;
+use WPActivityLedger\Support\IpResolver;
 
 /**
  * GET /meta: what the admin app needs to label and filter events (event types, categories,
@@ -70,15 +71,15 @@ final class MetaController extends BaseController {
 	public function get_meta(): \WP_REST_Response {
 		return rest_ensure_response(
 			array(
-				'event_types'  => array_values( array_map( static fn( $type ): array => $type->to_array(), $this->types->all() ) ),
-				'categories'   => array_map(
+				'event_types'   => array_values( array_map( static fn( $type ): array => $type->to_array(), $this->types->all() ) ),
+				'categories'    => array_map(
 					static fn( Category $c ): array => array(
 						'slug'  => $c->value,
 						'label' => $c->label(),
 					),
 					Category::cases()
 				),
-				'severities'   => array_map(
+				'severities'    => array_map(
 					static fn( Severity $s ): array => array(
 						'value' => $s->value,
 						'slug'  => $s->slug(),
@@ -86,10 +87,13 @@ final class MetaController extends BaseController {
 					),
 					Severity::cases()
 				),
-				'roles'        => self::roles(),
-				'integrations' => $this->integrations(),
-				'caps'         => self::caps(),
-				'prefs'        => UiPrefs::get( get_current_user_id() ),
+				'roles'         => self::roles(),
+				'integrations'  => $this->integrations(),
+				'caps'          => self::caps(),
+				'prefs'         => UiPrefs::get( get_current_user_id() ),
+				'proxy_headers' => IpResolver::ALLOWED_HEADERS,
+				'multisite'     => is_multisite(),
+				'super_admin'   => is_super_admin(),
 			)
 		);
 	}

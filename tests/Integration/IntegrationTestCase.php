@@ -54,6 +54,10 @@ abstract class IntegrationTestCase extends TestCase {
 		self::settle_all();
 		$wpdb->query( 'ROLLBACK' );
 		wp_cache_flush();
+
+		// In-memory state the rollback can't reach: loaded settings and role capabilities.
+		\WPActivityLedger\Plugin::instance()->settings()->reload();
+		wp_roles()->for_site();
 		wp_set_current_user( $this->previous_user_id );
 
 		parent::tearDown();
