@@ -59,7 +59,7 @@ class Updater {
 	/**
 	 * Returns "owner/repo" from a GitHub URL.
 	 *
-	 * @param string $url URL, e.g. "https://github.com/webofd/wp-activity-ledger".
+	 * @param string $url URL, e.g. "https://github.com/slightgrey/wp-activity-ledger".
 	 *
 	 * @return string|null Repository, or null for other URLs.
 	 */

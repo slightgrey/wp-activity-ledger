@@ -12,7 +12,7 @@
  * Text Domain:       wp-activity-ledger
  * Domain Path:       /languages
  * Network:           false
- * Update URI:        https://github.com/webofd/wp-activity-ledger
+ * Update URI:        https://github.com/slightgrey/wp-activity-ledger
  *
  * @package WPActivityLedger
  */
