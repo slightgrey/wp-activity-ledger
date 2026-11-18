@@ -65,6 +65,13 @@ final class UsersController extends BaseController {
 						'type'    => 'string',
 						'pattern' => '^[a-z0-9_-]{1,60}$',
 					),
+					'include'  => array(
+						'type'  => 'array',
+						'items' => array(
+							'type'    => 'integer',
+							'minimum' => 1,
+						),
+					),
 					'from'     => self::date_arg( __( 'Range start, UTC (default: 30 days ago).', 'wp-activity-ledger' ) ),
 					'to'       => self::date_arg( __( 'Range end, UTC (default: now).', 'wp-activity-ledger' ) ),
 				),
@@ -117,6 +124,10 @@ final class UsersController extends BaseController {
 
 		if ( is_string( $request['role'] ) ) {
 			$args['role'] = $request['role'];
+		}
+
+		if ( is_array( $request['include'] ) && array() !== $request['include'] ) {
+			$args['include'] = array_map( 'intval', $request['include'] );
 		}
 
 		return $args;

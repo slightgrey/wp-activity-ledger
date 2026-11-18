@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const ActivityLog = lazy(() => import('@/pages/ActivityLog'));
 const Users = lazy(() => import('@/pages/Users'));
+const UserDetail = lazy(() => import('@/pages/UserDetail'));
 const Alerts = lazy(() => import('@/pages/Alerts'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const Gallery = lazy(() => import('@/pages/Gallery'));
@@ -34,7 +35,8 @@ function syncAdminMenu(pathname) {
   items.forEach((li) => {
     const link = li.querySelector('a');
     const hash = link?.getAttribute('href')?.split('#')[1] ?? '/';
-    const current = link && hash === pathname;
+    const section = '/' + (pathname.split('/')[1] ?? '');
+    const current = link && (hash === pathname || (hash !== '/' && hash === section));
 
     li.classList.toggle('current', Boolean(current));
     link?.classList.toggle('current', Boolean(current));
@@ -56,7 +58,7 @@ function Layout() {
             <NavLink
               key={screen.path}
               to={screen.path}
-              end
+              end={screen.path === '/'}
               className={({ isActive }) =>
                 cn(
                   'rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground',
@@ -75,6 +77,7 @@ function Layout() {
             {screens.map((screen) => (
               <Route key={screen.path} path={screen.path} element={screen.element} />
             ))}
+            {config.caps.view && <Route path="/users/:id" element={<UserDetail />} />}
             {DEV && <Route path="/dev" element={<Gallery />} />}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

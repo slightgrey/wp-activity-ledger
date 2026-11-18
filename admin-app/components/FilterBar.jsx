@@ -51,8 +51,9 @@ function DebouncedInput({ value, onChange, ...props }) {
  * @param {Function} props.onChange Called with changed keys.
  * @param {Function} props.onClear  Resets every filter.
  * @param {object}   props.meta     /meta data.
+ * @param {string[]} props.hidden   Filters that are fixed by the page (not shown).
  */
-export default function FilterBar({ filters, onChange, onClear, meta }) {
+export default function FilterBar({ filters, onChange, onClear, meta, hidden = [] }) {
   const [more, setMore] = useState(Boolean(filters.object_type || filters.object_id || filters.ip || filters.session));
 
   const categories = useMemo(() => (meta?.categories ?? []).map((c) => ({ value: c.slug, label: c.label })), [meta]);
@@ -89,7 +90,7 @@ export default function FilterBar({ filters, onChange, onClear, meta }) {
             <Input type="date" className="w-40" value={filters.to} onChange={(e) => onChange({ to: e.target.value })} aria-label="To" />
           </>
         )}
-        <UserPicker value={filters.user} onChange={(user) => onChange({ user })} />
+        {!hidden.includes('user') && <UserPicker value={filters.user} onChange={(user) => onChange({ user })} />}
         <Select value={filters.role || ALL} onValueChange={(role) => onChange({ role: role === ALL ? '' : role })}>
           <SelectTrigger className="w-36">
             <SelectValue />
@@ -121,7 +122,7 @@ export default function FilterBar({ filters, onChange, onClear, meta }) {
           <SlidersHorizontal className="h-4 w-4" />
           More
         </Button>
-        {hasFilters(filters) && (
+        {hasFilters(Object.fromEntries(Object.entries(filters).filter(([key]) => !hidden.includes(key)))) && (
           <Button variant="ghost" size="sm" onClick={onClear}>
             <X className="h-4 w-4" />
             Clear

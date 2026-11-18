@@ -162,14 +162,21 @@ function useSavePrefs() {
   });
 }
 
-export default function ActivityLog() {
+/**
+ * The activity log. With `fixed`, those filters always apply and are not shown or stored
+ * in the URL (used on a user's page).
+ *
+ * @param {object} props
+ * @param {object} [props.fixed] Fixed filters, e.g. { user: ['5'] } (keep the object stable).
+ */
+export default function ActivityLog({ fixed = null }) {
   const [params, setParams] = useSearchParams();
   const [eventId, setEventId] = useState(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const meta = useMeta();
   const savePrefs = useSavePrefs();
 
-  const filters = useMemo(() => parseFilters(params), [params]);
+  const filters = useMemo(() => ({ ...parseFilters(params), ...(fixed ?? {}) }), [params, fixed]);
   const prefs = meta.data?.prefs;
   const columns = prefs?.columns?.length ? prefs.columns : ['time', 'user', 'event', 'object', 'ip'];
   const perPage = filters.per_page || prefs?.per_page || 25;
@@ -177,20 +184,22 @@ export default function ActivityLog() {
   // Relative ranges ("last 24 hours") are anchored when the filters change, not on every render.
   const query = useMemo(
     () => toApiQuery(filters, { timeZone: config.timezone, perPage, now: new Date() }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- `filters` derives from `params`.
-    [params, perPage]
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `filters` derives from `params` and `fixed`.
+    [params, fixed, perPage]
   );
 
   const events = useEvents(query, { refetchInterval: autoRefresh ? 30000 : false });
 
-  const update = useCallback(
-    (patch) => setParams(serializeFilters({ ...filters, page: 1, ...patch })),
-    [filters, setParams]
+  const withoutFixed = useCallback(
+    (state) => serializeFilters(Object.fromEntries(Object.entries(state).filter(([key]) => !(fixed && key in fixed)))),
+    [fixed]
   );
+
+  const update = useCallback((patch) => setParams(withoutFixed({ ...filters, page: 1, ...patch })), [filters, setParams, withoutFixed]);
 
   const applyFromDrawer = (patch) => {
     setEventId(null);
-    setParams(serializeFilters({ ...EMPTY, ...patch }));
+    setParams(withoutFixed({ ...EMPTY, ...patch }));
   };
 
   const total = events.data?.total ?? 0;
@@ -198,7 +207,7 @@ export default function ActivityLog() {
 
   return (
     <div className="space-y-3">
-      <FilterBar filters={filters} meta={meta.data} onChange={update} onClear={() => setParams(new URLSearchParams())} />
+      <FilterBar filters={filters} meta={meta.data} hidden={Object.keys(fixed ?? {})} onChange={update} onClear={() => setParams(new URLSearchParams())} />
 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm text-muted-foreground">

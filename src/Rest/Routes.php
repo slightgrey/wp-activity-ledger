@@ -61,6 +61,7 @@ final class Routes {
 			new StatsController( new EventStats() ),
 			new SettingsController( $this->plugin->settings() ),
 			new UsersController( new UserActivity() ),
+			new SessionsController( $this->plugin->recorder() ),
 		);
 	}
 }
