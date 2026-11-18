@@ -31,6 +31,7 @@ use WPActivityLedger\Admin\Assets;
 use WPActivityLedger\Admin\DashboardWidget;
 use WPActivityLedger\Admin\ExportHandler;
 use WPActivityLedger\Admin\Menu;
+use WPActivityLedger\Admin\PluginLinks;
 use WPActivityLedger\Cli\Command;
 use WPActivityLedger\Update\Updater;
 use WPActivityLedger\Lifecycle\Network;
@@ -545,5 +546,6 @@ final class Plugin {
 		( new Assets( $menu ) )->register( $this->loader );
 		( new DashboardWidget( $this->repository(), $this->settings() ) )->register( $this->loader );
 		( new ExportHandler( $this->repository(), $this->recorder() ) )->register( $this->loader );
+		( new PluginLinks() )->register( $this->loader );
 	}
 }

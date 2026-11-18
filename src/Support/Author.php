@@ -29,4 +29,18 @@ final class Author {
 	 * Smallest donation amount, in US dollars.
 	 */
 	public const MIN_DONATION = 1;
+
+	/**
+	 * Public repository (documentation and releases).
+	 */
+	public const REPOSITORY_URL = 'https://github.com/slightgrey/wp-activity-ledger';
+
+	/**
+	 * Returns the PayPal.Me link without an amount.
+	 *
+	 * @return string URL.
+	 */
+	public static function paypal_url(): string {
+		return 'https://paypal.me/' . self::PAYPAL_ME;
+	}
 }
