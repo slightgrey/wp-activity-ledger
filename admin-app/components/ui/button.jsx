@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
@@ -25,7 +26,12 @@ const buttonVariants = cva(
   }
 );
 
-export function Button({ className, variant, size, asChild = false, ...props }) {
+/**
+ * A button. Forwards its ref: Radix triggers (popover, dropdown, dialog) render it with
+ * `asChild` and need the element to position their content and detect outside clicks.
+ */
+export const Button = forwardRef(function Button({ className, variant, size, asChild = false, ...props }, ref) {
   const Comp = asChild ? Slot : 'button';
-  return <Comp className={cn(buttonVariants({ variant, size, className }))} {...props} />;
-}
+
+  return <Comp ref={ref} className={cn(buttonVariants({ variant, size, className }))} {...props} />;
+});

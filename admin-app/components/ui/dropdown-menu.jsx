@@ -11,7 +11,7 @@ export function DropdownMenuContent({ className, sideOffset = 4, ...props }) {
     <DropdownPrimitive.Portal container={portalContainer()}>
       <DropdownPrimitive.Content
         sideOffset={sideOffset}
-        className={cn('z-[100000] min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md', className)}
+        className={cn('z-[100010] min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md', className)}
         {...props}
       />
     </DropdownPrimitive.Portal>

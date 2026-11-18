@@ -41,7 +41,7 @@ export function Toaster({ children }) {
             </ToastPrimitive.Close>
           </ToastPrimitive.Root>
         ))}
-        <ToastPrimitive.Viewport className="fixed bottom-4 right-4 z-[100002] flex w-[360px] max-w-[100vw] flex-col gap-2" />
+        <ToastPrimitive.Viewport className="fixed bottom-4 right-4 z-[100020] flex w-[360px] max-w-[100vw] flex-col gap-2" />
       </ToastPrimitive.Provider>
     </ToastContext.Provider>
   );
