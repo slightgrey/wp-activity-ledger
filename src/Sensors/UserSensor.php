@@ -203,7 +203,7 @@ final class UserSensor implements SensorInterface {
 		$user = get_userdata( (int) $user_id );
 
 		if ( false !== $user ) {
-			$this->record( 'user.super_admin_granted', $user );
+			$this->record( 'user.super_admin_granted', $user, array( 'network' => true ) );
 		}
 	}
 
@@ -218,7 +218,7 @@ final class UserSensor implements SensorInterface {
 		$user = get_userdata( (int) $user_id );
 
 		if ( false !== $user ) {
-			$this->record( 'user.super_admin_revoked', $user );
+			$this->record( 'user.super_admin_revoked', $user, array( 'network' => true ) );
 		}
 	}
 

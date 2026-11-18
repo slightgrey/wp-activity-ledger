@@ -85,6 +85,8 @@ final class ThemeSensorTest extends IntegrationTestCase {
 	 * @return void
 	 */
 	public function test_file_editor(): void {
+		$this->single_site_only( 'On multisite only super admins can edit theme files.' );
+
 		$this->as_user( 'administrator' );
 		$start = self::max_event_id();
 

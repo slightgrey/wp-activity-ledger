@@ -125,6 +125,8 @@ final class UserSensorTest extends IntegrationTestCase {
 	 * @return void
 	 */
 	public function test_delete_with_reassign(): void {
+		$this->single_site_only( 'On multisite wp_delete_user() only removes the user from the site.' );
+
 		require_once ABSPATH . 'wp-admin/includes/user.php';
 
 		$actor   = $this->as_user( 'administrator' );

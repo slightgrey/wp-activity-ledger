@@ -37,6 +37,8 @@ final class AutoUpdateSensorTest extends IntegrationTestCase {
 	 * @return void
 	 */
 	public function test_plugin_toggle(): void {
+		$this->requires_hello_dolly();
+
 		$this->as_user( 'administrator' );
 		$start  = self::max_event_id();
 		$before = (array) get_site_option( 'auto_update_plugins', array() );

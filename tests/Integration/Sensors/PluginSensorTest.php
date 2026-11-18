@@ -45,6 +45,8 @@ final class PluginSensorTest extends IntegrationTestCase {
 	 * @return void
 	 */
 	public function test_activate_deactivate_delete(): void {
+		$this->requires_hello_dolly();
+
 		$this->as_user( 'administrator' );
 		$version = get_plugin_data( WP_PLUGIN_DIR . '/hello.php', false, false )['Version'];
 		$start   = self::max_event_id();

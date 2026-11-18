@@ -48,6 +48,8 @@ final class UpgraderSensorTest extends IntegrationTestCase {
 	 * @return void
 	 */
 	public function test_plugin_install_from_upload(): void {
+		$this->requires_hello_dolly();
+
 		$this->as_user( 'administrator' );
 
 		// A real Plugin_Upgrader (other plugins listen on the hook and type-check it), with the
@@ -84,6 +86,8 @@ final class UpgraderSensorTest extends IntegrationTestCase {
 	 * @return void
 	 */
 	public function test_bulk_plugin_update(): void {
+		$this->requires_hello_dolly();
+
 		$this->as_user( 'administrator' );
 		$version = get_plugin_data( WP_PLUGIN_DIR . '/hello.php', false, false )['Version'];
 

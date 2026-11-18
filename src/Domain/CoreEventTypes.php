@@ -44,6 +44,7 @@ final class CoreEventTypes {
 			self::taxonomies_and_menus(),
 			self::software(),
 			self::settings_and_tools(),
+			self::multisite(),
 			self::system()
 		);
 	}
@@ -197,6 +198,27 @@ final class CoreEventTypes {
 			array( 'core.import_run', $c, Severity::Notice, __( 'Content imported', 'wp-activity-ledger' ), __( 'Imported content', 'wp-activity-ledger' ) ),
 			array( 'core.privacy_export', $c, Severity::Notice, __( 'Personal data exported', 'wp-activity-ledger' ), __( 'Exported personal data for {object}', 'wp-activity-ledger' ) ),
 			array( 'core.privacy_erase', $c, Severity::Warning, __( 'Personal data erased', 'wp-activity-ledger' ), __( 'Erased personal data for {object}', 'wp-activity-ledger' ) ),
+		);
+	}
+
+	/**
+	 * Network (multisite) types. Stored in the main site's log.
+	 *
+	 * @return array<int, array{0: string, 1: Category, 2: Severity, 3: string, 4: string}> Definitions.
+	 */
+	private static function multisite(): array {
+		$c = Category::Multisite;
+
+		return array(
+			array( 'multisite.site_created', $c, Severity::Notice, __( 'Site created', 'wp-activity-ledger' ), __( 'Created site "{object}"', 'wp-activity-ledger' ) ),
+			array( 'multisite.site_deleted', $c, Severity::Warning, __( 'Site deleted', 'wp-activity-ledger' ), __( 'Deleted site "{object}"', 'wp-activity-ledger' ) ),
+			array( 'multisite.site_archived', $c, Severity::Notice, __( 'Site archived', 'wp-activity-ledger' ), __( 'Archived site "{object}"', 'wp-activity-ledger' ) ),
+			array( 'multisite.site_unarchived', $c, Severity::Notice, __( 'Site unarchived', 'wp-activity-ledger' ), __( 'Unarchived site "{object}"', 'wp-activity-ledger' ) ),
+			array( 'multisite.site_spammed', $c, Severity::Warning, __( 'Site marked as spam', 'wp-activity-ledger' ), __( 'Marked site "{object}" as spam', 'wp-activity-ledger' ) ),
+			array( 'multisite.site_unspammed', $c, Severity::Notice, __( 'Site unmarked as spam', 'wp-activity-ledger' ), __( 'Unmarked site "{object}" as spam', 'wp-activity-ledger' ) ),
+			array( 'multisite.site_deactivated', $c, Severity::Warning, __( 'Site deactivated', 'wp-activity-ledger' ), __( 'Deactivated site "{object}"', 'wp-activity-ledger' ) ),
+			array( 'multisite.site_activated', $c, Severity::Notice, __( 'Site activated', 'wp-activity-ledger' ), __( 'Activated site "{object}"', 'wp-activity-ledger' ) ),
+			array( 'multisite.network_settings_changed', $c, Severity::Notice, __( 'Network settings changed', 'wp-activity-ledger' ), __( 'Changed {count} network setting(s)', 'wp-activity-ledger' ) ),
 		);
 	}
 

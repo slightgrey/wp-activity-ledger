@@ -36,7 +36,7 @@ final class SessionsControllerTest extends RestTestCase {
 		$this->as_user( 'editor' );
 		$this->assertSame( 403, self::request( 'GET', "/users/$target/sessions" )->get_status() );
 
-		$this->as_user( 'administrator' );
+		$this->as_admin();
 		$sessions = self::request( 'GET', "/users/$target/sessions" )->get_data();
 		$this->assertCount( 2, $sessions );
 		$this->assertSame( substr( $sessions[0]['verifier'], 0, 16 ), $sessions[0]['session_hash'] );
@@ -72,8 +72,21 @@ final class SessionsControllerTest extends RestTestCase {
 	 * @return void
 	 */
 	public function test_unknown_user(): void {
-		$this->as_user( 'administrator' );
+		$this->as_admin();
 
 		$this->assertSame( 404, self::request( 'GET', '/users/999999999/sessions' )->get_status() );
+	}
+
+	/**
+	 * Acts as an administrator; on multisite a super admin (only they may manage other users).
+	 *
+	 * @return void
+	 */
+	private function as_admin(): void {
+		$user = $this->as_user( 'administrator' );
+
+		if ( is_multisite() ) {
+			grant_super_admin( $user->ID );
+		}
 	}
 }

@@ -40,9 +40,14 @@ final class Activator {
 	 * @return void
 	 */
 	public static function activate( bool $network_wide = false ): void {
-		unset( $network_wide ); // Network-wide activation is added with multisite support.
-
 		self::check_requirements();
+
+		if ( $network_wide && is_multisite() ) {
+			Network::activate_all();
+
+			return;
+		}
+
 		self::activate_site();
 	}
 

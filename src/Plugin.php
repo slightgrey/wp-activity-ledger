@@ -31,6 +31,7 @@ use WPActivityLedger\Admin\Assets;
 use WPActivityLedger\Admin\DashboardWidget;
 use WPActivityLedger\Admin\ExportHandler;
 use WPActivityLedger\Admin\Menu;
+use WPActivityLedger\Lifecycle\Network;
 use WPActivityLedger\Maintenance\Pruner;
 use WPActivityLedger\Privacy\PrivacyTools;
 use WPActivityLedger\Security\Capabilities;
@@ -41,6 +42,7 @@ use WPActivityLedger\Sensors\CustomizerSensor;
 use WPActivityLedger\Sensors\MediaSensor;
 use WPActivityLedger\Sensors\MenuSensor;
 use WPActivityLedger\Sensors\MetaWatcher;
+use WPActivityLedger\Sensors\MultisiteSensor;
 use WPActivityLedger\Sensors\OptionFilter;
 use WPActivityLedger\Sensors\OptionSensor;
 use WPActivityLedger\Sensors\PluginSensor;
@@ -363,6 +365,7 @@ final class Plugin {
 			'options'    => new OptionSensor( $this->recorder(), $this->differ(), $noise ),
 			'tools'      => new ToolsSensor( $this->recorder() ),
 			'self'       => new SelfSensor( $this->recorder(), $this->differ() ),
+			'multisite'  => new MultisiteSensor( $this->recorder(), $this->differ(), $noise ),
 		);
 
 		return $this->sensors;
@@ -389,6 +392,7 @@ final class Plugin {
 		( new SensorRegistry( $this->core_sensors() ) )->register( $this->loader );
 		$this->integrations()->load( $this->loader, $this->types() );
 		( new Routes( $this ) )->register( $this->loader );
+		Network::register( $this->loader );
 		$this->dispatcher()->register( $this->loader );
 		$this->deliverer()->register( $this->loader );
 		( new Pruner( $this->repository(), $this->settings(), $this->recorder() ) )->register( $this->loader );

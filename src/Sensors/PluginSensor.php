@@ -62,7 +62,7 @@ final class PluginSensor implements SensorInterface {
 			return;
 		}
 
-		$this->record( 'plugin.activated', (string) $plugin, self::details( (string) $plugin ), array( 'network_wide' => (bool) $network_wide ) );
+		$this->record( 'plugin.activated', (string) $plugin, self::details( (string) $plugin ), self::network_context( (bool) $network_wide ) );
 	}
 
 	/**
@@ -78,7 +78,7 @@ final class PluginSensor implements SensorInterface {
 			return;
 		}
 
-		$this->record( 'plugin.deactivated', (string) $plugin, self::details( (string) $plugin ), array( 'network_wide' => (bool) $network_deactivating ) );
+		$this->record( 'plugin.deactivated', (string) $plugin, self::details( (string) $plugin ), self::network_context( (bool) $network_deactivating ) );
 	}
 
 	/**
@@ -108,6 +108,20 @@ final class PluginSensor implements SensorInterface {
 		if ( $deleted ) {
 			$this->record( 'plugin.deleted', (string) $plugin, $details );
 		}
+	}
+
+	/**
+	 * Returns the context of a (de)activation; network-wide ones go to the network log.
+	 *
+	 * @param bool $network_wide Whether it was network-wide.
+	 *
+	 * @return array<string, bool> Context.
+	 */
+	private static function network_context( bool $network_wide ): array {
+		return $network_wide ? array(
+			'network_wide' => true,
+			'network'      => true,
+		) : array( 'network_wide' => false );
 	}
 
 	/**

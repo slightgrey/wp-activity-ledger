@@ -127,7 +127,7 @@ final class Recorder {
 
 		$events       = array_map( array( $this, 'with_message' ), $this->buffer );
 		$this->buffer = array();
-		$stored       = $this->repository->insert_many( $events );
+		$stored       = $this->store( $events );
 
 		/**
 		 * Fires after a batch of events was stored (alerts listen here).
@@ -158,6 +158,44 @@ final class Recorder {
 	 */
 	private static function as_event( mixed $value ): ?Event {
 		return $value instanceof Event ? $value : null;
+	}
+
+	/**
+	 * Stores events; on multisite, network events (context "network") go to the main site's log.
+	 *
+	 * @param array<int, Event> $events Events.
+	 *
+	 * @return int Stored.
+	 */
+	private function store( array $events ): int {
+		$network = array_filter( $events, array( self::class, 'is_network' ) );
+
+		if ( array() === $network || ! is_multisite() || is_main_site() ) {
+			return $this->repository->insert_many( $events );
+		}
+
+		$stored = $this->repository->insert_many( array_values( array_diff_key( $events, $network ) ) );
+
+		switch_to_blog( get_main_site_id() );
+
+		try {
+			$stored += $this->repository->insert_many( array_values( $network ) );
+		} finally {
+			restore_current_blog();
+		}
+
+		return $stored;
+	}
+
+	/**
+	 * Tells whether an event belongs to the network log.
+	 *
+	 * @param Event $event Event.
+	 *
+	 * @return bool True for network events.
+	 */
+	private static function is_network( Event $event ): bool {
+		return ! empty( $event->context['network'] );
 	}
 
 	/**

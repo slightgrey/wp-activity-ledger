@@ -64,6 +64,30 @@ abstract class IntegrationTestCase extends TestCase {
 	}
 
 	/**
+	 * Skips the test when Hello Dolly (used as a sample plugin) is not installed.
+	 *
+	 * @return void
+	 */
+	protected function requires_hello_dolly(): void {
+		if ( ! file_exists( WP_PLUGIN_DIR . '/hello.php' ) ) {
+			$this->markTestSkipped( 'Hello Dolly is not installed.' );
+		}
+	}
+
+	/**
+	 * Skips the test on multisite, where WordPress behaves differently on purpose.
+	 *
+	 * @param string $reason Why.
+	 *
+	 * @return void
+	 */
+	protected function single_site_only( string $reason ): void {
+		if ( is_multisite() ) {
+			$this->markTestSkipped( $reason );
+		}
+	}
+
+	/**
 	 * Runs every sensor's and integration's end-of-request recording, then flushes.
 	 *
 	 * @return void
