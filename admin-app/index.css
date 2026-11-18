@@ -14,8 +14,9 @@
   --wpal-card-foreground: 222 47% 11%;
   --wpal-popover: 0 0% 100%;
   --wpal-popover-foreground: 222 47% 11%;
-  --wpal-primary: 221 83% 45%;
+  --wpal-primary: 222 47% 11%;
   --wpal-primary-foreground: 210 40% 98%;
+  --wpal-link: 222 47% 11%;
   --wpal-secondary: 210 40% 96%;
   --wpal-secondary-foreground: 222 47% 11%;
   --wpal-muted: 210 40% 96%;
@@ -26,7 +27,7 @@
   --wpal-destructive-foreground: 210 40% 98%;
   --wpal-border: 214 32% 88%;
   --wpal-input: 214 32% 85%;
-  --wpal-ring: 221 83% 45%;
+  --wpal-ring: 222 47% 11%;
   --wpal-radius: 0.5rem;
 
   display: block;
@@ -94,7 +95,21 @@
 }
 
 #wpal-root a {
-  color: hsl(var(--wpal-primary));
+  color: hsl(var(--wpal-link));
+  text-decoration: none;
+}
+
+/* Links share the text color, so hovering underlines them to show they are clickable. */
+#wpal-root a:hover,
+#wpal-root a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Cards and nav tabs that are links do not get the underline. */
+#wpal-root a.block:hover,
+#wpal-root nav a:hover,
+#wpal-root nav a:focus-visible {
   text-decoration: none;
 }
 

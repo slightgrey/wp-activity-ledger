@@ -1,7 +1,8 @@
 import { Suspense, lazy, useEffect } from 'react';
 import { HashRouter, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { config } from '@/lib/config';
-import { cn } from '@/lib/utils';
+import { Bell, BookOpenCheck, LayoutDashboard, Network, ScrollText, Settings as SettingsIcon, Users as UsersIcon } from 'lucide-react';
+import { segmentClass, segmentGroupClass } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import SiteSwitcher from '@/components/SiteSwitcher';
@@ -18,19 +19,19 @@ const Gallery = lazy(() => import('@/pages/Gallery'));
 const NetworkSettings = lazy(() => import('@/pages/NetworkSettings'));
 
 const SITE_SCREENS = [
-  { path: '/', label: __( 'Dashboard', 'wp-activity-ledger' ), cap: 'view', element: <Dashboard /> },
-  { path: '/log', label: __( 'Activity Log', 'wp-activity-ledger' ), cap: 'view', element: <ActivityLog /> },
-  { path: '/users', label: __( 'Users & Sessions', 'wp-activity-ledger' ), cap: 'view', element: <Users /> },
-  { path: '/alerts', label: __( 'Alerts', 'wp-activity-ledger' ), cap: 'manage_settings', element: <Alerts /> },
+  { path: '/', label: __( 'Dashboard', 'wp-activity-ledger' ), icon: LayoutDashboard, cap: 'view', element: <Dashboard /> },
+  { path: '/log', label: __( 'Activity Log', 'wp-activity-ledger' ), icon: ScrollText, cap: 'view', element: <ActivityLog /> },
+  { path: '/users', label: __( 'Users & Sessions', 'wp-activity-ledger' ), icon: UsersIcon, cap: 'view', element: <Users /> },
+  { path: '/alerts', label: __( 'Alerts', 'wp-activity-ledger' ), icon: Bell, cap: 'manage_settings', element: <Alerts /> },
   // Shown read-only to site admins while the network lock is on.
-  { path: '/settings', label: __( 'Settings', 'wp-activity-ledger' ), cap: config.settingsLocked ? 'manage_options' : 'manage_settings', element: <Settings /> },
+  { path: '/settings', label: __( 'Settings', 'wp-activity-ledger' ), icon: SettingsIcon, cap: config.settingsLocked ? 'manage_options' : 'manage_settings', element: <Settings /> },
 ];
 
 const NETWORK_SCREENS = [
-  { path: '/', label: __( 'Dashboard', 'wp-activity-ledger' ), cap: 'view', element: <Dashboard /> },
-  { path: '/log', label: __( 'Activity Log', 'wp-activity-ledger' ), cap: 'view', element: <ActivityLog /> },
-  { path: '/users', label: __( 'Users & Sessions', 'wp-activity-ledger' ), cap: 'view', element: <Users /> },
-  { path: '/network', label: __( 'Network Settings', 'wp-activity-ledger' ), cap: 'view', element: <NetworkSettings /> },
+  { path: '/', label: __( 'Dashboard', 'wp-activity-ledger' ), icon: LayoutDashboard, cap: 'view', element: <Dashboard /> },
+  { path: '/log', label: __( 'Activity Log', 'wp-activity-ledger' ), icon: ScrollText, cap: 'view', element: <ActivityLog /> },
+  { path: '/users', label: __( 'Users & Sessions', 'wp-activity-ledger' ), icon: UsersIcon, cap: 'view', element: <Users /> },
+  { path: '/network', label: __( 'Network Settings', 'wp-activity-ledger' ), icon: Network, cap: 'view', element: <NetworkSettings /> },
 ];
 
 const SCREENS = config.network ? NETWORK_SCREENS : SITE_SCREENS;
@@ -66,22 +67,18 @@ function Layout() {
     <div className="space-y-4 pr-4">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <h2 className="text-xl font-semibold">{__( 'Activity Ledger', 'wp-activity-ledger' )}{config.network ? __( ' · Network', 'wp-activity-ledger' ) : ''}</h2>
+          <h2 className="flex items-center gap-2 text-xl font-semibold">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+              <BookOpenCheck className="h-4 w-4" aria-hidden="true" />
+            </span>
+            {__( 'Activity Ledger', 'wp-activity-ledger' )}{config.network ? __( ' · Network', 'wp-activity-ledger' ) : ''}
+          </h2>
           {config.network && location.pathname !== '/network' && <SiteSwitcher />}
         </div>
-        <nav className="flex flex-wrap gap-1 rounded-lg bg-muted p-1">
+        <nav className={segmentGroupClass}>
           {screens.map((screen) => (
-            <NavLink
-              key={screen.path}
-              to={screen.path}
-              end={screen.path === '/'}
-              className={({ isActive }) =>
-                cn(
-                  'rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground',
-                  isActive && 'bg-background text-foreground shadow-sm'
-                )
-              }
-            >
+            <NavLink key={screen.path} to={screen.path} end={screen.path === '/'} className={({ isActive }) => segmentClass(isActive)}>
+              <screen.icon className="h-4 w-4" aria-hidden="true" />
               {screen.label}
             </NavLink>
           ))}
