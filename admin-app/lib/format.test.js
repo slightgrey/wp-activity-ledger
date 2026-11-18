@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { categoryLabel, formatDateTime, localToUtc, relativeTime, severity, siteDate, typeLabel } from './format.js';
-import { buildUrl } from './api.js';
+import { buildUrl, toQuery } from './api.js';
 
 describe('formatDateTime', () => {
   it('converts UTC to an IANA timezone, including DST', () => {
@@ -62,6 +62,12 @@ describe('buildUrl', () => {
   it('builds pretty-permalink URLs with array params', () => {
     expect(buildUrl('http://x.test/wp-json/wpal/v1/', '/events', { type: ['a.b', 'c.d'], page: 2, search: '' })).toBe(
       'http://x.test/wp-json/wpal/v1/events?type%5B%5D=a.b&type%5B%5D=c.d&page=2'
+    );
+  });
+
+  it('builds query strings for admin-post exports', () => {
+    expect(toQuery({ action: 'wpal_export', user: ['3'], from: '2026-01-01 00:00:00', search: '' })).toBe(
+      'action=wpal_export&user%5B%5D=3&from=2026-01-01+00%3A00%3A00'
     );
   });
 

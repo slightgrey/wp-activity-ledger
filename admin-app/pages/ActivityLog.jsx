@@ -1,13 +1,14 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ChevronLeft, ChevronRight, Columns3, ExternalLink, Inbox } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Columns3, Download, ExternalLink, Inbox } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -22,7 +23,7 @@ import EventDrawer from '@/components/EventDrawer';
 import FilterBar from '@/components/FilterBar';
 import { useEvents } from '@/hooks/useEvents';
 import { useMeta } from '@/hooks/useMeta';
-import { api } from '@/lib/api';
+import { api, toQuery } from '@/lib/api';
 import { config } from '@/lib/config';
 import { EMPTY, parseFilters, serializeFilters, toApiQuery } from '@/lib/filters';
 import { categoryLabel, formatDateTime, relativeTime, severity, typeLabel } from '@/lib/format';
@@ -148,6 +149,34 @@ function ColumnMenu({ columns, onChange }) {
 }
 
 /**
+ * Downloads the filtered log (all pages) as CSV or JSON through admin-post.php.
+ */
+function ExportMenu({ query }) {
+  const download = (format) => {
+    const filters = Object.fromEntries(Object.entries(query).filter(([key]) => !['page', 'per_page', 'orderby', 'order'].includes(key)));
+
+    window.location.href = `${config.exportUrl}?${toQuery({ action: 'wpal_export', _wpnonce: config.exportNonce, format, ...filters })}`;
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm">
+          <Download className="h-4 w-4" />
+          Export
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Export these events</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={() => download('csv')}>CSV (spreadsheet)</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => download('json')}>JSON</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+/**
  * Saves UI prefs and updates the cached /meta.
  */
 function useSavePrefs() {
@@ -222,6 +251,7 @@ export default function ActivityLog({ fixed = null }) {
             </Label>
           </div>
           <ColumnMenu columns={columns} onChange={(next) => savePrefs.mutate({ columns: next })} />
+          {config.caps.export && <ExportMenu query={query} />}
         </div>
       </div>
 

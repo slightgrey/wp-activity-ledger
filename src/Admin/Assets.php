@@ -128,17 +128,19 @@ final class Assets {
 	 */
 	public static function config(): array {
 		return array(
-			'restUrl'    => esc_url_raw( rest_url( BaseController::NAMESPACE . '/' ) ),
-			'nonce'      => wp_create_nonce( 'wp_rest' ),
-			'nonceUrl'   => admin_url( 'admin-ajax.php?action=rest-nonce' ),
-			'adminUrl'   => admin_url(),
-			'pageUrl'    => admin_url( 'admin.php?page=' . Menu::SLUG ),
-			'timezone'   => wp_timezone_string(),
-			'dateFormat' => (string) get_option( 'date_format' ),
-			'timeFormat' => (string) get_option( 'time_format' ),
-			'version'    => WPAL_VERSION,
-			'userId'     => get_current_user_id(),
-			'caps'       => array(
+			'restUrl'     => esc_url_raw( rest_url( BaseController::NAMESPACE . '/' ) ),
+			'nonce'       => wp_create_nonce( 'wp_rest' ),
+			'nonceUrl'    => admin_url( 'admin-ajax.php?action=rest-nonce' ),
+			'adminUrl'    => admin_url(),
+			'pageUrl'     => admin_url( 'admin.php?page=' . Menu::SLUG ),
+			'timezone'    => wp_timezone_string(),
+			'dateFormat'  => (string) get_option( 'date_format' ),
+			'timeFormat'  => (string) get_option( 'time_format' ),
+			'version'     => WPAL_VERSION,
+			'exportUrl'   => admin_url( 'admin-post.php' ),
+			'exportNonce' => wp_create_nonce( ExportHandler::ACTION ),
+			'userId'      => get_current_user_id(),
+			'caps'        => array(
 				'view'            => current_user_can( Capabilities::VIEW ), // phpcs:ignore WordPress.WP.Capabilities.Undetermined -- Plugin capabilities.
 				'export'          => current_user_can( Capabilities::EXPORT ), // phpcs:ignore WordPress.WP.Capabilities.Undetermined
 				'manage_settings' => current_user_can( Capabilities::MANAGE_SETTINGS ), // phpcs:ignore WordPress.WP.Capabilities.Undetermined

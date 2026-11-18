@@ -22,14 +22,12 @@ export class ApiError extends Error {
 }
 
 /**
- * Builds a REST URL for a route below the plugin namespace, for pretty and plain permalinks.
+ * Builds a query string; arrays become `key[]=a&key[]=b`, empty values are left out.
  *
- * @param {string} restUrl Namespace URL, e.g. ".../wp-json/wpal/v1/" or ".../?rest_route=/wpal/v1/".
- * @param {string} path    Route, e.g. "/events".
- * @param {object} query   Query parameters; arrays become `key[]=a&key[]=b`.
- * @returns {string} URL.
+ * @param {object} query Parameters.
+ * @returns {string} Query string (without "?").
  */
-export function buildUrl(restUrl, path, query = {}) {
+export function toQuery(query = {}) {
   const params = new URLSearchParams();
 
   for (const [key, value] of Object.entries(query)) {
@@ -42,8 +40,20 @@ export function buildUrl(restUrl, path, query = {}) {
     }
   }
 
+  return params.toString();
+}
+
+/**
+ * Builds a REST URL for a route below the plugin namespace, for pretty and plain permalinks.
+ *
+ * @param {string} restUrl Namespace URL, e.g. ".../wp-json/wpal/v1/" or ".../?rest_route=/wpal/v1/".
+ * @param {string} path    Route, e.g. "/events".
+ * @param {object} query   Query parameters; arrays become `key[]=a&key[]=b`.
+ * @returns {string} URL.
+ */
+export function buildUrl(restUrl, path, query = {}) {
   const route = path.replace(/^\/+/, '');
-  const qs = params.toString();
+  const qs = toQuery(query);
 
   if (restUrl.includes('rest_route=')) {
     return `${restUrl}${route}${qs ? `&${qs}` : ''}`;
