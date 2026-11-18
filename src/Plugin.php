@@ -32,6 +32,7 @@ use WPActivityLedger\Admin\DashboardWidget;
 use WPActivityLedger\Admin\ExportHandler;
 use WPActivityLedger\Admin\Menu;
 use WPActivityLedger\Cli\Command;
+use WPActivityLedger\Update\Updater;
 use WPActivityLedger\Lifecycle\Network;
 use WPActivityLedger\Maintenance\Pruner;
 use WPActivityLedger\Privacy\PrivacyTools;
@@ -400,6 +401,7 @@ final class Plugin {
 		( new PrivacyTools( $this->repository() ) )->register( $this->loader );
 		$this->register_admin();
 		Command::register();
+		$this->register_updater();
 
 		if ( is_multisite() ) {
 			$this->loader->add_action( 'switch_blog', array( $this, 'on_switch_blog' ), 10, 2 );
@@ -413,6 +415,24 @@ final class Plugin {
 		do_action( 'wpal_register', $this->loader );
 
 		$this->loader->run();
+	}
+
+	/**
+	 * Registers the GitHub release updater (not admin-only: WordPress also checks from cron).
+	 * The updater is built on first use, so the plugin header is only read when needed.
+	 *
+	 * @return void
+	 */
+	private function register_updater(): void {
+		$updater = null;
+		$get     = static function () use ( &$updater ): ?Updater {
+			$updater ??= Updater::create() ?? false;
+
+			return $updater instanceof Updater ? $updater : null;
+		};
+
+		$this->loader->add_filter( 'update_plugins_github.com', static fn( $update, $data, $file ) => null === $get() ? $update : $get()->check_update( $update, (array) $data, (string) $file ), 10, 3 );
+		$this->loader->add_filter( 'plugins_api', static fn( $result, $action, $args ) => null === $get() ? $result : $get()->plugin_info( $result, (string) $action, $args ), 20, 3 );
 	}
 
 	/**
