@@ -14,7 +14,6 @@ use WPActivityLedger\Domain\Category;
 use WPActivityLedger\Domain\Event;
 use WPActivityLedger\Domain\EventTypeRegistry;
 use WPActivityLedger\Domain\Severity;
-use WPActivityLedger\Loader;
 
 /**
  * After each flush (and for each folded repeat), checks the events against the active
@@ -55,19 +54,6 @@ final class Dispatcher {
 		private readonly EventTypeRegistry $types,
 		private readonly Deliverer $deliverer
 	) {
-	}
-
-	/**
-	 * Queues the hooks.
-	 *
-	 * @param Loader $loader Hook loader.
-	 *
-	 * @return void
-	 */
-	public function register( Loader $loader ): void {
-		$loader->add_action( 'wpal_events_flushed', array( $this, 'on_flushed' ), 10, 1 );
-		$loader->add_action( 'wpal_event_repeated', array( $this, 'on_repeated' ), 10, 1 );
-		$loader->add_action( 'update_option_' . RuleStore::OPTION, array( $this, 'forget_rules' ), 10, 0 );
 	}
 
 	/**

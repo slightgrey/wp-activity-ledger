@@ -16,7 +16,6 @@ use WPActivityLedger\Alerts\Formatters\SlackFormatter;
 use WPActivityLedger\Alerts\Formatters\TeamsFormatter;
 use WPActivityLedger\Alerts\Formatters\WebhookFormatter;
 use WPActivityLedger\Domain\Event;
-use WPActivityLedger\Loader;
 use WPActivityLedger\Recording\Recorder;
 
 /**
@@ -55,17 +54,6 @@ final class Deliverer {
 		private readonly ChannelStore $channels,
 		private readonly Recorder $recorder
 	) {
-	}
-
-	/**
-	 * Queues the hook.
-	 *
-	 * @param Loader $loader Hook loader.
-	 *
-	 * @return void
-	 */
-	public function register( Loader $loader ): void {
-		$loader->add_action( Queue::HOOK, array( $this, 'deliver' ), 10, 1 );
 	}
 
 	/**

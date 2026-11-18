@@ -11,7 +11,6 @@ namespace WPActivityLedger\Maintenance;
 
 use WPActivityLedger\Database\EventRepository;
 use WPActivityLedger\Domain\Event;
-use WPActivityLedger\Loader;
 use WPActivityLedger\Recording\Recorder;
 use WPActivityLedger\Settings\Settings;
 
@@ -52,19 +51,6 @@ final class Pruner {
 		private readonly Settings $settings,
 		private readonly Recorder $recorder
 	) {
-	}
-
-	/**
-	 * Queues the hooks.
-	 *
-	 * @param Loader $loader Hook loader.
-	 *
-	 * @return void
-	 */
-	public function register( Loader $loader ): void {
-		$loader->add_action( self::HOOK, array( $this, 'run' ), 10, 0 );
-		$loader->add_action( self::CONTINUE_HOOK, array( $this, 'run' ), 10, 0 );
-		$loader->add_action( 'init', array( self::class, 'schedule' ), 20, 0 );
 	}
 
 	/**

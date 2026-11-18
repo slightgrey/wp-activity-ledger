@@ -396,12 +396,23 @@ final class Plugin {
 		$this->integrations()->load( $this->loader, $this->types() );
 		( new Routes( $this ) )->register( $this->loader );
 		Network::register( $this->loader );
-		$this->dispatcher()->register( $this->loader );
-		$this->deliverer()->register( $this->loader );
-		( new Pruner( $this->repository(), $this->settings(), $this->recorder() ) )->register( $this->loader );
-		( new PrivacyTools( $this->repository() ) )->register( $this->loader );
-		$this->register_admin();
-		Command::register();
+		$this->register_alerts();
+		$this->register_maintenance();
+
+		// Exporters/erasers can be run outside wp-admin too; the class loads when they run.
+		$privacy = fn(): PrivacyTools => new PrivacyTools( $this->repository() );
+		$this->loader->add_filter( 'wp_privacy_personal_data_exporters', fn( $exporters ) => $privacy()->add_exporter( $exporters ), 10, 1 );
+		$this->loader->add_filter( 'wp_privacy_personal_data_erasers', fn( $erasers ) => $privacy()->add_eraser( $erasers ), 10, 1 );
+
+		if ( is_admin() ) {
+			$this->loader->add_action( 'admin_init', fn() => $privacy()->add_policy_text(), 10, 0 );
+			$this->register_admin();
+		}
+
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			Command::register();
+		}
+
 		$this->register_updater();
 
 		if ( is_multisite() ) {
@@ -426,6 +437,35 @@ final class Plugin {
 	 */
 	public static function load_textdomain(): void {
 		load_plugin_textdomain( 'wp-activity-ledger', false, dirname( plugin_basename( WPAL_FILE ) ) . '/languages' );
+	}
+
+	/**
+	 * Queues the alert hooks. The alert services are built on first use: most requests store
+	 * no events, so they never load them.
+	 *
+	 * @return void
+	 */
+	private function register_alerts(): void {
+		$this->loader->add_action( 'wpal_events_flushed', fn( $events = array() ) => $this->dispatcher()->on_flushed( $events ), 10, 1 );
+		$this->loader->add_action( 'wpal_event_repeated', fn( $event = null ) => $this->dispatcher()->on_repeated( $event ), 10, 1 );
+		$this->loader->add_action( 'update_option_wpal_alert_rules', fn() => $this->dispatcher?->forget_rules(), 10, 0 );
+		$this->loader->add_action( 'wpal_deliver_alert', fn( $job = null ) => $this->deliverer()->deliver( $job ), 10, 1 );
+	}
+
+	/**
+	 * Queues the retention hooks; the daily event is repaired in wp-admin and cron requests.
+	 *
+	 * @return void
+	 */
+	private function register_maintenance(): void {
+		$run = fn() => ( new Pruner( $this->repository(), $this->settings(), $this->recorder() ) )->run();
+
+		$this->loader->add_action( 'wpal_daily_maintenance', $run, 10, 0 );
+		$this->loader->add_action( 'wpal_maintenance_continue', $run, 10, 0 );
+
+		if ( is_admin() || wp_doing_cron() ) {
+			$this->loader->add_action( 'init', array( Pruner::class, 'schedule' ), 20, 0 );
+		}
 	}
 
 	/**

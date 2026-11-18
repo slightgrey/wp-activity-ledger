@@ -67,6 +67,12 @@ final class Installer {
 	 * @return void
 	 */
 	public static function error_notice(): void {
+		// A failed install deletes the (autoloaded) version, so a current version means no
+		// error: this skips a database query on every admin page.
+		if ( Schema::VERSION === get_option( Schema::VERSION_OPTION ) ) {
+			return;
+		}
+
 		$error = get_option( self::ERROR_OPTION );
 
 		if ( ! is_string( $error ) || '' === $error || ! current_user_can( 'activate_plugins' ) ) {

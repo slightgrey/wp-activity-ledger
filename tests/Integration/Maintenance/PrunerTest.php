@@ -103,7 +103,14 @@ final class PrunerTest extends IntegrationTestCase {
 	 */
 	public function test_row_limit_and_disabled(): void {
 		$repository = Plugin::instance()->repository();
-		$total      = $repository->count();
+
+		// At least a dozen rows, whatever the log held before.
+		for ( $i = 1; $i <= 12; $i++ ) {
+			Plugin::instance()->recorder()->record( new Event( 'post.updated', object_type: 'post', object_id: (string) $i ) );
+		}
+
+		Plugin::instance()->recorder()->flush();
+		$total = $repository->count();
 
 		$this->assertSame(
 			array(
