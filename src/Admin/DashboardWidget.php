@@ -11,6 +11,7 @@ namespace WPActivityLedger\Admin;
 
 use WPActivityLedger\Database\EventRepository;
 use WPActivityLedger\Loader;
+use WPActivityLedger\Rest\UiPrefs;
 use WPActivityLedger\Security\Capabilities;
 use WPActivityLedger\Settings\Settings;
 
@@ -73,13 +74,21 @@ final class DashboardWidget {
 	 * @return void
 	 */
 	public function render(): void {
+		// Follows the viewer's "Show system events" choice in the admin app.
+		$hide   = ! UiPrefs::get( get_current_user_id() )['show_system'];
 		$day    = $this->repository->query(
 			array(
-				'from'     => gmdate( 'Y-m-d H:i:s', time() - DAY_IN_SECONDS ),
-				'per_page' => self::LIMIT,
+				'from'        => gmdate( 'Y-m-d H:i:s', time() - DAY_IN_SECONDS ),
+				'per_page'    => self::LIMIT,
+				'hide_system' => $hide,
 			)
 		);
-		$latest = $this->repository->query( array( 'per_page' => self::LIMIT ) )['items'];
+		$latest = $this->repository->query(
+			array(
+				'per_page'    => self::LIMIT,
+				'hide_system' => $hide,
+			)
+		)['items'];
 
 		echo '<p class="wpal-widget-count">';
 		/* translators: %s: number of events. */

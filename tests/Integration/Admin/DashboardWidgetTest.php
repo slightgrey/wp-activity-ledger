@@ -10,8 +10,10 @@ declare( strict_types=1 );
 namespace WPActivityLedger\Tests\Integration\Admin;
 
 use WPActivityLedger\Admin\DashboardWidget;
+use WPActivityLedger\Database\EventRepository;
 use WPActivityLedger\Domain\Event;
 use WPActivityLedger\Plugin;
+use WPActivityLedger\Rest\UiPrefs;
 use WPActivityLedger\Settings\Settings;
 use WPActivityLedger\Tests\Integration\IntegrationTestCase;
 
@@ -89,6 +91,29 @@ final class DashboardWidgetTest extends IntegrationTestCase {
 		$this->assertMatchesRegularExpression( '/\d+ events? in the last 24 hours/', $html );
 		$this->assertStringContainsString( 'page=wp-activity-ledger#/log', $html );
 		$this->assertStringContainsString( '<li', $html );
+	}
+
+	/**
+	 * Routine System events are left out unless the viewer turned on "Show system events".
+	 *
+	 * @return void
+	 */
+	public function test_follows_show_system_pref(): void {
+		$admin  = $this->as_user( 'administrator' );
+		$marker = 'Routine system event ' . wp_generate_password( 6, false );
+		( new EventRepository() )->insert_many( array( new Event( 'media.uploaded', category: 'media', severity: 0, message: $marker, created_at: gmdate( 'Y-m-d H:i:s', time() + 60 ) ) ) );
+
+		$render = static function (): string {
+			ob_start();
+			self::widget()->render();
+
+			return (string) ob_get_clean();
+		};
+
+		$this->assertStringNotContainsString( $marker, $render() );
+
+		UiPrefs::save( $admin->ID, array( 'show_system' => true ) );
+		$this->assertStringContainsString( $marker, $render() );
 	}
 
 	/**

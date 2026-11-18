@@ -16,7 +16,8 @@ An audit log for WordPress. It records who did what, when and from where, with f
   - Network activity on multisite.
 - **Field-level diffs:** each change stores the old and new value. Long text gets a line diff and arrays a tree view. Passwords, keys and tokens are stored as `[redacted]`.
 - **Activity log:** filters (date range, user, role, category, event type, severity, object, IP, session, text) kept in the URL so views can be shared. A detail drawer, per-user column choice, and a 30-second auto-refresh.
-- **Dashboard:** headline numbers, events over time by category (with a table view), top users and events, recent critical events, and a widget on Dashboard → Home.
+- **System events:** routine events with no logged-in user (cron, WP-CLI, remote site managers) are hidden by default in the log, the dashboard and exports. System warnings and critical events (failed logins, purges) always show. Each user can turn on "Show system events", or pick "System" in the user filter to see them all.
+- **Dashboard:** headline numbers, events over time by category (with a table view), top users and events, recent critical events that open in the detail drawer, and a widget on Dashboard → Home.
 - **Users & sessions:** activity per user, active sessions with "Log out" and "Log out everywhere".
 - **Alerts:** rules (event types, categories, severity, roles, "N times in M minutes per IP or user", cooldown) sent to email, signed webhooks, Slack, Discord or Microsoft Teams, in the background with retries. Seven built-in templates (new administrator, brute force, plugin changes…) ship switched off.
 - **Export:** CSV or JSON of the current filters, streamed, any size.
