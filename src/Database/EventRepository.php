@@ -252,6 +252,25 @@ final class EventRepository {
 	}
 
 	/**
+	 * Anonymises the actor fields of a user's events (privacy erasure): the login becomes
+	 * "deleted-user-#ID", IP address and user agent are blanked. The rows are kept.
+	 *
+	 * @param int $user_id User ID.
+	 *
+	 * @return int Rows changed.
+	 */
+	public function anonymize_user( int $user_id ): int {
+		return (int) $this->db->query(
+			$this->db->prepare(
+				'UPDATE ' . Schema::events_table() . " SET user_login = %s, ip = '', user_agent = '' WHERE user_id = %d AND ( user_login <> %s OR ip <> '' OR user_agent <> '' )",
+				'deleted-user-#' . $user_id,
+				$user_id,
+				'deleted-user-#' . $user_id
+			)
+		);
+	}
+
+	/**
 	 * Returns the total number of stored events.
 	 *
 	 * @return int Count.

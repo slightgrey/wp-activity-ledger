@@ -32,6 +32,7 @@ use WPActivityLedger\Admin\DashboardWidget;
 use WPActivityLedger\Admin\ExportHandler;
 use WPActivityLedger\Admin\Menu;
 use WPActivityLedger\Maintenance\Pruner;
+use WPActivityLedger\Privacy\PrivacyTools;
 use WPActivityLedger\Security\Capabilities;
 use WPActivityLedger\Sensors\AuthSensor;
 use WPActivityLedger\Sensors\AutoUpdateSensor;
@@ -391,6 +392,7 @@ final class Plugin {
 		$this->dispatcher()->register( $this->loader );
 		$this->deliverer()->register( $this->loader );
 		( new Pruner( $this->repository(), $this->settings(), $this->recorder() ) )->register( $this->loader );
+		( new PrivacyTools( $this->repository() ) )->register( $this->loader );
 		$this->register_admin();
 
 		/**
