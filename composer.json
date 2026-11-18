@@ -1,7 +1,7 @@
 {
   "name": "slightgrey/wp-activity-ledger",
   "description": "Records every meaningful action on a WordPress site, with field-level diffs, alerts, export and a React admin.",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
   "require": {
