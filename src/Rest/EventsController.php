@@ -45,9 +45,9 @@ final class EventsController extends BaseController {
 			'/' . $this->rest_base,
 			array(
 				'methods'             => \WP_REST_Server::READABLE,
-				'callback'            => array( $this, 'get_items' ),
+				'callback'            => fn( \WP_REST_Request $request ) => self::in_site( $request, fn() => $this->get_items( $request ) ),
 				'permission_callback' => self::permission( Capabilities::VIEW ),
-				'args'                => self::filter_args(),
+				'args'                => array_merge( self::filter_args(), array( 'site_id' => self::site_arg() ) ),
 			)
 		);
 
@@ -56,13 +56,14 @@ final class EventsController extends BaseController {
 			'/' . $this->rest_base . '/(?P<id>\d+)',
 			array(
 				'methods'             => \WP_REST_Server::READABLE,
-				'callback'            => array( $this, 'get_item' ),
+				'callback'            => fn( \WP_REST_Request $request ) => self::in_site( $request, fn() => $this->get_item( $request ) ),
 				'permission_callback' => self::permission( Capabilities::VIEW ),
 				'args'                => array(
-					'id' => array(
+					'id'      => array(
 						'type'    => 'integer',
 						'minimum' => 1,
 					),
+					'site_id' => self::site_arg(),
 				),
 			)
 		);

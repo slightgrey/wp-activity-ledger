@@ -41,7 +41,7 @@ final class SettingsController extends BaseController {
 				array(
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_settings' ),
-					'permission_callback' => self::permission( Capabilities::MANAGE_SETTINGS ),
+					'permission_callback' => static fn() => self::permission( self::read_capability() )(),
 				),
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
@@ -50,6 +50,16 @@ final class SettingsController extends BaseController {
 				),
 			)
 		);
+	}
+
+	/**
+	 * Returns the capability needed to read the settings: while the network lock is on,
+	 * site administrators may still read them (the screen is read-only for them).
+	 *
+	 * @return string Capability.
+	 */
+	public static function read_capability(): string {
+		return is_multisite() && Capabilities::network_locked() && current_user_can( 'manage_options' ) ? 'manage_options' : Capabilities::MANAGE_SETTINGS;
 	}
 
 	/**

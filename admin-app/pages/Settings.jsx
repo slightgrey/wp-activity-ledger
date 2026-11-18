@@ -159,6 +159,7 @@ export default function Settings() {
   }
 
   const props = { draft, set, errors, meta };
+  const readOnly = !config.caps.manage_settings;
 
   return (
     <Tabs value={tab} onValueChange={(value) => setParams(value === 'general' ? {} : { tab: value })}>
@@ -170,7 +171,7 @@ export default function Settings() {
           <TabsTrigger value="retention">Retention</TabsTrigger>
           <TabsTrigger value="advanced">Advanced</TabsTrigger>
         </TabsList>
-        <div className="flex items-center gap-2">
+        <div className={readOnly ? 'hidden' : 'flex items-center gap-2'}>
           {dirty && <span className="text-xs text-muted-foreground">Unsaved changes</span>}
           <Button variant="outline" disabled={!dirty || save.isPending} onClick={() => setDraft(settings.data)}>
             Discard
@@ -180,8 +181,14 @@ export default function Settings() {
           </Button>
         </div>
       </div>
+      {readOnly && (
+        <p className="mt-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          These settings are managed by the network administrator. You can view them but not change them.
+        </p>
+      )}
       <Card className="mt-3">
         <CardContent className="py-2">
+          <fieldset disabled={readOnly} className="contents">
           <TabsContent value="general" className="mt-0">
             <GeneralTab {...props} />
           </TabsContent>
@@ -197,6 +204,7 @@ export default function Settings() {
           <TabsContent value="advanced" className="mt-0">
             <AdvancedTab {...props} />
           </TabsContent>
+          </fieldset>
         </CardContent>
       </Card>
     </Tabs>

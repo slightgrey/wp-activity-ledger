@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace WPActivityLedger\Lifecycle;
 
 use WPActivityLedger\Loader;
+use WPActivityLedger\Settings\NetworkSettings;
 
 /**
  * Keeps every site of a network set up while the plugin is network-active: installs it on
@@ -124,6 +125,7 @@ final class Network {
 		switch_to_blog( $site_id );
 
 		try {
+			NetworkSettings::seed_site();
 			Activator::activate_site();
 		} finally {
 			restore_current_blog();

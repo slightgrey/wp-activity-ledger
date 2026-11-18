@@ -399,6 +399,10 @@ final class Plugin {
 		( new PrivacyTools( $this->repository() ) )->register( $this->loader );
 		$this->register_admin();
 
+		if ( is_multisite() ) {
+			$this->loader->add_action( 'switch_blog', array( $this, 'on_switch_blog' ), 10, 2 );
+		}
+
 		/**
 		 * Fires after the core modules queued their hooks and before they are registered.
 		 *
@@ -407,6 +411,54 @@ final class Plugin {
 		do_action( 'wpal_register', $this->loader );
 
 		$this->loader->run();
+	}
+
+	/**
+	 * Records what the sensors and integrations collected for the end of the request.
+	 *
+	 * @return void
+	 */
+	public function record_pending_activity(): void {
+		foreach ( $this->core_sensors() as $sensor ) {
+			foreach ( array( 'record_pending', 'record_role_deltas' ) as $method ) {
+				if ( method_exists( $sensor, $method ) ) {
+					$sensor->$method();
+				}
+			}
+		}
+
+		foreach ( array_keys( $this->integrations()->active() ) as $slug ) {
+			$integration = $this->integrations()->get( $slug );
+
+			if ( null !== $integration && method_exists( $integration, 'record_pending' ) ) {
+				$integration->record_pending();
+			}
+		}
+	}
+
+	/**
+	 * Before the request moves to another site, records what was collected on the one it
+	 * leaves, so that activity is stored in that site's log (multisite).
+	 *
+	 * @param int $new_site_id      Site switched to.
+	 * @param int $previous_site_id Site switched from.
+	 *
+	 * @return void
+	 */
+	public function on_switch_blog( $new_site_id, $previous_site_id ): void {
+		static $running = false;
+
+		if ( $running || (int) $new_site_id === (int) $previous_site_id || ! did_action( 'init' ) ) {
+			return;
+		}
+
+		$running = true;
+
+		try {
+			$this->recorder()->as_site( (int) $previous_site_id, fn() => $this->record_pending_activity() );
+		} finally {
+			$running = false;
+		}
 	}
 
 	/**

@@ -70,15 +70,16 @@ final class StatsController extends BaseController {
 			'/stats',
 			array(
 				'methods'             => \WP_REST_Server::READABLE,
-				'callback'            => array( $this, 'get_stats' ),
+				'callback'            => fn( \WP_REST_Request $request ) => self::in_site( $request, fn() => $this->get_stats( $request ) ),
 				'permission_callback' => self::permission( Capabilities::VIEW ),
 				'args'                => array(
-					'range' => array(
+					'site_id' => self::site_arg(),
+					'range'   => array(
 						'type' => 'string',
 						'enum' => array_keys( self::RANGES ),
 					),
-					'from'  => $day + array( 'description' => __( 'First day, site timezone (Y-m-d).', 'wp-activity-ledger' ) ),
-					'to'    => $day + array( 'description' => __( 'Last day, site timezone (Y-m-d).', 'wp-activity-ledger' ) ),
+					'from'    => $day + array( 'description' => __( 'First day, site timezone (Y-m-d).', 'wp-activity-ledger' ) ),
+					'to'      => $day + array( 'description' => __( 'Last day, site timezone (Y-m-d).', 'wp-activity-ledger' ) ),
 				),
 			)
 		);
@@ -121,7 +122,7 @@ final class StatsController extends BaseController {
 	 * @return string Transient key.
 	 */
 	public static function cache_key( string $range_key ): string {
-		return self::CACHE_PREFIX . md5( $range_key . '|' . wp_timezone_string() );
+		return self::CACHE_PREFIX . md5( $range_key . '|' . wp_timezone_string() . '|' . get_current_blog_id() );
 	}
 
 	/**

@@ -128,24 +128,28 @@ final class Assets {
 	 */
 	public static function config(): array {
 		return array(
-			'restUrl'     => esc_url_raw( rest_url( BaseController::NAMESPACE . '/' ) ),
-			'nonce'       => wp_create_nonce( 'wp_rest' ),
-			'nonceUrl'    => admin_url( 'admin-ajax.php?action=rest-nonce' ),
-			'adminUrl'    => admin_url(),
-			'pageUrl'     => admin_url( 'admin.php?page=' . Menu::SLUG ),
-			'timezone'    => wp_timezone_string(),
-			'dateFormat'  => (string) get_option( 'date_format' ),
-			'timeFormat'  => (string) get_option( 'time_format' ),
-			'version'     => WPAL_VERSION,
-			'exportUrl'   => admin_url( 'admin-post.php' ),
-			'exportNonce' => wp_create_nonce( ExportHandler::ACTION ),
-			'userId'      => get_current_user_id(),
-			'caps'        => array(
+			'restUrl'        => esc_url_raw( rest_url( BaseController::NAMESPACE . '/' ) ),
+			'nonce'          => wp_create_nonce( 'wp_rest' ),
+			'nonceUrl'       => admin_url( 'admin-ajax.php?action=rest-nonce' ),
+			'adminUrl'       => admin_url(),
+			'pageUrl'        => is_network_admin() ? network_admin_url( 'admin.php?page=' . Menu::SLUG ) : admin_url( 'admin.php?page=' . Menu::SLUG ),
+			'network'        => is_network_admin(),
+			'settingsLocked' => is_multisite() && Capabilities::network_locked(),
+			'siteId'         => get_current_blog_id(),
+			'timezone'       => wp_timezone_string(),
+			'dateFormat'     => (string) get_option( 'date_format' ),
+			'timeFormat'     => (string) get_option( 'time_format' ),
+			'version'        => WPAL_VERSION,
+			'exportUrl'      => admin_url( 'admin-post.php' ),
+			'exportNonce'    => wp_create_nonce( ExportHandler::ACTION ),
+			'userId'         => get_current_user_id(),
+			'caps'           => array(
 				'view'            => current_user_can( Capabilities::VIEW ), // phpcs:ignore WordPress.WP.Capabilities.Undetermined -- Plugin capabilities.
 				'export'          => current_user_can( Capabilities::EXPORT ), // phpcs:ignore WordPress.WP.Capabilities.Undetermined
 				'manage_settings' => current_user_can( Capabilities::MANAGE_SETTINGS ), // phpcs:ignore WordPress.WP.Capabilities.Undetermined
 				'delete'          => current_user_can( Capabilities::DELETE ), // phpcs:ignore WordPress.WP.Capabilities.Undetermined
 				'manage_sessions' => current_user_can( Capabilities::MANAGE_SESSIONS ), // phpcs:ignore WordPress.WP.Capabilities.Undetermined
+				'manage_options'  => current_user_can( 'manage_options' ),
 			),
 		);
 	}

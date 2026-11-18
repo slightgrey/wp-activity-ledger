@@ -67,6 +67,51 @@ abstract class BaseController extends \WP_REST_Controller {
 	}
 
 	/**
+	 * Returns the schema of the multisite "site_id" argument.
+	 *
+	 * @return array<string, mixed> Argument schema.
+	 */
+	protected static function site_arg(): array {
+		return array(
+			'description' => __( 'Site to read (multisite, super admins only).', 'wp-activity-ledger' ),
+			'type'        => 'integer',
+			'minimum'     => 1,
+		);
+	}
+
+	/**
+	 * Runs a callback in the site a request names with "site_id" (super admins on multisite).
+	 *
+	 * @param \WP_REST_Request $request  Request.
+	 * @param callable         $callback Callback returning the response.
+	 *
+	 * @return mixed The callback's result, or a 403/404 error.
+	 */
+	protected static function in_site( \WP_REST_Request $request, callable $callback ): mixed {
+		$site_id = (int) $request['site_id'];
+
+		if ( 0 === $site_id || ! is_multisite() || get_current_blog_id() === $site_id ) {
+			return $callback();
+		}
+
+		if ( ! is_super_admin() ) {
+			return self::error( 'rest_forbidden', __( 'Only network administrators can read other sites.', 'wp-activity-ledger' ), 403 );
+		}
+
+		if ( ! get_site( $site_id ) instanceof \WP_Site ) {
+			return self::error( 'wpal_site_not_found', __( 'Site not found.', 'wp-activity-ledger' ), 404 );
+		}
+
+		switch_to_blog( $site_id );
+
+		try {
+			return $callback();
+		} finally {
+			restore_current_blog();
+		}
+	}
+
+	/**
 	 * Returns the schema of a date argument ("Y-m-d" or "Y-m-d H:i:s").
 	 *
 	 * @param string $description Description.

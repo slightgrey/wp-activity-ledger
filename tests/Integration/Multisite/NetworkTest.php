@@ -75,6 +75,73 @@ final class NetworkTest extends IntegrationTestCase {
 	}
 
 	/**
+	 * An event recorded while switched to another site is stored in that site's log.
+	 *
+	 * @return void
+	 */
+	public function test_events_stay_in_the_site_they_happened_on(): void {
+		$here  = get_current_blog_id();
+		$other = (int) ( get_sites(
+			array(
+				'fields'       => 'ids',
+				'site__not_in' => array( $here ),
+				'number'       => 1,
+			)
+		)[0] ?? 0 );
+
+		if ( 0 === $other ) {
+			$this->markTestSkipped( 'Needs a second site.' );
+		}
+
+		$before = array( self::count_in( $other, 'system.alert_rules_changed' ), self::count_in( $here, 'system.alert_rules_changed' ) );
+
+		switch_to_blog( $other );
+		Plugin::instance()->recorder()->record( new Event( 'system.alert_rules_changed', object_type: 'alerts' ) );
+		restore_current_blog();
+		Plugin::instance()->recorder()->flush();
+
+		$this->assertSame( $before[0] + 1, self::count_in( $other, 'system.alert_rules_changed' ) );
+		$this->assertSame( $before[1], self::count_in( $here, 'system.alert_rules_changed' ) );
+	}
+
+	/**
+	 * Activity collected for the end of the request (a post edit) while switched to another
+	 * site is stored in that site's log, not the one the request ends on.
+	 *
+	 * @return void
+	 */
+	public function test_deferred_activity_follows_the_site(): void {
+		$here  = get_current_blog_id();
+		$other = (int) ( get_sites(
+			array(
+				'fields'       => 'ids',
+				'site__not_in' => array( $here ),
+				'number'       => 1,
+			)
+		)[0] ?? 0 );
+
+		if ( 0 === $other ) {
+			$this->markTestSkipped( 'Needs a second site.' );
+		}
+
+		$this->as_user( 'administrator' );
+		$before = array( self::count_in( $other, 'post.created' ), self::count_in( $here, 'post.created' ) );
+
+		switch_to_blog( $other );
+		wp_insert_post(
+			array(
+				'post_title'  => 'Switched post',
+				'post_status' => 'draft',
+			)
+		);
+		restore_current_blog();
+		self::settle_all();
+
+		$this->assertSame( $before[0] + 1, self::count_in( $other, 'post.created' ) );
+		$this->assertSame( $before[1], self::count_in( $here, 'post.created' ) );
+	}
+
+	/**
 	 * Deleting a site drops its log tables too.
 	 *
 	 * @return void

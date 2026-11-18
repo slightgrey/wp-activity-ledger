@@ -94,23 +94,7 @@ abstract class IntegrationTestCase extends TestCase {
 	 */
 	protected static function settle_all(): void {
 		$plugin = \WPActivityLedger\Plugin::instance();
-
-		foreach ( $plugin->core_sensors() as $sensor ) {
-			foreach ( array( 'record_pending', 'record_role_deltas' ) as $method ) {
-				if ( method_exists( $sensor, $method ) ) {
-					$sensor->$method();
-				}
-			}
-		}
-
-		foreach ( array_keys( $plugin->integrations()->active() ) as $slug ) {
-			$integration = $plugin->integrations()->get( $slug );
-
-			if ( null !== $integration && method_exists( $integration, 'record_pending' ) ) {
-				$integration->record_pending();
-			}
-		}
-
+		$plugin->record_pending_activity();
 		$plugin->recorder()->flush();
 	}
 

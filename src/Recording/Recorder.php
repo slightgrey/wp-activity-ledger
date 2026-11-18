@@ -37,6 +37,20 @@ final class Recorder {
 	private array $buffer = array();
 
 	/**
+	 * Site each buffered event happened on (multisite), by buffer index.
+	 *
+	 * @var array<int, int>
+	 */
+	private array $sites = array();
+
+	/**
+	 * Site to attribute recorded events to instead of the current one (see as_site()).
+	 *
+	 * @var int|null
+	 */
+	private ?int $site_override = null;
+
+	/**
 	 * Request facts, built on first use.
 	 *
 	 * @var RequestContext|null
@@ -94,6 +108,7 @@ final class Recorder {
 		}
 
 		$this->buffer[] = $event;
+		$this->sites[]  = $this->site_override ?? get_current_blog_id();
 
 		if ( count( $this->buffer ) >= self::FLUSH_EVERY && $this->is_long_running() ) {
 			$this->flush();
@@ -116,6 +131,25 @@ final class Recorder {
 	}
 
 	/**
+	 * Runs a callback whose recorded events belong to the given site (multisite).
+	 *
+	 * @param int      $site_id  Site ID.
+	 * @param callable $callback Callback.
+	 *
+	 * @return void
+	 */
+	public function as_site( int $site_id, callable $callback ): void {
+		$previous            = $this->site_override;
+		$this->site_override = $site_id;
+
+		try {
+			$callback();
+		} finally {
+			$this->site_override = $previous;
+		}
+	}
+
+	/**
 	 * Stores every buffered event and empties the buffer.
 	 *
 	 * @return int Number of events stored.
@@ -126,8 +160,10 @@ final class Recorder {
 		}
 
 		$events       = array_map( array( $this, 'with_message' ), $this->buffer );
+		$sites        = $this->sites;
 		$this->buffer = array();
-		$stored       = $this->store( $events );
+		$this->sites  = array();
+		$stored       = $this->store( $events, $sites );
 
 		/**
 		 * Fires after a batch of events was stored (alerts listen here).
@@ -161,30 +197,57 @@ final class Recorder {
 	}
 
 	/**
-	 * Stores events; on multisite, network events (context "network") go to the main site's log.
+	 * Stores events. On multisite each event goes to the log of the site it happened on
+	 * (code may switch sites mid-request), and network events (context "network") to the
+	 * main site's log.
 	 *
 	 * @param array<int, Event> $events Events.
+	 * @param array<int, int>   $sites  Site of each event, by index.
 	 *
 	 * @return int Stored.
 	 */
-	private function store( array $events ): int {
-		$network = array_filter( $events, array( self::class, 'is_network' ) );
-
-		if ( array() === $network || ! is_multisite() || is_main_site() ) {
+	private function store( array $events, array $sites ): int {
+		if ( ! is_multisite() ) {
 			return $this->repository->insert_many( $events );
 		}
 
-		$stored = $this->repository->insert_many( array_values( array_diff_key( $events, $network ) ) );
+		$current = get_current_blog_id();
+		$groups  = array();
 
-		switch_to_blog( get_main_site_id() );
+		foreach ( $events as $index => $event ) {
+			$site              = self::is_network( $event ) ? get_main_site_id() : ( $sites[ $index ] ?? $current );
+			$groups[ $site ][] = $event;
+		}
 
-		try {
-			$stored += $this->repository->insert_many( array_values( $network ) );
-		} finally {
-			restore_current_blog();
+		$stored = 0;
+
+		foreach ( $groups as $site => $group ) {
+			$stored += $site === $current ? $this->repository->insert_many( $group ) : $this->store_in( (int) $site, $group );
 		}
 
 		return $stored;
+	}
+
+	/**
+	 * Stores events in another site's log (skipped when that site no longer exists).
+	 *
+	 * @param int               $site_id Site ID.
+	 * @param array<int, Event> $events  Events.
+	 *
+	 * @return int Stored.
+	 */
+	private function store_in( int $site_id, array $events ): int {
+		if ( ! get_site( $site_id ) instanceof \WP_Site ) {
+			return 0;
+		}
+
+		switch_to_blog( $site_id );
+
+		try {
+			return $this->repository->insert_many( $events );
+		} finally {
+			restore_current_blog();
+		}
 	}
 
 	/**

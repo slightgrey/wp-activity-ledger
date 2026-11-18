@@ -1,6 +1,25 @@
 import { config } from '@/lib/config';
 
 let nonce = config.nonce;
+let siteId = null;
+
+/**
+ * Chooses the site the network admin reads (adds site_id to every GET request).
+ *
+ * @param {number|null} id Site ID, or null for the current site.
+ */
+export function setSite(id) {
+  siteId = id;
+}
+
+/**
+ * Returns the site the network admin reads.
+ *
+ * @returns {number|null} Site ID.
+ */
+export function currentSite() {
+  return siteId;
+}
 
 /**
  * An error returned by the REST API.
@@ -92,7 +111,9 @@ export async function api(path, { method = 'GET', query = {}, body, retried = fa
 
   if (body !== undefined) headers['Content-Type'] = 'application/json';
 
-  const response = await fetch(buildUrl(config.restUrl, path, query), {
+  const params = method === 'GET' && siteId ? { ...query, site_id: siteId } : query;
+
+  const response = await fetch(buildUrl(config.restUrl, path, params), {
     method,
     headers,
     credentials: 'same-origin',

@@ -13,7 +13,10 @@ const defaults = {
   timeFormat: 'g:i a',
   version: '',
   userId: 0,
-  caps: { view: false, export: false, manage_settings: false, delete: false, manage_sessions: false },
+  network: false,
+  settingsLocked: false,
+  siteId: 1,
+  caps: { view: false, export: false, manage_settings: false, delete: false, manage_sessions: false, manage_options: false },
 };
 
 export const config = {

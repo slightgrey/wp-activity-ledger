@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace WPActivityLedger\Admin;
 
 use WPActivityLedger\Loader;
+use WPActivityLedger\Rest\SettingsController;
 use WPActivityLedger\Security\Capabilities;
 
 /**
@@ -39,6 +40,7 @@ final class Menu {
 	 */
 	public function register( Loader $loader ): void {
 		$loader->add_action( 'admin_menu', array( $this, 'add_menu' ), 10, 0 );
+		$loader->add_action( 'network_admin_menu', array( $this, 'add_network_menu' ), 10, 0 );
 	}
 
 	/**
@@ -89,6 +91,47 @@ final class Menu {
 	}
 
 	/**
+	 * Adds the network admin page (multisite): the same app, reading any site's log.
+	 *
+	 * @return void
+	 */
+	public function add_network_menu(): void {
+		$this->hook_suffix = (string) add_menu_page(
+			__( 'Activity Ledger', 'wp-activity-ledger' ),
+			__( 'Activity Ledger', 'wp-activity-ledger' ),
+			'manage_network_options',
+			self::SLUG,
+			array( $this, 'render' ),
+			'dashicons-list-view',
+			81
+		);
+
+		foreach ( self::network_screens() as $route => $title ) {
+			add_submenu_page(
+				self::SLUG,
+				$title,
+				$title,
+				'manage_network_options',
+				'/' === $route ? self::SLUG : 'admin.php?page=' . self::SLUG . '#' . $route
+			);
+		}
+	}
+
+	/**
+	 * Returns the network admin screens: route => menu title.
+	 *
+	 * @return array<string, string> Screens.
+	 */
+	public static function network_screens(): array {
+		return array(
+			'/'        => __( 'Dashboard', 'wp-activity-ledger' ),
+			'/log'     => __( 'Activity Log', 'wp-activity-ledger' ),
+			'/users'   => __( 'Users & Sessions', 'wp-activity-ledger' ),
+			'/network' => __( 'Network Settings', 'wp-activity-ledger' ),
+		);
+	}
+
+	/**
 	 * Renders the page: the mount point of the React app.
 	 *
 	 * @return void
@@ -115,7 +158,7 @@ final class Menu {
 			'/log'      => array( __( 'Activity Log', 'wp-activity-ledger' ), Capabilities::VIEW ),
 			'/users'    => array( __( 'Users & Sessions', 'wp-activity-ledger' ), Capabilities::VIEW ),
 			'/alerts'   => array( __( 'Alerts', 'wp-activity-ledger' ), Capabilities::MANAGE_SETTINGS ),
-			'/settings' => array( __( 'Settings', 'wp-activity-ledger' ), Capabilities::MANAGE_SETTINGS ),
+			'/settings' => array( __( 'Settings', 'wp-activity-ledger' ), SettingsController::read_capability() ),
 		);
 	}
 }
