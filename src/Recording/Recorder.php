@@ -160,9 +160,22 @@ final class Recorder {
 	}
 
 	/**
-	 * Fills in category, severity, actor, request details and time.
+	 * Returns an event as it would be stored (enriched, with its message), without storing it.
+	 *
+	 * For events that update an existing row instead of adding one (folded failed logins).
 	 *
 	 * @param Event $event Event.
+	 *
+	 * @return Event Enriched event.
+	 */
+	public function enriched( Event $event ): Event {
+		return $this->with_message( $this->enrich( $event ) );
+	}
+
+	/**
+	 * Fills in the actor, category, severity, request details and time.
+	 *
+	 * @param Event $event Event from a sensor.
 	 *
 	 * @return Event Enriched event.
 	 */

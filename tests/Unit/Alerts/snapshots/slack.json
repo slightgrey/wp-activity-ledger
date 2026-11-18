@@ -1,0 +1,65 @@
+{
+    "text": "[Example] Plugin activated: Activated plugin \"Hello <Dolly> & Co\"",
+    "blocks": [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": "[Example] Plugin activated"
+            }
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Activated plugin \"Hello &lt;Dolly&gt; &amp; Co\""
+            }
+        },
+        {
+            "type": "section",
+            "fields": [
+                {
+                    "type": "mrkdwn",
+                    "text": "*Severity*\ncritical"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": "*Category*\nPlugins"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": "*User*\nadmin"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": "*Object*\nHello Dolly"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": "*IP*\n203.0.113.5"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": "*Time*\n2026-11-18 10:00:00 UTC"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": "*Rule*\nPlugin changes"
+                }
+            ]
+        },
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "View in the activity log"
+                    },
+                    "url": "https://example.test/wp-admin/admin.php?page=wp-activity-ledger#/log?type=plugin.activated"
+                }
+            ]
+        }
+    ]
+}

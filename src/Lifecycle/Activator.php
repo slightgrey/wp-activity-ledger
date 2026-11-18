@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace WPActivityLedger\Lifecycle;
 
+use WPActivityLedger\Alerts\AlertTemplates;
 use WPActivityLedger\Database\Installer;
 use WPActivityLedger\Domain\Event;
 use WPActivityLedger\Plugin;
@@ -57,6 +58,7 @@ final class Activator {
 
 		Capabilities::grant_defaults();
 		Capabilities::sync_role_grants( (array) $settings->get( 'view_roles' ), (array) $settings->get( 'export_roles' ) );
+		AlertTemplates::install( Plugin::instance()->alert_rules() );
 
 		Plugin::instance()->recorder()->record_now(
 			new Event( 'system.activated', object_type: 'plugin', object_id: plugin_basename( WPAL_FILE ), object_label: 'WP Activity Ledger', context: array( 'version' => WPAL_VERSION ) )

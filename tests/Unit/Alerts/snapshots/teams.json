@@ -1,0 +1,69 @@
+{
+    "type": "message",
+    "attachments": [
+        {
+            "contentType": "application/vnd.microsoft.card.adaptive",
+            "contentUrl": null,
+            "content": {
+                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                "type": "AdaptiveCard",
+                "version": "1.4",
+                "body": [
+                    {
+                        "type": "TextBlock",
+                        "size": "Medium",
+                        "weight": "Bolder",
+                        "color": "Attention",
+                        "text": "[Example] Plugin activated",
+                        "wrap": true
+                    },
+                    {
+                        "type": "TextBlock",
+                        "text": "Activated plugin \"Hello <Dolly> & Co\"",
+                        "wrap": true
+                    },
+                    {
+                        "type": "FactSet",
+                        "facts": [
+                            {
+                                "title": "Severity",
+                                "value": "critical"
+                            },
+                            {
+                                "title": "Category",
+                                "value": "Plugins"
+                            },
+                            {
+                                "title": "User",
+                                "value": "admin"
+                            },
+                            {
+                                "title": "Object",
+                                "value": "Hello Dolly"
+                            },
+                            {
+                                "title": "IP",
+                                "value": "203.0.113.5"
+                            },
+                            {
+                                "title": "Time",
+                                "value": "2026-11-18 10:00:00 UTC"
+                            },
+                            {
+                                "title": "Rule",
+                                "value": "Plugin changes"
+                            }
+                        ]
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "Action.OpenUrl",
+                        "title": "View in the activity log",
+                        "url": "https://example.test/wp-admin/admin.php?page=wp-activity-ledger#/log?type=plugin.activated"
+                    }
+                ]
+            }
+        }
+    ]
+}

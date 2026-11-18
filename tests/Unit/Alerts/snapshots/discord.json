@@ -1,0 +1,55 @@
+{
+    "username": "Activity Ledger",
+    "embeds": [
+        {
+            "title": "[Example] Plugin activated",
+            "description": "Activated plugin \"Hello <Dolly> & Co\"",
+            "url": "https://example.test/wp-admin/admin.php?page=wp-activity-ledger#/log?type=plugin.activated",
+            "color": 13646651,
+            "fields": [
+                {
+                    "name": "Severity",
+                    "value": "critical",
+                    "inline": true
+                },
+                {
+                    "name": "Category",
+                    "value": "Plugins",
+                    "inline": true
+                },
+                {
+                    "name": "User",
+                    "value": "admin",
+                    "inline": true
+                },
+                {
+                    "name": "Object",
+                    "value": "Hello Dolly",
+                    "inline": true
+                },
+                {
+                    "name": "IP",
+                    "value": "203.0.113.5",
+                    "inline": true
+                },
+                {
+                    "name": "Time",
+                    "value": "2026-11-18 10:00:00 UTC",
+                    "inline": true
+                },
+                {
+                    "name": "Rule",
+                    "value": "Plugin changes",
+                    "inline": true
+                }
+            ],
+            "footer": {
+                "text": "WP Activity Ledger · Example"
+            },
+            "timestamp": "2026-11-18T10:00:00Z"
+        }
+    ],
+    "allowed_mentions": {
+        "parse": []
+    }
+}

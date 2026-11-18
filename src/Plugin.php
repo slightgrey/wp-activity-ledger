@@ -21,6 +21,12 @@ use WPActivityLedger\Integrations\Elementor;
 use WPActivityLedger\Integrations\WooCommerce;
 use WPActivityLedger\Recording\Recorder;
 use WPActivityLedger\Rest\Routes;
+use WPActivityLedger\Alerts\ChannelStore;
+use WPActivityLedger\Alerts\Deliverer;
+use WPActivityLedger\Alerts\Dispatcher;
+use WPActivityLedger\Alerts\RuleMatcher;
+use WPActivityLedger\Alerts\RuleStore;
+use WPActivityLedger\Alerts\TransientAlertState;
 use WPActivityLedger\Admin\Assets;
 use WPActivityLedger\Admin\DashboardWidget;
 use WPActivityLedger\Admin\Menu;
@@ -124,6 +130,34 @@ final class Plugin {
 	 * @var OptionFilter|null
 	 */
 	private ?OptionFilter $option_filter = null;
+
+	/**
+	 * Alert channels.
+	 *
+	 * @var ChannelStore|null
+	 */
+	private ?ChannelStore $alert_channels = null;
+
+	/**
+	 * Alert rules.
+	 *
+	 * @var RuleStore|null
+	 */
+	private ?RuleStore $alert_rules = null;
+
+	/**
+	 * Alert deliverer.
+	 *
+	 * @var Deliverer|null
+	 */
+	private ?Deliverer $deliverer = null;
+
+	/**
+	 * Alert dispatcher.
+	 *
+	 * @var Dispatcher|null
+	 */
+	private ?Dispatcher $dispatcher = null;
 
 	/**
 	 * Creates the plugin.
@@ -243,6 +277,50 @@ final class Plugin {
 	}
 
 	/**
+	 * Returns the alert channel store.
+	 *
+	 * @return ChannelStore Channels.
+	 */
+	public function alert_channels(): ChannelStore {
+		$this->alert_channels ??= new ChannelStore();
+
+		return $this->alert_channels;
+	}
+
+	/**
+	 * Returns the alert rule store.
+	 *
+	 * @return RuleStore Rules.
+	 */
+	public function alert_rules(): RuleStore {
+		$this->alert_rules ??= new RuleStore( $this->alert_channels() );
+
+		return $this->alert_rules;
+	}
+
+	/**
+	 * Returns the alert deliverer.
+	 *
+	 * @return Deliverer Deliverer.
+	 */
+	public function deliverer(): Deliverer {
+		$this->deliverer ??= new Deliverer( $this->alert_channels(), $this->recorder() );
+
+		return $this->deliverer;
+	}
+
+	/**
+	 * Returns the alert dispatcher.
+	 *
+	 * @return Dispatcher Dispatcher.
+	 */
+	public function dispatcher(): Dispatcher {
+		$this->dispatcher ??= new Dispatcher( $this->alert_rules(), new RuleMatcher( new TransientAlertState() ), $this->types(), $this->deliverer() );
+
+		return $this->dispatcher;
+	}
+
+	/**
 	 * Returns the shared option noise filter.
 	 *
 	 * @return OptionFilter Filter.
@@ -308,6 +386,8 @@ final class Plugin {
 		( new SensorRegistry( $this->core_sensors() ) )->register( $this->loader );
 		$this->integrations()->load( $this->loader, $this->types() );
 		( new Routes( $this ) )->register( $this->loader );
+		$this->dispatcher()->register( $this->loader );
+		$this->deliverer()->register( $this->loader );
 		$this->register_admin();
 
 		/**

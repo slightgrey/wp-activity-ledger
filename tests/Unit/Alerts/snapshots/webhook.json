@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "type": "wpal.alert",
+    "rule": "Plugin changes",
+    "event": {
+        "id": 42,
+        "type": "plugin.activated",
+        "label": "Plugin activated",
+        "message": "Activated plugin \"Hello <Dolly> & Co\"",
+        "severity": "critical",
+        "category": "Plugins",
+        "user": "admin",
+        "ip": "203.0.113.5",
+        "object": "Hello Dolly",
+        "created_at": "2026-11-18 10:00:00",
+        "url": "https://example.test/wp-admin/admin.php?page=wp-activity-ledger#/log?type=plugin.activated"
+    },
+    "site": {
+        "name": "Example",
+        "url": "https://example.test/"
+    }
+}

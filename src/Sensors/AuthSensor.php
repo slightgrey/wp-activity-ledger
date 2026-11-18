@@ -299,6 +299,23 @@ final class AuthSensor implements SensorInterface {
 			new Event( 'auth.login_failed', object_label: $username, context: $context )
 		)->message;
 
-		return $this->repository->update_summary( (int) $recent['id'], $context, $message, $now );
+		if ( ! $this->repository->update_summary( (int) $recent['id'], $context, $message, $now ) ) {
+			return false;
+		}
+
+		/**
+		 * Fires when a repeated event updates its earlier row instead of adding one, so
+		 * threshold alerts still count every occurrence.
+		 *
+		 * @param Event $event The repeated event, enriched like a stored one.
+		 */
+		do_action(
+			'wpal_event_repeated',
+			$this->recorder->enriched(
+				new Event( 'auth.login_failed', object_type: 'user', object_id: (string) $recent['object_id'], object_label: $username, context: $context )
+			)
+		);
+
+		return true;
 	}
 }
