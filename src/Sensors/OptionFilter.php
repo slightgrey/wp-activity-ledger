@@ -48,6 +48,7 @@ final class OptionFilter {
 		'jetpack_*sync*',
 		'_elementor_*',
 		'*_batch_*', // WP background-processing queues.
+		'_wp_suggested_policy_text_has_changed', // Core's privacy-guide bookkeeping flag.
 	);
 
 	/**
