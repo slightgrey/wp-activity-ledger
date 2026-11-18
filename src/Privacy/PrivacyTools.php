@@ -138,7 +138,7 @@ final class PrivacyTools {
 		}
 
 		$this->repository->anonymize_user( $user->ID );
-		$kept    = $this->repository->query(
+		$kept = $this->repository->query(
 			array(
 				'user'     => array( $user->ID ),
 				'per_page' => 1,
@@ -159,7 +159,6 @@ final class PrivacyTools {
 				$kept
 			);
 		}
-
 
 		return self::erase_result( $kept > 0, $messages );
 	}
