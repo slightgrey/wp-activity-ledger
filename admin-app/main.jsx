@@ -1,12 +1,26 @@
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import App from './App';
 import './index.css';
 
-function Placeholder() {
-  return <div className="p-6 text-foreground">WP Activity Ledger</div>;
-}
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (count, error) => count < 2 && !(error?.status >= 400 && error?.status < 500),
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const root = document.getElementById('wpal-root');
 
 if (root) {
-  createRoot(root).render(<Placeholder />);
+  createRoot(root).render(
+    <StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    </StrictMode>
+  );
 }

@@ -21,6 +21,8 @@ use WPActivityLedger\Integrations\Elementor;
 use WPActivityLedger\Integrations\WooCommerce;
 use WPActivityLedger\Recording\Recorder;
 use WPActivityLedger\Rest\Routes;
+use WPActivityLedger\Admin\Assets;
+use WPActivityLedger\Admin\Menu;
 use WPActivityLedger\Security\Capabilities;
 use WPActivityLedger\Sensors\AuthSensor;
 use WPActivityLedger\Sensors\AutoUpdateSensor;
@@ -305,6 +307,7 @@ final class Plugin {
 		( new SensorRegistry( $this->core_sensors() ) )->register( $this->loader );
 		$this->integrations()->load( $this->loader, $this->types() );
 		( new Routes( $this ) )->register( $this->loader );
+		$this->register_admin();
 
 		/**
 		 * Fires after the core modules queued their hooks and before they are registered.
@@ -314,5 +317,16 @@ final class Plugin {
 		do_action( 'wpal_register', $this->loader );
 
 		$this->loader->run();
+	}
+
+	/**
+	 * Queues the admin screen hooks (menu and app assets).
+	 *
+	 * @return void
+	 */
+	private function register_admin(): void {
+		$menu = new Menu();
+		$menu->register( $this->loader );
+		( new Assets( $menu ) )->register( $this->loader );
 	}
 }

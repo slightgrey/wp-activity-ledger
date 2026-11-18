@@ -1,0 +1,173 @@
+<?php
+/**
+ * Admin app assets.
+ *
+ * @package WPActivityLedger
+ */
+
+declare( strict_types=1 );
+
+namespace WPActivityLedger\Admin;
+
+use WPActivityLedger\Loader;
+use WPActivityLedger\Rest\BaseController;
+use WPActivityLedger\Security\Capabilities;
+
+/**
+ * Enqueues the Vite build of the admin app (read from its manifest) on the plugin page only,
+ * with the app config passed inline as `window.wpalConfig`.
+ */
+final class Assets {
+
+	/**
+	 * Script handle.
+	 */
+	public const HANDLE = 'wpal-admin';
+
+	/**
+	 * Build folder, relative to the plugin.
+	 */
+	private const BUILD_DIR = 'dist/admin/';
+
+	/**
+	 * Manifest entry of the app.
+	 */
+	private const ENTRY = 'main.jsx';
+
+	/**
+	 * Creates the asset loader.
+	 *
+	 * @param Menu $menu Admin menu (gives the page's hook suffix).
+	 */
+	public function __construct( private readonly Menu $menu ) {
+	}
+
+	/**
+	 * Queues the hooks.
+	 *
+	 * @param Loader $loader Hook loader.
+	 *
+	 * @return void
+	 */
+	public function register( Loader $loader ): void {
+		$loader->add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ), 10, 1 );
+		$loader->add_filter( 'script_loader_tag', array( $this, 'module_tag' ), 10, 2 );
+		$loader->add_action( 'admin_notices', array( $this, 'missing_build_notice' ), 10, 0 );
+	}
+
+	/**
+	 * Tells whether the app has been built.
+	 *
+	 * @return bool True when the manifest exists.
+	 */
+	public static function is_built(): bool {
+		return null !== self::entry();
+	}
+
+	/**
+	 * Enqueues the app on its page.
+	 *
+	 * @param string $hook_suffix Current admin page.
+	 *
+	 * @return void
+	 */
+	public function enqueue( $hook_suffix ): void {
+		$entry = self::entry();
+
+		if ( '' === $this->menu->hook_suffix() || $this->menu->hook_suffix() !== $hook_suffix || null === $entry ) {
+			return;
+		}
+
+		$version = WPAL_VERSION . '-' . (string) filemtime( WPAL_DIR . self::BUILD_DIR . $entry['file'] );
+
+		wp_enqueue_script( self::HANDLE, WPAL_URL . self::BUILD_DIR . $entry['file'], array(), $version, true );
+		wp_add_inline_script( self::HANDLE, 'window.wpalConfig = ' . wp_json_encode( self::config() ) . ';', 'before' );
+
+		foreach ( $entry['css'] as $index => $css ) {
+			wp_enqueue_style( self::HANDLE . ( 0 === $index ? '' : '-' . $index ), WPAL_URL . self::BUILD_DIR . $css, array(), $version );
+		}
+	}
+
+	/**
+	 * Loads the app script as an ES module.
+	 *
+	 * @param string $tag    Script tag.
+	 * @param string $handle Script handle.
+	 *
+	 * @return string Script tag.
+	 */
+	public function module_tag( $tag, $handle ): string {
+		if ( self::HANDLE !== $handle || str_contains( (string) $tag, 'type="module"' ) ) {
+			return (string) $tag;
+		}
+
+		return (string) preg_replace( '/<script (?=[^>]*\bsrc=)/', '<script type="module" ', (string) $tag, 1 );
+	}
+
+	/**
+	 * Shows a notice on the plugin page when the app has not been built.
+	 *
+	 * @return void
+	 */
+	public function missing_build_notice(): void {
+		$screen = get_current_screen();
+
+		if ( null === $screen || $screen->id !== $this->menu->hook_suffix() || self::is_built() ) {
+			return;
+		}
+
+		echo '<div class="notice notice-warning"><p>' . esc_html__( 'WP Activity Ledger: the admin app build is missing (dist/admin).', 'wp-activity-ledger' ) . '</p></div>';
+	}
+
+	/**
+	 * Returns the config the app reads from `window.wpalConfig`.
+	 *
+	 * @return array<string, mixed> Config.
+	 */
+	public static function config(): array {
+		return array(
+			'restUrl'    => esc_url_raw( rest_url( BaseController::NAMESPACE . '/' ) ),
+			'nonce'      => wp_create_nonce( 'wp_rest' ),
+			'nonceUrl'   => admin_url( 'admin-ajax.php?action=rest-nonce' ),
+			'adminUrl'   => admin_url(),
+			'pageUrl'    => admin_url( 'admin.php?page=' . Menu::SLUG ),
+			'timezone'   => wp_timezone_string(),
+			'dateFormat' => (string) get_option( 'date_format' ),
+			'timeFormat' => (string) get_option( 'time_format' ),
+			'version'    => WPAL_VERSION,
+			'userId'     => get_current_user_id(),
+			'caps'       => array(
+				'view'            => current_user_can( Capabilities::VIEW ), // phpcs:ignore WordPress.WP.Capabilities.Undetermined -- Plugin capabilities.
+				'export'          => current_user_can( Capabilities::EXPORT ), // phpcs:ignore WordPress.WP.Capabilities.Undetermined
+				'manage_settings' => current_user_can( Capabilities::MANAGE_SETTINGS ), // phpcs:ignore WordPress.WP.Capabilities.Undetermined
+				'delete'          => current_user_can( Capabilities::DELETE ), // phpcs:ignore WordPress.WP.Capabilities.Undetermined
+				'manage_sessions' => current_user_can( Capabilities::MANAGE_SESSIONS ), // phpcs:ignore WordPress.WP.Capabilities.Undetermined
+			),
+		);
+	}
+
+	/**
+	 * Returns the app's manifest entry.
+	 *
+	 * @return array{file: string, css: array<int, string>}|null Entry, or null when not built.
+	 */
+	private static function entry(): ?array {
+		$path = WPAL_DIR . self::BUILD_DIR . '.vite/manifest.json';
+
+		if ( ! is_readable( $path ) ) {
+			return null;
+		}
+
+		$manifest = json_decode( (string) file_get_contents( $path ), true ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local file.
+		$entry    = is_array( $manifest ) ? ( $manifest[ self::ENTRY ] ?? null ) : null;
+
+		if ( ! is_array( $entry ) || ! is_string( $entry['file'] ?? null ) ) {
+			return null;
+		}
+
+		return array(
+			'file' => $entry['file'],
+			'css'  => array_values( array_filter( (array) ( $entry['css'] ?? array() ), 'is_string' ) ),
+		);
+	}
+}

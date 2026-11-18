@@ -1,3 +1,108 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Everything is scoped to #wpal-root: Tailwind's preflight is off (it would restyle all of
+ * wp-admin) and this small reset applies inside the app only. Radix popups render into
+ * #wpal-portal, which sits inside #wpal-root, so they get the same styles.
+ */
+#wpal-root {
+  --wpal-background: 0 0% 100%;
+  --wpal-foreground: 222 47% 11%;
+  --wpal-card: 0 0% 100%;
+  --wpal-card-foreground: 222 47% 11%;
+  --wpal-popover: 0 0% 100%;
+  --wpal-popover-foreground: 222 47% 11%;
+  --wpal-primary: 221 83% 45%;
+  --wpal-primary-foreground: 210 40% 98%;
+  --wpal-secondary: 210 40% 96%;
+  --wpal-secondary-foreground: 222 47% 11%;
+  --wpal-muted: 210 40% 96%;
+  --wpal-muted-foreground: 215 16% 40%;
+  --wpal-accent: 210 40% 94%;
+  --wpal-accent-foreground: 222 47% 11%;
+  --wpal-destructive: 0 72% 45%;
+  --wpal-destructive-foreground: 210 40% 98%;
+  --wpal-border: 214 32% 88%;
+  --wpal-input: 214 32% 85%;
+  --wpal-ring: 221 83% 45%;
+  --wpal-radius: 0.5rem;
+
+  display: block;
+  margin-top: 12px;
+  color: hsl(var(--wpal-foreground));
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#wpal-root *,
+#wpal-root *::before,
+#wpal-root *::after {
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: hsl(var(--wpal-border));
+}
+
+#wpal-root h1,
+#wpal-root h2,
+#wpal-root h3,
+#wpal-root h4,
+#wpal-root p {
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+}
+
+#wpal-root ul,
+#wpal-root ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#wpal-root button,
+#wpal-root input,
+#wpal-root select,
+#wpal-root textarea {
+  font-family: inherit;
+  font-size: 100%;
+  line-height: inherit;
+  color: inherit;
+  margin: 0;
+}
+
+#wpal-root button {
+  background: transparent;
+  cursor: pointer;
+}
+
+#wpal-root input[type='text'],
+#wpal-root input[type='search'],
+#wpal-root input[type='number'],
+#wpal-root input[type='date'],
+#wpal-root input[type='email'],
+#wpal-root input[type='url'],
+#wpal-root input[type='password'],
+#wpal-root textarea {
+  box-shadow: none;
+  min-height: 0;
+}
+
+#wpal-root a {
+  color: hsl(var(--wpal-primary));
+  text-decoration: none;
+}
+
+#wpal-root table {
+  border-collapse: collapse;
+}
+
+#wpal-root svg {
+  display: inline-block;
+  vertical-align: middle;
+}

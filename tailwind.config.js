@@ -10,6 +10,7 @@ export default {
   important: '#wpal-root',
   corePlugins: {
     preflight: false,
+    container: false, // Its unscoped .container rule would restyle wp-admin elements.
   },
   theme: {
     extend: {
