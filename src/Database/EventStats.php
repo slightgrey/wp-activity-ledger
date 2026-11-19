@@ -42,7 +42,7 @@ final class EventStats {
 	 * @param string $to             End, UTC "Y-m-d H:i:s" (inclusive).
 	 * @param int    $offset_seconds Site timezone offset from UTC, used to group days locally.
 	 * @param string $bucket         "day" or "hour" for the activity series.
-	 * @param bool   $hide_system    Leave out routine System events (see QueryBuilder::system_condition()).
+	 * @param bool   $hide_system    Leave out System events (see QueryBuilder::system_condition()).
 	 *
 	 * @return array<string, mixed> Aggregates.
 	 */
@@ -61,7 +61,7 @@ final class EventStats {
 	 *
 	 * @param string $from        Start (UTC).
 	 * @param string $to          End (UTC).
-	 * @param bool   $hide_system Leave out routine System events.
+	 * @param bool   $hide_system Leave out System events.
 	 *
 	 * @return array{events: int, failed_logins: int, critical: int, users: int} Counts.
 	 */
@@ -96,7 +96,7 @@ final class EventStats {
 	 * @param string $to             End (UTC).
 	 * @param int    $offset_seconds Site timezone offset.
 	 * @param string $bucket         "day" ("Y-m-d") or "hour" ("Y-m-d H:00").
-	 * @param bool   $hide_system    Leave out routine System events.
+	 * @param bool   $hide_system    Leave out System events.
 	 *
 	 * @return array<int, array{day: string, category: string, count: int}> Rows, oldest day first.
 	 */
@@ -133,7 +133,7 @@ final class EventStats {
 	 * @param string $columns "event_type" or "user_id, user_login" (fixed, never user input).
 	 * @param string $from    Start (UTC).
 	 * @param string $to          End (UTC).
-	 * @param bool   $hide_system Leave out routine System events.
+	 * @param bool   $hide_system Leave out System events.
 	 *
 	 * @return array<int, array<string, int|string>> Rows with a "count".
 	 */
@@ -175,7 +175,7 @@ final class EventStats {
 	/**
 	 * Returns the extra WHERE condition for hidden System events (fixed SQL, no user input).
 	 *
-	 * @param bool $hide_system Leave out routine System events.
+	 * @param bool $hide_system Leave out System events.
 	 *
 	 * @return string SQL starting with " AND ", or ''.
 	 */

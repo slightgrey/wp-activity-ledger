@@ -121,7 +121,7 @@ export default function Dashboard() {
           <Clock className="h-4 w-4" aria-hidden="true" />
           {sprintf( __( 'Activity in the last %s', 'wp-activity-ledger' ), RANGES.find((r) => r.key === range).label )}
           {hideSystem && (
-            <span title={__( 'Routine events with no logged-in user are left out. Warnings and critical events are always counted. Change this with "Show system events" in the Activity Log.', 'wp-activity-ledger' )}>
+            <span title={__( 'Events with no logged-in user, including failed logins, are left out. Change this with "Show system events" in the Activity Log.', 'wp-activity-ledger' )}>
               {' · '}
               {__( 'system events hidden', 'wp-activity-ledger' )}
             </span>

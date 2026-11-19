@@ -25,12 +25,6 @@ use WPActivityLedger\Domain\Severity;
 final class QueryBuilder {
 
 	/**
-	 * System events (no logged-in user) at or above this severity stay visible when
-	 * "hide_system" is on, so failed logins and critical events are never hidden.
-	 */
-	public const SYSTEM_KEEP_SEVERITY = Severity::Warning;
-
-	/**
 	 * Columns the result may be sorted by.
 	 */
 	public const ORDERBY = array( 'created_at', 'id', 'user_login', 'event_type', 'severity', 'category', 'ip', 'object_label' );
@@ -82,12 +76,12 @@ final class QueryBuilder {
 	}
 
 	/**
-	 * Returns the condition that drops routine System events (user 0 below warning).
+	 * Returns the condition that drops every System event (user 0), failed logins included.
 	 *
 	 * @return string SQL without placeholders.
 	 */
 	public static function system_condition(): string {
-		return sprintf( '(user_id <> 0 OR severity >= %d)', self::SYSTEM_KEEP_SEVERITY->value );
+		return 'user_id <> 0';
 	}
 
 	/**
@@ -198,7 +192,7 @@ final class QueryBuilder {
 	}
 
 	/**
-	 * Hides routine System events, unless the user filter asks for System (user 0).
+	 * Hides System events, unless the user filter asks for System (user 0).
 	 *
 	 * @return void
 	 */

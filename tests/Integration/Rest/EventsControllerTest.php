@@ -139,7 +139,7 @@ final class EventsControllerTest extends RestTestCase {
 	}
 
 	/**
-	 * hide_system leaves out routine System events (list and export) but keeps System warnings,
+	 * hide_system leaves out every System event (list and export), failed logins included,
 	 * and an explicit System user filter still shows them all.
 	 *
 	 * @return void
@@ -161,7 +161,7 @@ final class EventsControllerTest extends RestTestCase {
 		$types = static fn( array $params ): array => array_column( self::request( 'GET', '/events', array( 'object_id' => $marker ) + $params )->get_data(), 'event_type' );
 
 		$this->assertCount( 4, $types( array() ) );
-		$this->assertEqualsCanonicalizing( array( 'auth.login_failed', 'post.updated' ), $types( array( 'hide_system' => true ) ) );
+		$this->assertSame( array( 'post.updated' ), $types( array( 'hide_system' => true ) ) );
 		$this->assertCount( 4, $types( array( 'hide_system' => false ) ) );
 		$this->assertCount( 3, $types( array( 'hide_system' => true, 'user' => array( 0 ) ) ) );
 		$this->assertSame( array( 'hide_system' => true ), ExportHandler::filters( array( 'hide_system' => '1' ) ) );

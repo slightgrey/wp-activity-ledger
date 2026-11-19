@@ -112,12 +112,12 @@ final class QueryBuilderTest extends TestCase {
 	}
 
 	/**
-	 * hide_system drops System events below warning, unless the user filter asks for System.
+	 * hide_system drops every System event, unless the user filter asks for System.
 	 *
 	 * @return void
 	 */
 	public function test_hide_system(): void {
-		$condition = '(user_id <> 0 OR severity >= 2)';
+		$condition = 'user_id <> 0';
 
 		$this->assertSame( $condition, QueryBuilder::system_condition() );
 

@@ -11,7 +11,7 @@ namespace WPActivityLedger\Rest;
 
 /**
  * Validates and stores the admin app preferences of a user (user meta "wpal_ui_prefs"):
- * visible log columns, rows per page, saved filters and whether routine System events
+ * visible log columns, rows per page, saved filters and whether System events
  * are shown (off by default). Unknown keys are dropped.
  */
 final class UiPrefs {

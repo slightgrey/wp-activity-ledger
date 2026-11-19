@@ -124,19 +124,19 @@ final class StatsController extends BaseController {
 	 * Returns the cache key of a range.
 	 *
 	 * @param string $range_key   Preset key, or "from|to" days.
-	 * @param bool   $hide_system Whether routine System events are left out.
+	 * @param bool   $hide_system Whether System events are left out.
 	 *
 	 * @return string Transient key.
 	 */
 	public static function cache_key( string $range_key, bool $hide_system = false ): string {
-		return self::CACHE_PREFIX . md5( $range_key . '|' . wp_timezone_string() . '|' . get_current_blog_id() . ( $hide_system ? '|nosys' : '' ) );
+		return self::CACHE_PREFIX . md5( $range_key . '|' . wp_timezone_string() . '|' . get_current_blog_id() . ( $hide_system ? '|nosys2' : '' ) );
 	}
 
 	/**
 	 * Runs the aggregate queries.
 	 *
 	 * @param array{key: string, from: string, to: string, bucket: string} $range       Range (UTC).
-	 * @param bool                                                         $hide_system Leave out routine System events.
+	 * @param bool                                                         $hide_system Leave out System events.
 	 *
 	 * @return array<string, mixed> Aggregates with the range.
 	 */

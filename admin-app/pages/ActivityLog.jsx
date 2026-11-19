@@ -210,7 +210,7 @@ export default function ActivityLog({ fixed = null }) {
   const prefs = meta.data?.prefs;
   const columns = prefs?.columns?.length ? prefs.columns : ['time', 'user', 'event', 'object', 'ip'];
   const perPage = filters.per_page || prefs?.per_page || 25;
-  // Routine System events (no logged-in user, below warning) are hidden unless the user opts in.
+  // System events (no logged-in user, failed logins included) are hidden unless the user opts in.
   const showSystem = Boolean(prefs?.show_system);
 
   // Relative ranges ("last 24 hours") are anchored when the filters change, not on every render.
@@ -254,7 +254,7 @@ export default function ActivityLog({ fixed = null }) {
             </Label>
           </div>
           {!fixed?.user && (
-            <div className="flex items-center gap-2" title={__( 'System events have no logged-in user: cron, WP-CLI, remote managers and site connectors. Warnings and critical events are always shown.', 'wp-activity-ledger' )}>
+            <div className="flex items-center gap-2" title={__( 'System events have no logged-in user: cron, WP-CLI, remote managers, site connectors and failed logins by visitors.', 'wp-activity-ledger' )}>
               <Switch id="wpal-show-system" checked={showSystem} onCheckedChange={(checked) => savePrefs.mutate({ show_system: checked })} />
               <Label htmlFor="wpal-show-system" className="text-sm font-normal">
                 {__( 'Show system events', 'wp-activity-ledger' )}

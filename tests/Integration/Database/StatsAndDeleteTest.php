@@ -120,11 +120,11 @@ final class StatsAndDeleteTest extends IntegrationTestCase {
 	}
 
 	/**
-	 * Hiding System events drops routine user-0 events but keeps System warnings (failed logins).
+	 * Hiding System events drops every user-0 event, failed logins included.
 	 *
 	 * @return void
 	 */
-	public function test_summary_hides_routine_system_events(): void {
+	public function test_summary_hides_system_events(): void {
 		$this->repo->insert_many(
 			array(
 				self::event( 'media.uploaded', 'media', 0, 0, '2030-03-02 08:00:00' ),
@@ -138,15 +138,14 @@ final class StatsAndDeleteTest extends IntegrationTestCase {
 		$hidden = $stats->summary( '2030-03-01 00:00:00', '2030-03-02 23:59:59', 0, 'day', true );
 
 		$this->assertSame( 13, $all['totals']['events'] );
-		$this->assertSame( 10, $hidden['totals']['events'] );
-		$this->assertSame( 2, $hidden['totals']['failed_logins'] );
+		$this->assertSame( 8, $hidden['totals']['events'] );
+		$this->assertSame( 0, $hidden['totals']['failed_logins'] );
 		$this->assertSame( 1, $hidden['totals']['critical'] );
 
-		// System (user 0) still ranks with its two failed logins, not with all five events.
-		$system = array_values( array_filter( $hidden['top_users'], static fn( array $row ): bool => 0 === $row['user_id'] ) );
-		$this->assertSame( 2, $system[0]['count'] );
+		// System (user 0) no longer ranks at all.
+		$this->assertNotContains( 0, array_column( $hidden['top_users'], 'user_id' ) );
 		$this->assertNotContains( 'media.uploaded', array_column( $hidden['top_types'], 'event_type' ) );
-		$this->assertSame( 10, array_sum( array_column( $hidden['by_day'], 'count' ) ) );
+		$this->assertSame( 8, array_sum( array_column( $hidden['by_day'], 'count' ) ) );
 		$this->assertSame( 13, array_sum( array_column( $stats->by_day( '2030-03-01 00:00:00', '2030-03-02 23:59:59', 0 ), 'count' ) ) );
 	}
 
