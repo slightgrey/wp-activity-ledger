@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/toast';
 import FieldError from '@/components/FieldError';
 import MultiSelect from '@/components/MultiSelect';
-import UserPicker from '@/components/UserPicker';
+import ExcludedUsers from '@/components/settings/ExcludedUsers';
 import EventsTab from '@/components/settings/EventsTab';
 import PurgePanel from '@/components/settings/PurgePanel';
 import { NumberRow, Row, ToggleRow } from '@/components/settings/fields';
@@ -38,7 +38,7 @@ function GeneralTab({ draft, set, errors, meta }) {
         {!everyRole && <MultiSelect label={__( 'Choose roles', 'wp-activity-ledger' )} options={roles} value={draft.logged_roles ?? []} onChange={(logged_roles) => set({ logged_roles })} />}
       </Row>
       <Row label={__( 'Never record these users', 'wp-activity-ledger' )} help={__( 'For service accounts or your own test users.', 'wp-activity-ledger' )} error={<FieldError errors={errors} field="excluded_users" />}>
-        <UserPicker showSelected value={(draft.excluded_users ?? []).map(String)} onChange={(ids) => set({ excluded_users: ids.map(Number) })} />
+        <ExcludedUsers value={draft.excluded_users ?? []} onChange={(excluded_users) => set({ excluded_users })} />
       </Row>
       <ToggleRow name="log_anonymous" label={__( 'Record anonymous actions', 'wp-activity-ledger' )} help={__( 'Failed logins and password reset requests by visitors.', 'wp-activity-ledger' )} draft={draft} set={set} />
       <Row label={__( 'Who can view the log', 'wp-activity-ledger' )} help={__( 'Administrators always can. Viewers also see the dashboard and users.', 'wp-activity-ledger' )} error={<FieldError errors={errors} field="view_roles" />}>
