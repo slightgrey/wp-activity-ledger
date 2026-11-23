@@ -96,7 +96,7 @@ final class Installer {
 		}
 
 		printf(
-			'<div class="notice notice-error"><p><strong>%1$s</strong> %2$s <code>%3$s</code></p></div>',
+			'<div class="notice notice-error wpal-notice"><p><strong>%1$s</strong> %2$s <code>%3$s</code></p></div>',
 			esc_html__( 'WP Activity Ledger:', 'wp-activity-ledger' ),
 			esc_html__( 'The activity log tables could not be created, so nothing is being recorded. Database error:', 'wp-activity-ledger' ),
 			esc_html( $error )

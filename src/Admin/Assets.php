@@ -119,7 +119,7 @@ final class Assets {
 			return;
 		}
 
-		echo '<div class="notice notice-warning"><p>' . esc_html__( 'WP Activity Ledger: the admin app build is missing (dist/admin).', 'wp-activity-ledger' ) . '</p></div>';
+		echo '<div class="notice notice-warning wpal-notice"><p>' . esc_html__( 'WP Activity Ledger: the admin app build is missing (dist/admin).', 'wp-activity-ledger' ) . '</p></div>';
 	}
 
 	/**

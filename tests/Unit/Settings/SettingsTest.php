@@ -57,6 +57,7 @@ final class SettingsTest extends TestCase {
 				'retention_days'       => '99999',
 				'max_value_size'       => 10,
 				'anonymize_ip'         => 'yes',
+				'hide_admin_notices'   => 'off',
 				'log_anonymous'        => '0',
 				'excluded_users'       => array( '3', 'x', -1, 3, 9 ),
 				'logged_roles'         => "administrator\neditor\n<bad>\n*",
@@ -73,6 +74,7 @@ final class SettingsTest extends TestCase {
 		$this->assertSame( 3650, $settings['retention_days'] );
 		$this->assertSame( 1024, $settings['max_value_size'] );
 		$this->assertTrue( $settings['anonymize_ip'] );
+		$this->assertFalse( $settings['hide_admin_notices'] );
 		$this->assertFalse( $settings['log_anonymous'] );
 		$this->assertSame( array( 3, 9 ), $settings['excluded_users'] );
 		$this->assertSame( array( 'administrator', 'editor', '*' ), $settings['logged_roles'] );

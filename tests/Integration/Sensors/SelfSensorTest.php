@@ -43,9 +43,12 @@ final class SelfSensorTest extends IntegrationTestCase {
 	public function test_settings_change(): void {
 		$admin    = $this->as_user( 'administrator' );
 		$start    = self::max_event_id();
-		$settings = array_merge( Settings::defaults(), (array) get_option( Settings::OPTION, array() ) );
-		$new      = array_merge(
-			$settings,
+		$stored   = (array) get_option( Settings::OPTION, array() );
+		$settings = array_merge( Settings::defaults(), $stored );
+		// Built on the stored option (not the defaults), so settings added in later versions
+		// and missing from it do not show up as changes.
+		$new = array_merge(
+			$stored,
 			array(
 				'retention_days' => 30 === $settings['retention_days'] ? 31 : 30,
 				'excluded_users' => array( $admin->ID ),

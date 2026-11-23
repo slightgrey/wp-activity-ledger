@@ -34,7 +34,7 @@ final class SettingsValidator {
 	/**
 	 * Boolean fields.
 	 */
-	public const BOOLEANS = array( 'log_anonymous', 'anonymize_ip', 'store_user_agent', 'delete_data_on_uninstall', 'dashboard_widget' );
+	public const BOOLEANS = array( 'log_anonymous', 'anonymize_ip', 'store_user_agent', 'delete_data_on_uninstall', 'dashboard_widget', 'hide_admin_notices' );
 
 	/**
 	 * Role list fields ("*" allowed in logged_roles only).

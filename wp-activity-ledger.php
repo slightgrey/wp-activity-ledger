@@ -47,7 +47,7 @@ if ( ! function_exists( 'wpal_missing_vendor_notice' ) ) {
 		}
 
 		printf(
-			'<div class="notice notice-error"><p><strong>%1$s</strong> %2$s</p></div>',
+			'<div class="notice notice-error wpal-notice"><p><strong>%1$s</strong> %2$s</p></div>',
 			esc_html__( 'WP Activity Ledger:', 'wp-activity-ledger' ),
 			wp_kses(
 				__( 'Run <code>composer install</code> in the plugin directory, or install the release zip, before use.', 'wp-activity-ledger' ),

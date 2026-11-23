@@ -31,6 +31,7 @@ use WPActivityLedger\Admin\Assets;
 use WPActivityLedger\Admin\DashboardWidget;
 use WPActivityLedger\Admin\ExportHandler;
 use WPActivityLedger\Admin\Menu;
+use WPActivityLedger\Admin\NoticeSuppressor;
 use WPActivityLedger\Admin\PluginLinks;
 use WPActivityLedger\Cli\Command;
 use WPActivityLedger\Update\Updater;
@@ -545,6 +546,7 @@ final class Plugin {
 		$menu->register( $this->loader );
 		( new Assets( $menu ) )->register( $this->loader );
 		( new DashboardWidget( $this->repository(), $this->settings() ) )->register( $this->loader );
+		( new NoticeSuppressor( $menu, $this->settings() ) )->register( $this->loader );
 		( new ExportHandler( $this->repository(), $this->recorder() ) )->register( $this->loader );
 		( new PluginLinks() )->register( $this->loader );
 	}

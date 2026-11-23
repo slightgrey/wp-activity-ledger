@@ -58,6 +58,7 @@ final class Settings {
 			'redact_patterns'             => array( '*pass*', '*secret*', '*token*', '*api_key*', '*apikey*', '*license*', '*private_key*', '*auth_key*', '*salt*' ),
 			'delete_data_on_uninstall'    => false,
 			'dashboard_widget'            => true,
+			'hide_admin_notices'          => true,
 			'failed_login_dedupe_minutes' => 5,
 			'view_roles'                  => array(),
 			'export_roles'                => array(),

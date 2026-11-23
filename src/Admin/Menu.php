@@ -25,6 +25,11 @@ final class Menu {
 	public const SLUG = 'wp-activity-ledger';
 
 	/**
+	 * Menu position: right below Dashboard (2), above the first separator (4).
+	 */
+	private const POSITION = 3;
+
+	/**
 	 * Hook suffix of the page, set once the menu is added.
 	 *
 	 * @var string
@@ -76,7 +81,7 @@ final class Menu {
 			self::SLUG,
 			array( $this, 'render' ),
 			'dashicons-list-view',
-			81
+			self::POSITION
 		);
 
 		foreach ( self::screens() as $route => [ $title, $capability ] ) {
@@ -103,7 +108,7 @@ final class Menu {
 			self::SLUG,
 			array( $this, 'render' ),
 			'dashicons-list-view',
-			81
+			self::POSITION
 		);
 
 		foreach ( self::network_screens() as $route => $title ) {

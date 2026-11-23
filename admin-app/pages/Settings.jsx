@@ -57,6 +57,7 @@ function GeneralTab({ draft, set, errors, meta }) {
         errors={errors}
       />
       <ToggleRow name="dashboard_widget" label={__( 'Dashboard widget', 'wp-activity-ledger' )} help={__( 'Show recent activity on Dashboard → Home.', 'wp-activity-ledger' )} draft={draft} set={set} />
+      <ToggleRow name="hide_admin_notices" label={__( 'Hide other notices', 'wp-activity-ledger' )} help={__( 'Hide notices from WordPress and other plugins on Activity Ledger screens.', 'wp-activity-ledger' )} draft={draft} set={set} />
     </div>
   );
 }

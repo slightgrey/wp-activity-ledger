@@ -121,3 +121,19 @@
   display: inline-block;
   vertical-align: middle;
 }
+
+/*
+ * Settings → General → "Hide other notices": hides notices other plugins print outside
+ * the notice hooks (NoticeSuppressor empties the hooks). WordPress moves notices to just
+ * after the first h1 in .wrap, which is inside .wpal-wrap. The plugin's own notices have .wpal-notice.
+ */
+body.wpal-hide-notices #wpbody-content > .notice:not(.wpal-notice),
+body.wpal-hide-notices #wpbody-content > .updated:not(.wpal-notice),
+body.wpal-hide-notices #wpbody-content > .error:not(.wpal-notice),
+body.wpal-hide-notices #wpbody-content > .update-nag,
+body.wpal-hide-notices .wpal-wrap > .notice:not(.wpal-notice),
+body.wpal-hide-notices .wpal-wrap > .updated:not(.wpal-notice),
+body.wpal-hide-notices .wpal-wrap > .error:not(.wpal-notice),
+body.wpal-hide-notices .wpal-wrap > .update-nag {
+  display: none !important;
+}
