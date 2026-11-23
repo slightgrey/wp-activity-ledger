@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       WP Activity Ledger
  * Description:       Records every meaningful action on your site (who, what, when, from where) with field-level before/after diffs, alerts, export and a modern admin.
- * Version:           0.4.4
+ * Version:           0.4.5
  * Requires at least: 6.5
  * Requires PHP:      8.1
  * Author:            Web of D
@@ -28,7 +28,7 @@ if ( defined( 'WPAL_VERSION' ) ) {
 	return;
 }
 
-define( 'WPAL_VERSION', '0.4.4' );
+define( 'WPAL_VERSION', '0.4.5' );
 define( 'WPAL_FILE', __FILE__ );
 define( 'WPAL_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WPAL_URL', plugin_dir_url( __FILE__ ) );
